@@ -1,0 +1,16 @@
+﻿<Window x:Class="TransitCity.Utility.BusyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:utility="clr-namespace:TransitCity.Utility"
+        mc:Ignorable="d"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        Background="#55000000"
+        Height="300" Width="300"
+        WindowStartupLocation="CenterOwner">
+    <utility:BusyViewbox VerticalAlignment="Center"
+                         HorizontalAlignment="Center"
+                         Width="120" Height="120"/>
+</Window>

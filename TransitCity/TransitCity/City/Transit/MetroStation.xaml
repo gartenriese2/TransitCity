@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="TransitCity.City.Transit.MetroStation"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:transit="clr-namespace:TransitCity.City.Transit"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=transit:MetroStationViewModel, IsDesignTimeCreatable=True}"
+             SizeChanged="FrameworkElement_OnSizeChanged">
+    <UserControl.ToolTip>
+        <TextBlock>
+            <Run Text="People entering:"/>
+            <Run Text="{Binding Model.PeopleEntering}"/>
+            <LineBreak/>
+            <Run Text="People exiting:"/>
+            <Run Text="{Binding Model.PeopleExiting}"/>
+            <LineBreak/>
+            <Run Text="People transfering:"/>
+            <Run Text="{Binding Model.PeopleTransfering}"/>
+        </TextBlock>
+    </UserControl.ToolTip>
+    <Grid>
+        <Ellipse Opacity="0.4" Fill="LimeGreen"
+                 Width="{Binding ReachSize}" Height="{Binding ReachSize}"
+                 Visibility="{Binding ReachVisibility}"/>
+        <Ellipse Width="10" Height="10"
+                 Fill="White"
+                 Stroke="Black" StrokeThickness="1"
+                 MouseLeftButtonDown="UIElement_OnMouseLeftButtonDown"/>
+    </Grid>
+</UserControl>
+

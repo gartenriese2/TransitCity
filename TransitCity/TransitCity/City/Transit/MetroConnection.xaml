@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="TransitCity.City.Transit.MetroConnection"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:transit="clr-namespace:TransitCity.City.Transit"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=transit:MetroConnectionViewModel, IsDesignTimeCreatable=True}">
+    <Line X1="{Binding From.X}" Y1="{Binding From.Y}"
+          X2="{Binding To.X}" Y2="{Binding To.Y}"
+          StrokeThickness="{Binding Width}"
+          Stroke="{Binding Brush}"/>
+</UserControl>
