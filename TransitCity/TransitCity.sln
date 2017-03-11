@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26206.0
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransitCity", "TransitCity\TransitCity.csproj", "{0CD661EF-7D39-4874-9DB0-4DBC0EAECD40}"
 EndProject
@@ -28,6 +28,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseUnitTest", "DatabaseUnitTest\DatabaseUnitTest.csproj", "{81269EE2-E89A-4ADF-8961-558869B0A59F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{5BC68F4D-A91F-4250-853F-416519473A5D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utility", "Utility\Utility.csproj", "{D1E7778B-2C3C-4058-9CCF-757E12D3BEB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvgDrawing", "SvgDrawing\SvgDrawing.csproj", "{AC4D9311-EBDF-4D30-BA19-5B45C8006ADD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvgDrawingUnitTest", "SvgDrawingUnitTest\SvgDrawingUnitTest.csproj", "{39F642F4-64A7-4E42-9CD7-DEA9337E055E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +93,18 @@ Global
 		{5BC68F4D-A91F-4250-853F-416519473A5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BC68F4D-A91F-4250-853F-416519473A5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BC68F4D-A91F-4250-853F-416519473A5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1E7778B-2C3C-4058-9CCF-757E12D3BEB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1E7778B-2C3C-4058-9CCF-757E12D3BEB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1E7778B-2C3C-4058-9CCF-757E12D3BEB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1E7778B-2C3C-4058-9CCF-757E12D3BEB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC4D9311-EBDF-4D30-BA19-5B45C8006ADD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC4D9311-EBDF-4D30-BA19-5B45C8006ADD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC4D9311-EBDF-4D30-BA19-5B45C8006ADD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC4D9311-EBDF-4D30-BA19-5B45C8006ADD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39F642F4-64A7-4E42-9CD7-DEA9337E055E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39F642F4-64A7-4E42-9CD7-DEA9337E055E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39F642F4-64A7-4E42-9CD7-DEA9337E055E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39F642F4-64A7-4E42-9CD7-DEA9337E055E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -43,7 +43,7 @@ namespace Time
         {
         }
 
-        public TimeSpan TimePoint { get; }
+        public TimeSpan TimePoint { get; set; }
 
         public static bool operator ==(WeekTimePoint a, WeekTimePoint b) => a?.TimePoint == b?.TimePoint;
 

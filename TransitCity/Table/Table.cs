@@ -2,18 +2,18 @@
 
 namespace Table
 {
-    public class Table<TEntry>
+    public class Table<TCollectionType, T> where TCollectionType : ICollection<T>, new()
     {
-        private readonly List<TEntry> _table = new List<TEntry>();
+        private readonly TCollectionType _table = new TCollectionType();
 
-        public IEnumerable<TEntry> All => _table;
+        public IEnumerable<T> All => _table;
 
-        public void AddEntry(TEntry entry)
+        public void AddEntry(T entry)
         {
             _table.Add(entry);
         }
 
-        public IEnumerable<TEntry> Query(IQuery<TEntry> query)
+        public IEnumerable<T> Query(IQuery<T> query)
         {
             return query.Execute(_table);
         }

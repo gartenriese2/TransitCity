@@ -3,9 +3,9 @@ using Time;
 
 namespace Transit.Timetable
 {
-    public class Entry<P> where P : IPosition
+    public class Entry<TPos> where TPos : IPosition
     {
-        internal Entry(WeekTimePoint weekTimePoint, WeekTimePoint weekTimePointNextStation, Line<P> line, Route<P> route, TransferStation<P> transferStation, Station<P> station)
+        internal Entry(WeekTimePoint weekTimePoint, WeekTimePoint weekTimePointNextStation, Line<TPos> line, Route<TPos> route, TransferStation<TPos> transferStation, Station<TPos> station)
         {
             WeekTimePoint = weekTimePoint;
             WeekTimePointNextStation = weekTimePointNextStation;
@@ -15,16 +15,16 @@ namespace Transit.Timetable
             Station = station;
         }
 
-        internal WeekTimePoint WeekTimePoint { get; }
+        public WeekTimePoint WeekTimePoint { get; }
 
         internal WeekTimePoint WeekTimePointNextStation { get; }
 
-        internal Line<P> Line { get; }
+        internal Line<TPos> Line { get; }
 
-        internal Route<P> Route { get; }
+        internal Route<TPos> Route { get; }
 
-        internal TransferStation<P> TransferStation { get; }
+        internal TransferStation<TPos> TransferStation { get; }
 
-        internal Station<P> Station { get; }
+        internal Station<TPos> Station { get; }
     }
 }

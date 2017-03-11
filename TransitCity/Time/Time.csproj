@@ -41,10 +41,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AtomicWeekTimePoint.cs" />
     <Compile Include="WeekTimeCollection.cs" />
     <Compile Include="WeekTimeEnumerator.cs" />
     <Compile Include="WeekTimePoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Utility\Utility.csproj">
+      <Project>{D1E7778B-2C3C-4058-9CCF-757E12D3BEB1}</Project>
+      <Name>Utility</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

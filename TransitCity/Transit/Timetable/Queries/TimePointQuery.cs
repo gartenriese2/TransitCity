@@ -5,9 +5,9 @@ using Geometry;
 using Table;
 using Time;
 
-namespace Transit.Timetable
+namespace Transit.Timetable.Queries
 {
-    public class TimePointQuery<P> : IQuery<Entry<P>> where P : IPosition
+    public class TimePointQuery<TPos> : IQuery<Entry<TPos>> where TPos : IPosition
     {
         private readonly WeekTimePoint _startTimePoint;
         private readonly WeekTimePoint _endTimePoint;
@@ -18,7 +18,7 @@ namespace Transit.Timetable
             _endTimePoint = endTimePoint;
         }
 
-        public IEnumerable<Entry<P>> Execute(IEnumerable<Entry<P>> table)
+        public IEnumerable<Entry<TPos>> Execute(IEnumerable<Entry<TPos>> table)
         {
             return
                 from entry in table

@@ -44,12 +44,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Timetable\Algorithm\LinkedParallelRaptor.cs" />
+    <Compile Include="Timetable\Algorithm\LinkedRaptor.cs" />
+    <Compile Include="Timetable\Algorithm\ParallelRaptorBase.cs" />
     <Compile Include="Timetable\Connection.cs" />
-    <Compile Include="Timetable\DeparturesQuery.cs" />
-    <Compile Include="Timetable\Raptor.cs" />
-    <Compile Include="Timetable\TimePointQuery.cs" />
+    <Compile Include="Timetable\Managers\DictionaryTimetableManager.cs" />
+    <Compile Include="Timetable\Managers\ITimetableManager.cs" />
+    <Compile Include="Timetable\Queries\DeparturesQuery.cs" />
+    <Compile Include="Timetable\Algorithm\IRaptor.cs" />
+    <Compile Include="Timetable\ITimetable.cs" />
+    <Compile Include="Timetable\LinkedEntry.cs" />
+    <Compile Include="Timetable\LinkedTimetable.cs" />
+    <Compile Include="Timetable\Managers\LinkedTimetableManager.cs" />
+    <Compile Include="Timetable\Algorithm\ParallelRaptor.cs" />
+    <Compile Include="Timetable\Algorithm\Raptor.cs" />
+    <Compile Include="Timetable\Queries\LinkedEntryQuery.cs" />
+    <Compile Include="Timetable\Queries\TimePointQuery.cs" />
     <Compile Include="Timetable\Timetable.cs" />
-    <Compile Include="Timetable\TimetableManager.cs" />
+    <Compile Include="Timetable\Managers\TimetableManager.cs" />
     <Compile Include="TransferStation.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="Route.cs" />
@@ -74,6 +86,10 @@
     <ProjectReference Include="..\Time\Time.csproj">
       <Project>{E9ED2B02-1DE4-49FF-963C-DE6B0DEFE3EE}</Project>
       <Name>Time</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utility\Utility.csproj">
+      <Project>{d1e7778b-2c3c-4058-9ccf-757e12d3beb1}</Project>
+      <Name>Utility</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -5,7 +5,8 @@ using Geometry;
 using PathFinding.Network;
 using Time;
 using Transit;
-using Transit.Timetable;
+using Transit.Timetable.Algorithm;
+using Transit.Timetable.Managers;
 
 namespace ConsoleApp1
 {
@@ -32,8 +33,8 @@ namespace ConsoleApp1
 
             var raptor = new Raptor<Position2f>(manager);
 
-            raptor.Compute(transferStationDictionary.Values.ElementAt(0), new WeekTimePoint(DayOfWeek.Monday, 5), transferStationDictionary.Values.ElementAt(4), new List<TransferStation<Position2f>>(transferStationDictionary.Values));
-            raptor.Compute(transferStationDictionary["Stanmore"], new WeekTimePoint(DayOfWeek.Tuesday, 11, 30), transferStationDictionary["Stockwell"], new List<TransferStation<Position2f>>(transferStationDictionary.Values));
+            raptor.Compute(transferStationDictionary.Values.ElementAt(0).Stations.ElementAt(0).Position, new WeekTimePoint(DayOfWeek.Monday, 5), transferStationDictionary.Values.ElementAt(4).Stations.ElementAt(0).Position, new List<TransferStation<Position2f>>(transferStationDictionary.Values));
+            raptor.Compute(transferStationDictionary["Stanmore"].Stations.ElementAt(0).Position, new WeekTimePoint(DayOfWeek.Tuesday, 11, 30), transferStationDictionary["Stockwell"].Stations.ElementAt(0).Position, new List<TransferStation<Position2f>>(transferStationDictionary.Values));
         }
 
         private static Station<Position2f> CreateStation(Position2f pos, string name, Dictionary<string, TransferStation<Position2f>> tsd)

@@ -5,16 +5,21 @@ using Time;
 
 namespace Transit.Timetable
 {
-    public class Timetable<P> where P : IPosition
+    public class Timetable<TPos> : ITimetable<Entry<TPos>> where TPos : IPosition
     {
-        private readonly Table<Entry<P>> _table = new Table<Entry<P>>();
+        private readonly Table<List<Entry<TPos>>, Entry<TPos>> _table = new Table<List<Entry<TPos>>, Entry<TPos>>();
 
-        public void AddEntry(WeekTimePoint weekTimePoint, WeekTimePoint weekTimePointNextStation, Line<P> line, Route<P> route, TransferStation<P> transferStation, Station<P> station)
+        public void AddEntry(Entry<TPos> entry)
         {
-            _table.AddEntry(new Entry<P>(weekTimePoint, weekTimePointNextStation, line, route, transferStation, station));
+            _table.AddEntry(entry);
         }
 
-        public IEnumerable<Entry<P>> Query(IQuery<Entry<P>> query)
+        public void AddEntry(WeekTimePoint weekTimePoint, WeekTimePoint weekTimePointNextStation, Line<TPos> line, Route<TPos> route, TransferStation<TPos> transferStation, Station<TPos> station)
+        {
+            _table.AddEntry(new Entry<TPos>(weekTimePoint, weekTimePointNextStation, line, route, transferStation, station));
+        }
+
+        public IEnumerable<Entry<TPos>> Query(IQuery<Entry<TPos>> query)
         {
             return _table.Query(query);
         }

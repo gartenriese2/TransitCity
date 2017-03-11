@@ -4,10 +4,11 @@ using System.Linq;
 using Geometry;
 using PathFinding.Network;
 using Time;
+using Transit.Timetable.Queries;
 
-namespace Transit.Timetable
+namespace Transit.Timetable.Managers
 {
-    public class TimetableManager<TPos> where TPos : IPosition
+    public class TimetableManager<TPos> : ITimetableManager<TPos, Entry<TPos>> where TPos : IPosition
     {
         private readonly Timetable<TPos> _timetable = new Timetable<TPos>();
 
@@ -38,12 +39,28 @@ namespace Transit.Timetable
 
         public IEnumerable<Entry<TPos>> GetDepartures(Station<TPos> station, WeekTimePoint from, WeekTimePoint to)
         {
-            return _timetable.Query(new DeparturesQuery<TPos>(station, from, to));
+            return _timetable.Query(new DeparturesQueryEntry<TPos>(station, from, to));
         }
 
         public IEnumerable<Entry<TPos>> GetDepartures(TransferStation<TPos> station, WeekTimePoint from, WeekTimePoint to)
         {
-            return _timetable.Query(new DeparturesQuery<TPos>(station, from, to));
+            return _timetable.Query(new DeparturesQueryEntry<TPos>(station, from, to));
+        }
+
+        public IEnumerable<Entry<TPos>> GetNextEntries(Entry<TPos> entry)
+        {
+            var nextEntries = new List<Entry<TPos>>();
+            var nextTime = entry.WeekTimePointNextStation;
+            var nextStation = entry.Route.GetNextStation(entry.Station);
+            while (nextTime != null)
+            {
+                var nextEntry = GetEntriesInRange(nextTime, nextTime).Where(e => e.Station == nextStation && e.Route == entry.Route).ElementAt(0);
+                nextEntries.Add(nextEntry);
+                nextTime = nextEntry.WeekTimePointNextStation;
+                nextStation = nextEntry.Route.GetNextStation(nextEntry.Station);
+            }
+            
+            return nextEntries;
         }
 
         private TransferStation<TPos> GetTransferStation(Station<TPos> station, IEnumerable<TransferStation<TPos>> transferStations)
