@@ -14,18 +14,18 @@ namespace Transit.Timetable.Algorithm
     {
         private readonly ITimetableManager<TPos, LinkedEntry<TPos>> _timetableManager;
 
-        public LinkedParallelRaptor(ITimetableManager<TPos, LinkedEntry<TPos>> manager, float walkingSpeed)
-            : base(walkingSpeed)
+        public LinkedParallelRaptor(ITimetableManager<TPos, LinkedEntry<TPos>> manager, float walkingSpeed, TimeSpan maxWalkingTime, IReadOnlyCollection<TransferStation<TPos>> transferStations)
+            : base(walkingSpeed, maxWalkingTime, transferStations)
         {
             _timetableManager = manager ?? throw new ArgumentNullException();
         }
 
-        protected override void ComputeRoundForStation(Station<TPos> station, WeekTimePoint startTime, Atomic<AtomicWeekTimePoint> earliestKnownTargetArrivalTime, ConcurrentBag<Connection<TPos>> earliestKnownConnections, TPos targetPos, IReadOnlyCollection<TransferStation<TPos>> transferStations, ConcurrentDictionary<Station<TPos>, WeekTimePoint> newlyMarkedStations)
+        protected override void ComputeRoundForStation(Station<TPos> station, WeekTimePoint startTime, Atomic<AtomicWeekTimePoint> earliestKnownTargetArrivalTime, ConcurrentBag<Connection<TPos>> earliestKnownConnections, TPos targetPos, ConcurrentDictionary<Station<TPos>, WeekTimePoint> newlyMarkedStations)
         {
             var firstDepartures = _timetableManager.GetDepartures(station, startTime, startTime + TimeSpan.FromHours(1)).GroupBy(e => e.Route).Select(g => g.First());
             foreach (var firstDepartureEntry in firstDepartures)
             {
-                var newStations = CheckRoute(firstDepartureEntry, earliestKnownTargetArrivalTime, earliestKnownConnections, targetPos, transferStations);
+                var newStations = CheckRoute(firstDepartureEntry, earliestKnownTargetArrivalTime, earliestKnownConnections, targetPos);
                 foreach (var pair in newStations)
                 {
                     newlyMarkedStations.TryAdd(pair.Key, pair.Value);
@@ -33,7 +33,7 @@ namespace Transit.Timetable.Algorithm
             }
         }
 
-        private Dictionary<Station<TPos>, WeekTimePoint> CheckRoute(LinkedEntry<TPos> entry, Atomic<AtomicWeekTimePoint> earliestKnownTargetArrivalTime, ConcurrentBag<Connection<TPos>> earliestKnownConnections, TPos targetPos, IReadOnlyCollection<TransferStation<TPos>> transferStations)
+        private Dictionary<Station<TPos>, WeekTimePoint> CheckRoute(LinkedEntry<TPos> entry, Atomic<AtomicWeekTimePoint> earliestKnownTargetArrivalTime, ConcurrentBag<Connection<TPos>> earliestKnownConnections, TPos targetPos)
         {
             var newlyMarkedStations = new Dictionary<Station<TPos>, WeekTimePoint>();
             var nextEntries = _timetableManager.GetNextEntries(entry).ToList();
@@ -76,7 +76,7 @@ namespace Transit.Timetable.Algorithm
                     newlyMarkedStations.Add(nextStation, nextTime);
                 }
 
-                var transferStation = GetTransferStation(nextStation, transferStations);
+                var transferStation = GetTransferStation(nextStation);
                 var otherStations = transferStation.Stations.Where(s => s != nextStation);
                 foreach (var otherStation in otherStations)
                 {

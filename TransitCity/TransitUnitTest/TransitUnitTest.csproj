@@ -55,10 +55,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LineUnitTest.cs" />
+    <Compile Include="LineUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TimetableUnitTest.cs" />
+    <Compile Include="TimetableUnitTests.cs" />
     <Compile Include="TimetableManagerUnitTests.cs" />
+    <Compile Include="DataManagerUniTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

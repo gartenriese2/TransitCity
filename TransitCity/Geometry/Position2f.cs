@@ -60,6 +60,13 @@ namespace Geometry
             return DistanceTo((Position2f) other);
         }
 
+        public (Position2f, Position2f) GetOffsetPoints(Vector2f vec, float offset)
+        {
+            var vecRight = vec.RotateRight().Normalize() * offset;
+            var vecLeft = vec.RotateLeft().Normalize() * offset;
+            return (this + vecRight, this + vecLeft);
+        }
+
         private float DistanceTo(Position2f other)
         {
             return (this - other).Length();

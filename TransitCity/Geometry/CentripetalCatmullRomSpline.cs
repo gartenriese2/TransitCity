@@ -18,7 +18,7 @@ namespace Geometry
             _controlPoints = controlPoints;
         }
 
-        public List<Position2f> CalculateSegments(int subsegments)
+        public Path<Position2f> CalculateSegments(int subsegments)
         {
             if (subsegments < 1)
             {
@@ -27,7 +27,7 @@ namespace Geometry
 
             if (subsegments == 1)
             {
-                return _controlPoints;
+                return new Path<Position2f>(_controlPoints);
             }
 
             var pts = new List<Position2f>
@@ -44,7 +44,7 @@ namespace Geometry
                 }
 
                 pts.Add(_controlPoints.Last());
-                return pts;
+                return new Path<Position2f>(pts);
             }
 
             for (var i = 1; i < subsegments; ++i)
@@ -69,7 +69,7 @@ namespace Geometry
 
             pts.Add(_controlPoints.Last());
 
-            return pts;
+            return new Path<Position2f>(pts);
         }
 
         private static Position2f PointOnCurve(Position2f p0, Position2f p1, Position2f p2, Position2f p3, float t)

@@ -44,9 +44,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\DataManager.cs" />
+    <Compile Include="Data\TestTransitData.cs" />
     <Compile Include="Timetable\Algorithm\LinkedParallelRaptor.cs" />
     <Compile Include="Timetable\Algorithm\LinkedRaptor.cs" />
     <Compile Include="Timetable\Algorithm\ParallelRaptorBase.cs" />
+    <Compile Include="Timetable\Algorithm\RaptorBase.cs" />
+    <Compile Include="Timetable\Algorithm\SequentialRaptorBase.cs" />
     <Compile Include="Timetable\Connection.cs" />
     <Compile Include="Timetable\Managers\DictionaryTimetableManager.cs" />
     <Compile Include="Timetable\Managers\ITimetableManager.cs" />

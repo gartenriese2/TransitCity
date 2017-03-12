@@ -1,0 +1,90 @@
+﻿using System.Collections.Generic;
+using Geometry;
+
+namespace Transit.Data
+{
+    public class TestTransitData
+    {
+        public TestTransitData()
+        {
+            Initialize();
+        }
+
+        public DataManager DataManager { get; } = new DataManager();
+
+        private void Initialize()
+        {
+            CreateSubwayLines();
+        }
+
+        private void CreateSubwayLines()
+        {
+            DataManager.AddSubwayLine(
+                new Dictionary<Position2f, string>
+                {
+                    [new Position2f(1500, 1000)] = "Stanmore",
+                    [new Position2f(2500, 1000)] = "Canons Park",
+                    [new Position2f(3500, 1500)] = "Queensbury",
+                    [new Position2f(4000, 2500)] = "Kingsbury",
+                    [new Position2f(4500, 3500)] = "Wembley Park",
+                    [new Position2f(5500, 4000)] = "Neasden",
+                    [new Position2f(6500, 4000)] = "Clapham South",
+                    [new Position2f(7500, 4000)] = "Dollis Hill",
+                    [new Position2f(8000, 5000)] = "Willesden Green",
+                    [new Position2f(8000, 6000)] = "Kilburn",
+                    [new Position2f(7500, 7000)] = "West Hampstead",
+                    [new Position2f(7500, 8000)] = "Finchley Road",
+                    [new Position2f(8000, 9000)] = "Swiss Cottage"
+                },
+                240f,
+                "1");
+            DataManager.AddSubwayLine(
+                new Dictionary<Position2f, string>
+                {
+                    [new Position2f(1500, 8000)] = "Morden",
+                    [new Position2f(2500, 7500)] = "South Wimbledon",
+                    [new Position2f(3500, 7000)] = "Colliers Wood",
+                    [new Position2f(4500, 6500)] = "Tooting Broadway",
+                    [new Position2f(5500, 5500)] = "Tooting Bec",
+                    [new Position2f(6000, 4750)] = "Balham",
+                    [new Position2f(6500, 4000)] = "Clapham South",
+                    [new Position2f(7000, 3000)] = "Clapham Common",
+                    [new Position2f(7000, 2000)] = "Clapham North",
+                    [new Position2f(8000, 1500)] = "Stockwell",
+                    [new Position2f(9000, 1500)] = "Oval"
+                },
+                240f,
+                "2");
+            DataManager.AddSubwayLine(
+                new Dictionary<Position2f, string>
+                {
+                    [new Position2f(5500, 2000)] = "Chesham",
+                    [new Position2f(5500, 3000)] = "Amersham",
+                    [new Position2f(5500, 4000)] = "Neasden",
+                    [new Position2f(6000, 4750)] = "Balham",
+                    [new Position2f(6750, 5750)] = "Chalfont",
+                    [new Position2f(8000, 6000)] = "Latimer",
+                    [new Position2f(9000, 6250)] = "Watford",
+                    [new Position2f(9900, 6300)] = "Croxley"
+                },
+                120f,
+                "3");
+            DataManager.AddSubwayLine(
+                new Dictionary<Position2f, string>
+                {
+                    [new Position2f(500, 5500)] = "Epping",
+                    [new Position2f(1500, 5000)] = "Theydon Bois",
+                    [new Position2f(2500, 4500)] = "Debden",
+                    [new Position2f(3500, 4500)] = "Loughton",
+                    [new Position2f(4750, 5000)] = "Buckhurst Hill",
+                    [new Position2f(5900, 4900)] = "Balham",
+                    [new Position2f(7000, 4500)] = "Woodford",
+                    [new Position2f(7500, 4100)] = "Dollis Hill",
+                    [new Position2f(8500, 3500)] = "Roding Valley",
+                    [new Position2f(9600, 3600)] = "Chigwell"
+                },
+                180f,
+                "4");
+        }
+    }
+}

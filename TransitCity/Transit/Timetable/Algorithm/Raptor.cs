@@ -8,64 +8,17 @@ using Utility.Extensions;
 
 namespace Transit.Timetable.Algorithm
 {
-    public class Raptor<TPos> : IRaptor<TPos> where TPos : IPosition
+    public class Raptor<TPos> : SequentialRaptorBase<TPos> where TPos : IPosition
     {
-        private const int NumRounds = 5;
-
         private readonly ITimetableManager<TPos, Entry<TPos>> _timetableManager;
 
-        public Raptor(ITimetableManager<TPos, Entry<TPos>> manager)
+        public Raptor(ITimetableManager<TPos, Entry<TPos>> manager, float walkingSpeed, TimeSpan maxWalkingTime, IReadOnlyCollection<TransferStation<TPos>> transferStations)
+            : base(walkingSpeed, maxWalkingTime, transferStations)
         {
             _timetableManager = manager ?? throw new ArgumentNullException();
         }
 
-        public List<Connection<TPos>> Compute(TPos startPos, WeekTimePoint startTime, TPos targetPos, IReadOnlyCollection<TransferStation<TPos>> transferStations)
-        {
-            var maxWalkingTime = TimeSpan.FromMinutes(10);
-            var earliestKnownTargetArrivalTime = startTime + TimeSpan.FromSeconds(startPos.DistanceTo(targetPos) / 2.2f);
-            var earliestConnections = new List<Connection<TPos>>
-            {
-                Connection<TPos>.CreateWalk(startPos, startTime, targetPos, earliestKnownTargetArrivalTime)
-            };
-
-            var markedStations = new Dictionary<Station<TPos>, WeekTimePoint>();
-            foreach (var enterStation in transferStations.SelectMany(ts => ts.Stations))
-            {
-                var walkingTime = TimeSpan.FromSeconds(startPos.DistanceTo(enterStation.Position) / 2.2f);
-                if (walkingTime > maxWalkingTime)
-                {
-                    continue;
-                }
-
-                var arrivalTime = startTime + walkingTime;
-                earliestConnections.Add(Connection<TPos>.CreateWalkToStation(startPos, startTime, enterStation, arrivalTime));
-                markedStations.Add(enterStation, arrivalTime);
-            }
-
-            Compute(markedStations, targetPos, transferStations, ref earliestKnownTargetArrivalTime, earliestConnections);
-
-            var con = earliestConnections.Find(c => c.TargetPos.DistanceTo(targetPos) < float.Epsilon);
-
-            var connectionList = new List<Connection<TPos>> {con};
-
-            while (con.Type == Connection<TPos>.TypeEnum.Ride || con.Type == Connection<TPos>.TypeEnum.Transfer || con.Type == Connection<TPos>.TypeEnum.WalkFromStation)
-            {
-                con = earliestConnections.Find(c => c.TargetStation == con.SourceStation);
-                connectionList.Insert(0, con);
-            }
-
-            return connectionList;
-        }
-
-        private void Compute(IDictionary<Station<TPos>, WeekTimePoint> markedStations, TPos targetPos, IReadOnlyCollection<TransferStation<TPos>> transferStations, ref WeekTimePoint earliestKnownTargetArrivalTime, List<Connection<TPos>> earliestKnownConnections)
-        {
-            for (var k = 1; markedStations.Count > 0 && k <= NumRounds; ++k)
-            {
-                ComputeRound(targetPos, transferStations, earliestKnownConnections, markedStations, ref earliestKnownTargetArrivalTime);
-            }
-        }
-
-        private void ComputeRound(TPos targetPos, IReadOnlyCollection<TransferStation<TPos>> transferStations, List<Connection<TPos>> earliestKnownConnections, IDictionary<Station<TPos>, WeekTimePoint> markedStations, ref WeekTimePoint earliestKnownTargetArrivalTime)
+        protected override void ComputeRound(TPos targetPos, List<Connection<TPos>> earliestKnownConnections, IDictionary<Station<TPos>, WeekTimePoint> markedStations, ref WeekTimePoint earliestKnownTargetArrivalTime)
         {
             var newlyMarkedStations = new Dictionary<Station<TPos>, WeekTimePoint>();
 
@@ -74,7 +27,7 @@ namespace Transit.Timetable.Algorithm
                 var firstDepartures = _timetableManager.GetDepartures(station, startTime, startTime + TimeSpan.FromHours(1)).GroupBy(e => e.Route).Select(g => g.First());
                 foreach (var firstDepartureEntry in firstDepartures)
                 {
-                    var newStations = CheckRoute(firstDepartureEntry, ref earliestKnownTargetArrivalTime, earliestKnownConnections, targetPos, transferStations);
+                    var newStations = CheckRoute(firstDepartureEntry, ref earliestKnownTargetArrivalTime, earliestKnownConnections, targetPos);
                     foreach (var pair in newStations)
                     {
                         newlyMarkedStations.Add(pair.Key, pair.Value);
@@ -89,18 +42,7 @@ namespace Transit.Timetable.Algorithm
             }
         }
 
-        private static TransferStation<TPos> GetTransferStation(Station<TPos> station, IEnumerable<TransferStation<TPos>> transferStations)
-        {
-            var collection = transferStations.Where(ts => ts.Stations.Any(s => s == station)).ToList();
-            if (collection.Count != 1)
-            {
-                throw new InvalidOperationException();
-            }
-
-            return collection[0];
-        }
-
-        private Dictionary<Station<TPos>, WeekTimePoint> CheckRoute(Entry<TPos> entry, ref WeekTimePoint earliestKnownTargetArrivalTime, List<Connection<TPos>> earliestKnownConnections, TPos targetPos, IReadOnlyCollection<TransferStation<TPos>> transferStations)
+        private Dictionary<Station<TPos>, WeekTimePoint> CheckRoute(Entry<TPos> entry, ref WeekTimePoint earliestKnownTargetArrivalTime, List<Connection<TPos>> earliestKnownConnections, TPos targetPos)
         {
             var newlyMarkedStations = new Dictionary<Station<TPos>, WeekTimePoint>();
             var nextEntries = _timetableManager.GetNextEntries(entry).ToList();
@@ -145,7 +87,7 @@ namespace Transit.Timetable.Algorithm
                     newlyMarkedStations.Add(nextStation, nextTime);
                 }
 
-                var transferStation = GetTransferStation(nextStation, transferStations);
+                var transferStation = GetTransferStation(nextStation);
                 var otherStations = transferStation.Stations.Where(s => s != nextStation);
                 foreach (var otherStation in otherStations)
                 {

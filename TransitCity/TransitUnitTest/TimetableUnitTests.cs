@@ -16,7 +16,7 @@ using Utility.Extensions;
 namespace TransitUnitTest
 {
     [TestClass]
-    public class TimetableUnitTest
+    public class TimetableUnitTests
     {
         [TestMethod]
         public void AddEntryTest()
@@ -153,12 +153,14 @@ namespace TransitUnitTest
             ITimetableManager<Position2f, LinkedEntry<Position2f>> manager2 = CreateManager<LinkedTimetableManager<Position2f>, LinkedEntry<Position2f>>(tsd2);
             ITimetableManager<Position2f, LinkedEntry<Position2f>> manager3 = CreateManager<DictionaryTimetableManager<Position2f>, LinkedEntry<Position2f>>(tsd3);
 
-            var raptor1 = new Raptor<Position2f>(manager1);
-            var raptor2 = new ParallelRaptor<Position2f>(manager1, 2.2f);
-            var raptor3 = new LinkedParallelRaptor<Position2f>(manager2, 2.2f);
-            var raptor4 = new LinkedParallelRaptor<Position2f>(manager3, 2.2f);
-            var raptor5 = new LinkedRaptor<Position2f>(manager2);
-            var raptor6 = new LinkedRaptor<Position2f>(manager3);
+            var walkingSpeed = 2.2f;
+            var maxWalkingTime = TimeSpan.FromMinutes(10);
+            var raptor1 = new Raptor<Position2f>(manager1, walkingSpeed, maxWalkingTime, tsd1.Values);
+            var raptor2 = new ParallelRaptor<Position2f>(manager1, walkingSpeed, maxWalkingTime, tsd1.Values);
+            var raptor3 = new LinkedParallelRaptor<Position2f>(manager2, walkingSpeed, maxWalkingTime, tsd2.Values);
+            var raptor4 = new LinkedParallelRaptor<Position2f>(manager3, walkingSpeed, maxWalkingTime, tsd3.Values);
+            var raptor5 = new LinkedRaptor<Position2f>(manager2, walkingSpeed, maxWalkingTime, tsd2.Values);
+            var raptor6 = new LinkedRaptor<Position2f>(manager3, walkingSpeed, maxWalkingTime, tsd3.Values);
 
             var source = new Position2f(500, 500);
             var target = new Position2f(7800, 1200);
@@ -166,42 +168,42 @@ namespace TransitUnitTest
 
             const uint iterations = 5u;
 
-            var tuple1 = Timing.Profile(() => raptor1.Compute(source, time, target, tsd1.Values), iterations);
+            var tuple1 = Timing.Profile(() => raptor1.Compute(source, time, target), iterations);
             Console.WriteLine($"Raptor with TimetableManager: {tuple1.timespan}");
             var connectionList1 = tuple1.results[0];
             connectionList1.ForEach(Console.WriteLine);
             Console.WriteLine($"Total travel time: {(connectionList1.Last().TargetTime - connectionList1.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
             Console.WriteLine();
 
-            var tuple2 = Timing.Profile(() => raptor2.Compute(source, time, target, tsd1.Values), iterations);
+            var tuple2 = Timing.Profile(() => raptor2.Compute(source, time, target), iterations);
             Console.WriteLine($"ParallelRaptor with TimetableManager: {tuple2.timespan}");
             var connectionList2 = tuple2.results[0];
             connectionList2.ForEach(Console.WriteLine);
             Console.WriteLine($"Total travel time: {(connectionList2.Last().TargetTime - connectionList2.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
             Console.WriteLine();
 
-            var tuple3 = Timing.Profile(() => raptor3.Compute(source, time, target, tsd2.Values), iterations);
+            var tuple3 = Timing.Profile(() => raptor3.Compute(source, time, target), iterations);
             Console.WriteLine($"LinkedParallelRaptor with LinkedTimetableManager: {tuple3.timespan}");
             var connectionList3 = tuple3.results[0];
             connectionList3.ForEach(Console.WriteLine);
             Console.WriteLine($"Total travel time: {(connectionList3.Last().TargetTime - connectionList3.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
             Console.WriteLine();
 
-            var tuple4 = Timing.Profile(() => raptor4.Compute(source, time, target, tsd3.Values), iterations);
+            var tuple4 = Timing.Profile(() => raptor4.Compute(source, time, target), iterations);
             Console.WriteLine($"LinkedParallelRaptor with DictionaryTimetableManager: {tuple4.timespan}");
             var connectionList4 = tuple4.results[0];
             connectionList4.ForEach(Console.WriteLine);
             Console.WriteLine($"Total travel time: {(connectionList4.Last().TargetTime - connectionList4.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
             Console.WriteLine();
 
-            var tuple5 = Timing.Profile(() => raptor5.Compute(source, time, target, tsd2.Values), iterations);
+            var tuple5 = Timing.Profile(() => raptor5.Compute(source, time, target), iterations);
             Console.WriteLine($"LinkedRaptor with LinkedTimetableManager: {tuple5.timespan}");
             var connectionList5 = tuple5.results[0];
             connectionList5.ForEach(Console.WriteLine);
             Console.WriteLine($"Total travel time: {(connectionList5.Last().TargetTime - connectionList5.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
             Console.WriteLine();
 
-            var tuple6 = Timing.Profile(() => raptor6.Compute(source, time, target, tsd3.Values), iterations);
+            var tuple6 = Timing.Profile(() => raptor6.Compute(source, time, target), iterations);
             Console.WriteLine($"LinkedRaptor with DictionaryTimetableManager: {tuple6.timespan}");
             var connectionList6 = tuple6.results[0];
             connectionList6.ForEach(Console.WriteLine);

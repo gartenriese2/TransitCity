@@ -7,7 +7,7 @@ using Transit;
 namespace TransitUnitTest
 {
     [TestClass]
-    public class LineUnitTest
+    public class LineUnitTests
     {
         [TestMethod]
         public void TestMethod1()
