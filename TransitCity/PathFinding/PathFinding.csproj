@@ -57,6 +57,10 @@
       <Project>{75EB7F70-EC1D-45AD-82AC-CB953003D1A3}</Project>
       <Name>Geometry</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Utility\Utility.csproj">
+      <Project>{D1E7778B-2C3C-4058-9CCF-757E12D3BEB1}</Project>
+      <Name>Utility</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

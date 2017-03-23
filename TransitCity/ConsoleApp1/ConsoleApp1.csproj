@@ -32,8 +32,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Svg, Version=2.2.1.39233, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <HintPath>..\packages\Svg.2.3.0\lib\net35\Svg.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Geometry\Geometry.csproj">
@@ -57,6 +63,10 @@
       <Project>{88FF68AB-2F6D-4DE9-8B15-68C56C0DB206}</Project>
       <Name>PathFinding</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SvgDrawing\SvgDrawing.csproj">
+      <Project>{AC4D9311-EBDF-4D30-BA19-5B45C8006ADD}</Project>
+      <Name>SvgDrawing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Time\Time.csproj">
       <Project>{E9ED2B02-1DE4-49FF-963C-DE6B0DEFE3EE}</Project>
       <Name>Time</Name>
@@ -64,6 +74,10 @@
     <ProjectReference Include="..\Transit\Transit.csproj">
       <Project>{0E4A9D5D-3EB2-4C41-B4C6-1987B2398F8C}</Project>
       <Name>Transit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utility\Utility.csproj">
+      <Project>{D1E7778B-2C3C-4058-9CCF-757E12D3BEB1}</Project>
+      <Name>Utility</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

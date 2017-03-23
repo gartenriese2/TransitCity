@@ -49,6 +49,10 @@
     <Compile Include="Threading\Atomic.cs" />
     <Compile Include="Threading\IAtomic.cs" />
     <Compile Include="Timing\Timing.cs" />
+    <Compile Include="Units\Acceleration.cs" />
+    <Compile Include="Units\Distance.cs" />
+    <Compile Include="Units\Speed.cs" />
+    <Compile Include="Units\Duration.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -42,14 +42,25 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UnitsNet, Version=3.55.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UnitsNet.3.55.0\lib\net35\UnitsNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\DataManager.cs" />
+    <Compile Include="Data\LineInfo.cs" />
+    <Compile Include="Data\RouteInfo.cs" />
+    <Compile Include="Data\StationInfo.cs" />
     <Compile Include="Data\TestTransitData.cs" />
     <Compile Include="Timetable\Algorithm\LinkedParallelRaptor.cs" />
     <Compile Include="Timetable\Algorithm\LinkedRaptor.cs" />
     <Compile Include="Timetable\Algorithm\ParallelRaptorBase.cs" />
     <Compile Include="Timetable\Algorithm\RaptorBase.cs" />
+    <Compile Include="Timetable\Algorithm\ParallelRaptorWithDataManager.cs" />
+    <Compile Include="Timetable\Algorithm\RaptorWithDataManager.cs" />
+    <Compile Include="Timetable\Algorithm\RaptorWithDataManagerBase.cs" />
+    <Compile Include="Timetable\Algorithm\RaptorWithDataManagerBinarySearch.cs" />
+    <Compile Include="Timetable\Algorithm\RaptorWithDataManagerBinarySearchTripLookup.cs" />
     <Compile Include="Timetable\Algorithm\SequentialRaptorBase.cs" />
     <Compile Include="Timetable\Connection.cs" />
     <Compile Include="Timetable\Managers\DictionaryTimetableManager.cs" />
@@ -73,6 +84,7 @@
     <Compile Include="Station.cs" />
     <Compile Include="Timetable\Entry.cs" />
     <Compile Include="TransitNetwork.cs" />
+    <Compile Include="Trip.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Geometry\Geometry.csproj">

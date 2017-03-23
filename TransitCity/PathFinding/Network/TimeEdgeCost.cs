@@ -1,4 +1,5 @@
 ﻿using System;
+using Utility.Units;
 
 namespace PathFinding.Network
 {
@@ -13,7 +14,17 @@ namespace PathFinding.Network
 
         public TimeEdgeCost(float seconds)
         {
-            _cost = new TimeSpan((long)(TimeSpan.TicksPerSecond * seconds));
+            _cost = TimeSpan.FromSeconds(seconds);
+        }
+
+        public TimeEdgeCost(TimeSpan ts)
+        {
+            _cost = ts;
+        }
+
+        public TimeEdgeCost(Duration duration)
+        {
+            _cost = TimeSpan.FromSeconds(duration.Seconds);
         }
 
         public TimeSpan TimeSpan => _cost;

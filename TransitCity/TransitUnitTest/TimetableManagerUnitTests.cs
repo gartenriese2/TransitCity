@@ -9,6 +9,7 @@ using Transit;
 using Transit.Timetable;
 using Transit.Timetable.Managers;
 using Utility.Timing;
+using Utility.Units;
 
 namespace TransitUnitTest
 {
@@ -84,12 +85,12 @@ namespace TransitUnitTest
             var line2 = CreateLine2(transferStationDictionary);
             var line3 = CreateLine3(transferStationDictionary);
 
-            var coll1A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line1.Routes.ElementAt(0).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
-            var coll1B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line1.Routes.ElementAt(1).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
-            var coll2A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line2.Routes.ElementAt(0).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
-            var coll2B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line2.Routes.ElementAt(1).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
-            var coll3A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line3.Routes.ElementAt(0).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
-            var coll3B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line3.Routes.ElementAt(1).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
+            var coll1A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(240f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
+            var coll1B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(240f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
+            var coll2A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(180f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
+            var coll2B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(180f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
+            var coll3A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(240f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
+            var coll3B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(240f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
 
             manager.AddRoute(line1, line1.Routes.ElementAt(0), coll1A, new List<TransferStation<Position2f>>(transferStationDictionary.Values), SubwayTravelTimeFunc);
             manager.AddRoute(line1, line1.Routes.ElementAt(1), coll1B, new List<TransferStation<Position2f>>(transferStationDictionary.Values), SubwayTravelTimeFunc);
@@ -103,15 +104,15 @@ namespace TransitUnitTest
 
         private TimeEdgeCost SubwayTravelTimeFunc(Station<Position2f> a, Station<Position2f> b)
         {
-            const float meanAcceleration = 0.6f;
-            const float maximalSpeed = 70f / 3.6f; // 70 km/h
-            const float timeToReachMaximalSpeed = maximalSpeed / meanAcceleration;
-            const float neededDistanceToReachMaximalSpeed = meanAcceleration / 2 * timeToReachMaximalSpeed * timeToReachMaximalSpeed;
-            var distance = a.Position.DistanceTo(b.Position);
-            var baseTime = 30f; // waiting time at station
+            var meanAcceleration = Acceleration.FromMetersPerSecondSquared(0.6f);
+            var maximalSpeed = Speed.FromKilometersPerHour(70f);
+            var timeToReachMaximalSpeed = maximalSpeed / meanAcceleration;
+            var neededDistanceToReachMaximalSpeed = meanAcceleration / 2 * (timeToReachMaximalSpeed * timeToReachMaximalSpeed);
+            var distance = Distance.FromMeters(a.Position.DistanceTo(b.Position));
+            var baseTime = Duration.FromSeconds(30); // waiting time at station
             if (distance < 2 * neededDistanceToReachMaximalSpeed) // distance is too small to reach maximalSpeed
             {
-                baseTime += 2 * (float)Math.Sqrt(distance / meanAcceleration);
+                baseTime += 2 * (distance / meanAcceleration).SquareRoot;
             }
             else
             {
@@ -119,7 +120,7 @@ namespace TransitUnitTest
                 baseTime += 2 * timeToReachMaximalSpeed + remainingDistance / maximalSpeed;
             }
 
-            return new TimeEdgeCost(baseTime);
+            return new TimeEdgeCost(baseTime.Seconds);
         }
 
         private Line<Position2f> CreateLine1(IDictionary<string, TransferStation<Position2f>> tsd)
@@ -214,9 +215,9 @@ namespace TransitUnitTest
                 routeBList.Add(stationB);
             }
 
-            var routeA = new Route<Position2f>(routeAList, frequency);
+            var routeA = new Route<Position2f>(routeAList);
             routeBList.Reverse();
-            var routeB = new Route<Position2f>(routeBList, frequency);
+            var routeB = new Route<Position2f>(routeBList);
 
             var offsetSplines = GetOffsetSplines(spline, 4f);
 

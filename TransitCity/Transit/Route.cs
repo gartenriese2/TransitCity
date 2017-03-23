@@ -9,7 +9,7 @@ namespace Transit
     {
         private readonly List<Station<P>> _stations = new List<Station<P>>();
 
-        public Route(IEnumerable<Station<P>> stations, float frequency)
+        public Route(IEnumerable<Station<P>> stations)
         {
             if (stations == null || stations.Count() < 2)
             {
@@ -17,12 +17,9 @@ namespace Transit
             }
 
             _stations.AddRange(stations);
-            Frequency = frequency;
         }
 
         public IEnumerable<Station<P>> Stations => _stations;
-
-        public float Frequency { get; }
 
         public override string ToString()
         {

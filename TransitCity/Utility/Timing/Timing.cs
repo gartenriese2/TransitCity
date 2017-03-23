@@ -19,7 +19,6 @@ namespace Utility.Timing
             //warmup
             var warmupTask = Task.Factory.StartNew(func);
             warmupTask.Wait();
-            list.Add(warmupTask.Result);
 
             var sw = Stopwatch.StartNew();
             for (var i = 0; i < repitions; ++i)

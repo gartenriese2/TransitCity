@@ -6,7 +6,7 @@ using Time;
 
 namespace Transit.Timetable.Algorithm
 {
-    public class RaptorBase<TPos> : IRaptor<TPos> where TPos : IPosition
+    public abstract class RaptorBase<TPos> : IRaptor<TPos> where TPos : IPosition
     {
         protected const int NumRounds = 5;
         protected readonly float _walkingSpeed;

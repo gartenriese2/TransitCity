@@ -42,8 +42,8 @@ namespace TransitUnitTest
             var station12B = new Station<Position2f>(new Position2f(7500, 8020));
             var station13B = new Station<Position2f>(new Position2f(8000, 9020));
 
-            var route1A = new Route<Position2f>(new[]{ station1A, station2A, station3A, station4A, station5A, station6A, station7A, station8A, station9A, station10A, station11A, station12A, station13A }, 300f);
-            var route1B = new Route<Position2f>(new[]{ station1B, station2B, station3B, station4B, station5B, station6B, station7B, station8B, station9B, station10B, station11B, station12B, station13B }, 300f);
+            var route1A = new Route<Position2f>(new[]{ station1A, station2A, station3A, station4A, station5A, station6A, station7A, station8A, station9A, station10A, station11A, station12A, station13A });
+            var route1B = new Route<Position2f>(new[]{ station1B, station2B, station3B, station4B, station5B, station6B, station7B, station8B, station9B, station10B, station11B, station12B, station13B });
             var line1 = new Line<Position2f>("1", route1A, route1B);
 
             var network = new TransitNetwork<Position2f>();

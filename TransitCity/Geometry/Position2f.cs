@@ -67,6 +67,11 @@ namespace Geometry
             return (this + vecRight, this + vecLeft);
         }
 
+        public bool EqualPosition(Position2f other)
+        {
+            return DistanceTo(other) <= float.Epsilon;
+        }
+
         private float DistanceTo(Position2f other)
         {
             return (this - other).Length();

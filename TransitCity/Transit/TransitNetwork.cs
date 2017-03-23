@@ -16,7 +16,7 @@ namespace Transit
             foreach (var route in line.Routes)
             {
                 ConnectRoute(route, transitCostFunc);
-                ConnectEntryExit(route, (a, b) => new TimeEdgeCost(route.Frequency / 2), (a, b) => new TimeEdgeCost(10f)); // 10 seconds exit time
+                ConnectEntryExit(route, (a, b) => new TimeEdgeCost(120f), (a, b) => new TimeEdgeCost(10f)); // 10 seconds exit time, 240 seconds frequency TODO
             }
         }
 

@@ -283,9 +283,9 @@ namespace SvgDrawingUnitTest
                 routeBList.Add(stationB);
             }
 
-            var routeA = new Route<Position2f>(routeAList, frequency);
+            var routeA = new Route<Position2f>(routeAList);
             routeBList.Reverse();
-            var routeB = new Route<Position2f>(routeBList, frequency);
+            var routeB = new Route<Position2f>(routeBList);
 
             var offsetSplines = GetOffsetSplines(spline, 4f);
 

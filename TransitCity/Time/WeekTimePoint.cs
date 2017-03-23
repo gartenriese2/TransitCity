@@ -84,6 +84,16 @@ namespace Time
             return wtp1.TimePoint - wtp2.TimePoint;
         }
 
+        public static TimeSpan GetCorrectedDifference(WeekTimePoint wtp1, WeekTimePoint wtp2)
+        {
+            if (wtp2 >= wtp1)
+            {
+                return wtp2 - wtp1;
+            }
+
+            return TimeSpan.FromDays(7) - (wtp1 - wtp2);
+        }
+
         public override int GetHashCode()
         {
             return TimePoint.GetHashCode();

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Geometry;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PathFinding.Network;
 using Time;
 using Transit;
+using Transit.Data;
 using Transit.Timetable;
 using Transit.Timetable.Algorithm;
 using Transit.Timetable.Managers;
@@ -51,8 +54,8 @@ namespace TransitUnitTest
             var station12B = new Station<Position2f>(new Position2f(7500, 8020));
             var station13B = new Station<Position2f>(new Position2f(8000, 9020));
 
-            var route1A = new Route<Position2f>(new[] { station1A, station2A, station3A, station4A, station5A, station6A, station7A, station8A, station9A, station10A, station11A, station12A, station13A }, 300f);
-            var route1B = new Route<Position2f>(new[] { station1B, station2B, station3B, station4B, station5B, station6B, station7B, station8B, station9B, station10B, station11B, station12B, station13B }, 300f);
+            var route1A = new Route<Position2f>(new[] { station1A, station2A, station3A, station4A, station5A, station6A, station7A, station8A, station9A, station10A, station11A, station12A, station13A });
+            var route1B = new Route<Position2f>(new[] { station1B, station2B, station3B, station4B, station5B, station6B, station7B, station8B, station9B, station10B, station11B, station12B, station13B });
             var line1 = new Line<Position2f>("1", route1A, route1B);
 
             var transferStation1 = new TransferStation<Position2f>("1_1", station1A, station1B);
@@ -94,8 +97,8 @@ namespace TransitUnitTest
             var station12B = new Station<Position2f>(new Position2f(7500, 8020));
             var station13B = new Station<Position2f>(new Position2f(8000, 9020));
 
-            var route1A = new Route<Position2f>(new[] { station1A, station2A, station3A, station4A, station5A, station6A, station7A, station8A, station9A, station10A, station11A, station12A, station13A }, 300f);
-            var route1B = new Route<Position2f>(new[] { station1B, station2B, station3B, station4B, station5B, station6B, station7B, station8B, station9B, station10B, station11B, station12B, station13B }, 300f);
+            var route1A = new Route<Position2f>(new[] { station1A, station2A, station3A, station4A, station5A, station6A, station7A, station8A, station9A, station10A, station11A, station12A, station13A });
+            var route1B = new Route<Position2f>(new[] { station1B, station2B, station3B, station4B, station5B, station6B, station7B, station8B, station9B, station10B, station11B, station12B, station13B });
             var line1 = new Line<Position2f>("1", route1A, route1B);
 
             var transferStation1 = new TransferStation<Position2f>("1_1", station1A, station1B);
@@ -119,10 +122,10 @@ namespace TransitUnitTest
             var line1 = CreateLine1(transferStationDictionary);
             var line2 = CreateLine2(transferStationDictionary);
 
-            var coll1A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line1.Routes.ElementAt(0).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
-            var coll1B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line1.Routes.ElementAt(1).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
-            var coll2A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line2.Routes.ElementAt(0).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
-            var coll2B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line2.Routes.ElementAt(1).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
+            var coll1A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(240f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
+            var coll1B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(240f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
+            var coll2A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(180f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
+            var coll2B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(180f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
 
             manager.AddRoute(line1, line1.Routes.ElementAt(0), coll1A, new List<TransferStation<Position2f>>(transferStationDictionary.Values), SubwayTravelTimeFunc);
             manager.AddRoute(line1, line1.Routes.ElementAt(1), coll1B, new List<TransferStation<Position2f>>(transferStationDictionary.Values), SubwayTravelTimeFunc);
@@ -161,6 +164,9 @@ namespace TransitUnitTest
             var raptor4 = new LinkedParallelRaptor<Position2f>(manager3, walkingSpeed, maxWalkingTime, tsd3.Values);
             var raptor5 = new LinkedRaptor<Position2f>(manager2, walkingSpeed, maxWalkingTime, tsd2.Values);
             var raptor6 = new LinkedRaptor<Position2f>(manager3, walkingSpeed, maxWalkingTime, tsd3.Values);
+            var raptor7 = new ParallelRaptorWithDataManager(walkingSpeed, maxWalkingTime, TimeSpan.FromMinutes(15), new TestTransitData().DataManager);
+            var raptor8 = new RaptorWithDataManager(walkingSpeed, maxWalkingTime, TimeSpan.FromMinutes(15), new TestTransitData().DataManager);
+            var raptor9 = new RaptorWithDataManagerBinarySearch(walkingSpeed, maxWalkingTime, TimeSpan.FromMinutes(15), new TestTransitData().DataManager);
 
             var source = new Position2f(500, 500);
             var target = new Position2f(7800, 1200);
@@ -168,47 +174,121 @@ namespace TransitUnitTest
 
             const uint iterations = 5u;
 
-            var tuple1 = Timing.Profile(() => raptor1.Compute(source, time, target), iterations);
-            Console.WriteLine($"Raptor with TimetableManager: {tuple1.timespan}");
-            var connectionList1 = tuple1.results[0];
-            connectionList1.ForEach(Console.WriteLine);
-            Console.WriteLine($"Total travel time: {(connectionList1.Last().TargetTime - connectionList1.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
-            Console.WriteLine();
+            //var tuple1 = Timing.Profile(() => raptor1.Compute(source, time, target), iterations);
+            //Console.WriteLine($"Raptor with TimetableManager: {tuple1.timespan:g}");
+            //var connectionList1 = tuple1.results[0];
+            //connectionList1.ForEach(Console.WriteLine);
+            //Console.WriteLine($"Total travel time: {(connectionList1.Last().TargetTime - connectionList1.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
+            //Console.WriteLine();
 
-            var tuple2 = Timing.Profile(() => raptor2.Compute(source, time, target), iterations);
-            Console.WriteLine($"ParallelRaptor with TimetableManager: {tuple2.timespan}");
-            var connectionList2 = tuple2.results[0];
-            connectionList2.ForEach(Console.WriteLine);
-            Console.WriteLine($"Total travel time: {(connectionList2.Last().TargetTime - connectionList2.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
-            Console.WriteLine();
+            //var tuple2 = Timing.Profile(() => raptor2.Compute(source, time, target), iterations);
+            //Console.WriteLine($"ParallelRaptor with TimetableManager: {tuple2.timespan:g}");
+            //var connectionList2 = tuple2.results[0];
+            //connectionList2.ForEach(Console.WriteLine);
+            //Console.WriteLine($"Total travel time: {(connectionList2.Last().TargetTime - connectionList2.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
+            //Console.WriteLine();
 
-            var tuple3 = Timing.Profile(() => raptor3.Compute(source, time, target), iterations);
-            Console.WriteLine($"LinkedParallelRaptor with LinkedTimetableManager: {tuple3.timespan}");
-            var connectionList3 = tuple3.results[0];
-            connectionList3.ForEach(Console.WriteLine);
-            Console.WriteLine($"Total travel time: {(connectionList3.Last().TargetTime - connectionList3.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
-            Console.WriteLine();
+            //var tuple3 = Timing.Profile(() => raptor3.Compute(source, time, target), iterations);
+            //Console.WriteLine($"LinkedParallelRaptor with LinkedTimetableManager: {tuple3.timespan:g}");
+            //var connectionList3 = tuple3.results[0];
+            //connectionList3.ForEach(Console.WriteLine);
+            //Console.WriteLine($"Total travel time: {(connectionList3.Last().TargetTime - connectionList3.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
+            //Console.WriteLine();
 
-            var tuple4 = Timing.Profile(() => raptor4.Compute(source, time, target), iterations);
-            Console.WriteLine($"LinkedParallelRaptor with DictionaryTimetableManager: {tuple4.timespan}");
-            var connectionList4 = tuple4.results[0];
-            connectionList4.ForEach(Console.WriteLine);
-            Console.WriteLine($"Total travel time: {(connectionList4.Last().TargetTime - connectionList4.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
-            Console.WriteLine();
+            //var tuple4 = Timing.Profile(() => raptor4.Compute(source, time, target), iterations);
+            //Console.WriteLine($"LinkedParallelRaptor with DictionaryTimetableManager: {tuple4.timespan:g}");
+            //var connectionList4 = tuple4.results[0];
+            //connectionList4.ForEach(Console.WriteLine);
+            //Console.WriteLine($"Total travel time: {(connectionList4.Last().TargetTime - connectionList4.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
+            //Console.WriteLine();
 
-            var tuple5 = Timing.Profile(() => raptor5.Compute(source, time, target), iterations);
-            Console.WriteLine($"LinkedRaptor with LinkedTimetableManager: {tuple5.timespan}");
-            var connectionList5 = tuple5.results[0];
-            connectionList5.ForEach(Console.WriteLine);
-            Console.WriteLine($"Total travel time: {(connectionList5.Last().TargetTime - connectionList5.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
-            Console.WriteLine();
+            //var tuple5 = Timing.Profile(() => raptor5.Compute(source, time, target), iterations);
+            //Console.WriteLine($"LinkedRaptor with LinkedTimetableManager: {tuple5.timespan:g}");
+            //var connectionList5 = tuple5.results[0];
+            //connectionList5.ForEach(Console.WriteLine);
+            //Console.WriteLine($"Total travel time: {(connectionList5.Last().TargetTime - connectionList5.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
+            //Console.WriteLine();
 
             var tuple6 = Timing.Profile(() => raptor6.Compute(source, time, target), iterations);
-            Console.WriteLine($"LinkedRaptor with DictionaryTimetableManager: {tuple6.timespan}");
+            Console.WriteLine($"LinkedRaptor with DictionaryTimetableManager: {tuple6.timespan:g}");
             var connectionList6 = tuple6.results[0];
             connectionList6.ForEach(Console.WriteLine);
             Console.WriteLine($"Total travel time: {(connectionList6.Last().TargetTime - connectionList6.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
             Console.WriteLine();
+
+            //var tuple7 = Timing.Profile(() => raptor7.Compute(source, time, target), iterations);
+            //Console.WriteLine($"ParallelRaptorWithDataManager: {tuple7.timespan:g}");
+            //var connectionList7 = tuple7.results[0];
+            //connectionList7.ForEach(Console.WriteLine);
+            //Console.WriteLine($"Total travel time: {(connectionList7.Last().TargetTime - connectionList7.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
+            //Console.WriteLine();
+
+            var tuple8 = Timing.Profile(() => raptor8.Compute(source, time, target), iterations);
+            Console.WriteLine($"RaptorWithDataManager: {tuple8.timespan:g}");
+            var connectionList8 = tuple8.results[0];
+            connectionList8.ForEach(Console.WriteLine);
+            Console.WriteLine($"Total travel time: {(connectionList8.Last().TargetTime - connectionList8.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
+            Console.WriteLine();
+
+            var tuple9 = Timing.Profile(() => raptor9.Compute(source, time, target), iterations);
+            Console.WriteLine($"RaptorWithDataManagerBinarySearch: {tuple9.timespan:g}");
+            var connectionList9 = tuple9.results[0];
+            connectionList9.ForEach(Console.WriteLine);
+            Console.WriteLine($"Total travel time: {(connectionList9.Last().TargetTime - connectionList9.First().SourceTime).ToString(@"hh\:mm\:ss")} h");
+            Console.WriteLine();
+        }
+
+        [TestMethod]
+        public void RaptorPerformanceTest2()
+        {
+            var walkingSpeed = 2.2f;
+            var maxWalkingTime = TimeSpan.FromMinutes(10);
+            var maxWaitingTime = TimeSpan.FromMinutes(15);
+            var tsd3 = new Dictionary<string, TransferStation<Position2f>>();
+            ITimetableManager<Position2f, LinkedEntry<Position2f>> manager3 = CreateManager<DictionaryTimetableManager<Position2f>, LinkedEntry<Position2f>>(tsd3);
+            var raptor6 = new LinkedRaptor<Position2f>(manager3, walkingSpeed, maxWalkingTime, tsd3.Values);
+            var raptor8 = new RaptorWithDataManager(walkingSpeed, maxWalkingTime, maxWaitingTime, new TestTransitData().DataManager);
+            var raptor9 = new RaptorWithDataManagerBinarySearch(walkingSpeed, maxWalkingTime, maxWaitingTime, new TestTransitData().DataManager);
+
+            var source = new Position2f(500, 500);
+            var target = new Position2f(7800, 1200);
+            var time = new WeekTimePoint(DayOfWeek.Tuesday, 11, 30);
+
+            const int tasks = 200;
+
+            var taskList1 = new List<Task>();
+            var taskList2 = new List<Task>();
+            var taskList3 = new List<Task>();
+
+            for (var i = 0; i < tasks; ++i)
+            {
+                taskList3.Add(Task.Factory.StartNew(() => raptor6.Compute(source, time, target)));
+            }
+
+            var sw3 = Stopwatch.StartNew();
+            Task.WaitAll(taskList3.ToArray());
+            sw3.Stop();
+            Console.WriteLine($"LinkedRaptor with DictionaryTimetableManager: {sw3.ElapsedMilliseconds}ms ({sw3.ElapsedTicks / tasks} ticks per task)");
+
+            for (var i = 0; i < tasks; ++i)
+            {
+                taskList1.Add(Task.Factory.StartNew(() => raptor8.Compute(source, time, target)));
+            }
+
+            var sw1 = Stopwatch.StartNew();
+            Task.WaitAll(taskList1.ToArray());
+            sw1.Stop();
+            Console.WriteLine($"RaptorWithDataManager: {sw1.ElapsedMilliseconds}ms ({sw1.ElapsedTicks / tasks} ticks per task)");
+
+            for (var i = 0; i < tasks; ++i)
+            {
+                taskList2.Add(Task.Factory.StartNew(() => raptor9.Compute(source, time, target)));
+            }
+
+            var sw2 = Stopwatch.StartNew();
+            Task.WaitAll(taskList2.ToArray());
+            sw2.Stop();
+            Console.WriteLine($"RaptorWithDataManagerBinarySearch: {sw2.ElapsedMilliseconds}ms ({sw2.ElapsedTicks / tasks} ticks per task)");
         }
 
         [TestMethod]
@@ -228,14 +308,14 @@ namespace TransitUnitTest
             var line3 = CreateLine3(transferStationDictionary);
             var line4 = CreateLine4(transferStationDictionary);
 
-            var coll1A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line1.Routes.ElementAt(0).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
-            var coll1B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line1.Routes.ElementAt(1).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
-            var coll2A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line2.Routes.ElementAt(0).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
-            var coll2B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line2.Routes.ElementAt(1).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
-            var coll3A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line3.Routes.ElementAt(0).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
-            var coll3B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line3.Routes.ElementAt(1).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
-            var coll4A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line4.Routes.ElementAt(0).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
-            var coll4B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line4.Routes.ElementAt(1).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
+            var coll1A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(240f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
+            var coll1B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(240f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
+            var coll2A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(180f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
+            var coll2B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(180f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
+            var coll3A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(240f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
+            var coll3B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(240f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
+            var coll4A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(180f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
+            var coll4B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(180f), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday });
 
             manager.AddRoute(line1, line1.Routes.ElementAt(0), coll1A, new List<TransferStation<Position2f>>(transferStationDictionary.Values), SubwayTravelTimeFunc);
             manager.AddRoute(line1, line1.Routes.ElementAt(1), coll1B, new List<TransferStation<Position2f>>(transferStationDictionary.Values), SubwayTravelTimeFunc);
@@ -299,7 +379,7 @@ namespace TransitUnitTest
                 [new Position2f(7500, 7000)] = "West Hampstead",
                 [new Position2f(7500, 8000)] = "Finchley Road",
                 [new Position2f(8000, 9000)] = "Swiss Cottage",
-            }, 180f, tsd);
+            }, tsd);
 
             return new Line<Position2f>("1", rA, rB);
         }
@@ -319,7 +399,7 @@ namespace TransitUnitTest
                 [new Position2f(7000, 2000)] = "Clapham North",
                 [new Position2f(8000, 1500)] = "Stockwell",
                 [new Position2f(9000, 1500)] = "Oval",
-            }, 240f, tsd);
+            }, tsd);
 
             return new Line<Position2f>("2", rA, rB);
         }
@@ -336,7 +416,7 @@ namespace TransitUnitTest
                 [new Position2f(8000, 6000)] = "Kilburn",
                 [new Position2f(9000, 6250)] = "Watford",
                 [new Position2f(9900, 6300)] = "Croxley"
-            }, 120f, tsd);
+            }, tsd);
 
             return new Line<Position2f>("3", rA, rB);
         }
@@ -355,12 +435,12 @@ namespace TransitUnitTest
                 [new Position2f(7500, 4100)] = "Dollis Hill",
                 [new Position2f(8500, 3500)] = "Roding Valley",
                 [new Position2f(9600, 3600)] = "Chigwell"
-            }, 180f, tsd);
+            }, tsd);
 
             return new Line<Position2f>("4", rA, rB);
         }
 
-        private static Tuple<Route<Position2f>, Route<Position2f>> CreateRoutes(IDictionary<Position2f, string> dic, float frequency, IDictionary<string, TransferStation<Position2f>> tsd)
+        private static Tuple<Route<Position2f>, Route<Position2f>> CreateRoutes(IDictionary<Position2f, string> dic, IDictionary<string, TransferStation<Position2f>> tsd)
         {
             var positions = dic.Keys.ToList();
             var spline = GetSpline(positions, 4);
@@ -380,9 +460,9 @@ namespace TransitUnitTest
                 routeBList.Add(stationB);
             }
 
-            var routeA = new Route<Position2f>(routeAList, frequency);
+            var routeA = new Route<Position2f>(routeAList);
             routeBList.Reverse();
-            var routeB = new Route<Position2f>(routeBList, frequency);
+            var routeB = new Route<Position2f>(routeBList);
 
             return new Tuple<Route<Position2f>, Route<Position2f>>(routeA, routeB);
         }

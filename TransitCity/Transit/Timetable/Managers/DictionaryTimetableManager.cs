@@ -38,7 +38,7 @@ namespace Transit.Timetable.Managers
                 }
 
                 var lastId = idQueue.Dequeue();
-                var lastEntry = new LinkedEntry<TPos>(lastId, currentTime, line, route, GetTransferStation(route.Stations.Last(), transferStations), route.Stations.Last(), null);
+                var lastEntry = new LinkedEntry<TPos>(lastId, currentTime, line, route, GetTransferStation(route.Stations.Last(), transferStations), route.Stations.Last());
                 _timetable.Add(lastId, lastEntry);
             }
         }

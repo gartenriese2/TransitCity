@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Geometry;
+using Time;
+using Utility.Units;
 
 namespace Transit.Data
 {
@@ -36,8 +39,10 @@ namespace Transit.Data
                     [new Position2f(7500, 8000)] = "Finchley Road",
                     [new Position2f(8000, 9000)] = "Swiss Cottage"
                 },
-                240f,
-                "1");
+                "1",
+                new WeekTimeCollection(new TimeSpan(5, 30, 0), new TimeSpan(23, 30, 0), TimeSpan.FromMinutes(4), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }),
+                new WeekTimeCollection(new TimeSpan(5, 30, 0), new TimeSpan(23, 30, 0), TimeSpan.FromMinutes(4), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }),
+                Duration.FromSeconds(30));
             DataManager.AddSubwayLine(
                 new Dictionary<Position2f, string>
                 {
@@ -53,8 +58,10 @@ namespace Transit.Data
                     [new Position2f(8000, 1500)] = "Stockwell",
                     [new Position2f(9000, 1500)] = "Oval"
                 },
-                240f,
-                "2");
+                "2",
+                new WeekTimeCollection(new TimeSpan(5, 30, 0), new TimeSpan(23, 30, 0), TimeSpan.FromMinutes(3), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }),
+                new WeekTimeCollection(new TimeSpan(5, 30, 0), new TimeSpan(23, 30, 0), TimeSpan.FromMinutes(3), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }),
+                Duration.FromSeconds(30));
             DataManager.AddSubwayLine(
                 new Dictionary<Position2f, string>
                 {
@@ -63,12 +70,14 @@ namespace Transit.Data
                     [new Position2f(5500, 4000)] = "Neasden",
                     [new Position2f(6000, 4750)] = "Balham",
                     [new Position2f(6750, 5750)] = "Chalfont",
-                    [new Position2f(8000, 6000)] = "Latimer",
+                    [new Position2f(8000, 6000)] = "Kilburn",
                     [new Position2f(9000, 6250)] = "Watford",
                     [new Position2f(9900, 6300)] = "Croxley"
                 },
-                120f,
-                "3");
+                "3",
+                new WeekTimeCollection(new TimeSpan(5, 30, 0), new TimeSpan(23, 30, 0), TimeSpan.FromMinutes(2), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }),
+                new WeekTimeCollection(new TimeSpan(5, 30, 0), new TimeSpan(23, 30, 0), TimeSpan.FromMinutes(2), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }),
+                Duration.FromSeconds(30));
             DataManager.AddSubwayLine(
                 new Dictionary<Position2f, string>
                 {
@@ -83,8 +92,10 @@ namespace Transit.Data
                     [new Position2f(8500, 3500)] = "Roding Valley",
                     [new Position2f(9600, 3600)] = "Chigwell"
                 },
-                180f,
-                "4");
+                "4",
+                new WeekTimeCollection(new TimeSpan(5, 30, 0), new TimeSpan(23, 30, 0), TimeSpan.FromMinutes(4), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }),
+                new WeekTimeCollection(new TimeSpan(5, 30, 0), new TimeSpan(23, 30, 0), TimeSpan.FromMinutes(4), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }),
+                Duration.FromSeconds(30));
         }
     }
 }

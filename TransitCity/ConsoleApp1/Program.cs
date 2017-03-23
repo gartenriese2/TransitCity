@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 using Geometry;
-using PathFinding.Network;
+using Svg;
+using SvgDrawing;
 using Time;
 using Transit;
+using Transit.Data;
+using Transit.Timetable;
 using Transit.Timetable.Algorithm;
-using Transit.Timetable.Managers;
+using Utility.Units;
 
 namespace ConsoleApp1
 {
@@ -14,128 +20,294 @@ namespace ConsoleApp1
     {
         private static void Main(string[] args)
         {
-            var manager = new TimetableManager<Position2f>();
-
-            var transferStationDictionary = new Dictionary<string, TransferStation<Position2f>>();
-
-            var line1 = CreateLine1(transferStationDictionary);
-            var line2 = CreateLine2(transferStationDictionary);
-
-            var coll1A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line1.Routes.ElementAt(0).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
-            var coll1B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line1.Routes.ElementAt(1).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
-            var coll2A = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line2.Routes.ElementAt(0).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
-            var coll2B = new WeekTimeCollection(new TimeSpan(5, 0, 0), new TimeSpan(23, 59, 59), TimeSpan.FromSeconds(line2.Routes.ElementAt(1).Frequency), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday });
-
-            manager.AddRoute(line1, line1.Routes.ElementAt(0), coll1A, new List<TransferStation<Position2f>>(transferStationDictionary.Values), SubwayTravelTimeFunc);
-            manager.AddRoute(line1, line1.Routes.ElementAt(1), coll1B, new List<TransferStation<Position2f>>(transferStationDictionary.Values), SubwayTravelTimeFunc);
-            manager.AddRoute(line2, line2.Routes.ElementAt(0), coll2A, new List<TransferStation<Position2f>>(transferStationDictionary.Values), SubwayTravelTimeFunc);
-            manager.AddRoute(line2, line2.Routes.ElementAt(1), coll2B, new List<TransferStation<Position2f>>(transferStationDictionary.Values), SubwayTravelTimeFunc);
-
-            var raptor = new Raptor<Position2f>(manager);
-
-            raptor.Compute(transferStationDictionary.Values.ElementAt(0).Stations.ElementAt(0).Position, new WeekTimePoint(DayOfWeek.Monday, 5), transferStationDictionary.Values.ElementAt(4).Stations.ElementAt(0).Position, new List<TransferStation<Position2f>>(transferStationDictionary.Values));
-            raptor.Compute(transferStationDictionary["Stanmore"].Stations.ElementAt(0).Position, new WeekTimePoint(DayOfWeek.Tuesday, 11, 30), transferStationDictionary["Stockwell"].Stations.ElementAt(0).Position, new List<TransferStation<Position2f>>(transferStationDictionary.Values));
+            //RaptorPerformanceTest2();
+            DrawBusiestStations();
         }
 
-        private static Station<Position2f> CreateStation(Position2f pos, string name, Dictionary<string, TransferStation<Position2f>> tsd)
+        private static void DrawBusiestStations()
         {
-            var station = new Station<Position2f>(pos);
-            if (!tsd.ContainsKey(name))
+            var dataManager = new TestTransitData().DataManager;
+            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(8).MetersPerSecond, TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
+
+            const int count = 1000000;
+            var random = new Random();
+
+            var sourceList = new List<Position2f>();
+            var targetList = new List<Position2f>();
+            for (var i = 0; i < count; ++i)
             {
-                tsd[name] = new TransferStation<Position2f>(name);
+                sourceList.Add(CreateRandomPosition());
+                targetList.Add(CreateRandomPosition());
             }
 
-            tsd[name].AddStation(station);
-            return station;
-        }
+            var time = new WeekTimePoint(DayOfWeek.Wednesday, 7, 30);
 
-        private static TimeEdgeCost SubwayTravelTimeFunc(Station<Position2f> a, Station<Position2f> b)
-        {
-            const float meanAcceleration = 0.6f;
-            const float maximalSpeed = 70f / 3.6f; // 70 km/h
-            const float timeToReachMaximalSpeed = maximalSpeed / meanAcceleration;
-            const float neededDistanceToReachMaximalSpeed = meanAcceleration / 2 * timeToReachMaximalSpeed * timeToReachMaximalSpeed;
-            var distance = a.Position.DistanceTo(b.Position);
-            var baseTime = 30f; // waiting time at station
-            if (distance < 2 * neededDistanceToReachMaximalSpeed) // distance is too small to reach maximalSpeed
+            var taskList = new List<Task<List<Connection<Position2f>>>>();
+            for (var i = 0; i < count; ++i)
             {
-                baseTime += 2 * (float)Math.Sqrt(distance / meanAcceleration);
-            }
-            else
-            {
-                var remainingDistance = distance - 2 * neededDistanceToReachMaximalSpeed;
-                baseTime += 2 * timeToReachMaximalSpeed + remainingDistance / maximalSpeed;
+                var source = sourceList[i];
+                var target = targetList[i];
+                taskList.Add(Task.Factory.StartNew(() => raptor.Compute(source, time, target)));
             }
 
-            return new TimeEdgeCost(baseTime);
+            Task.WaitAll(taskList.ToArray());
+
+            var results = taskList.Select(t => t.Result).ToList();
+
+            var busiestStations = GetBusiestStations(results).OrderByDescending(x => x.Value);
+            var transferStationDic = new Dictionary<TransferStation<Position2f>, uint>();
+            foreach (var station in busiestStations)
+            {
+                var ts = dataManager.GetTransferStation(station.Key);
+                if (!transferStationDic.ContainsKey(ts))
+                {
+                    transferStationDic[ts] = station.Value;
+                }
+                else
+                {
+                    transferStationDic[ts] += station.Value;
+                }
+            }
+
+            var document = new SvgDocumentWrapper(10000, 10000);
+
+            foreach (var station in dataManager.AllStations)
+            {
+                var c = new SvgCircle
+                {
+                    CenterX = station.Position.X,
+                    CenterY = station.Position.Y,
+                    Radius = 8f,
+                    Fill = new SvgColourServer(Color.White),
+                    Stroke = new SvgColourServer(Color.Black),
+                    StrokeWidth = 2f
+                };
+                document.Add(c);
+            }
+
+            foreach (var lineInfo in dataManager.AllLineInfos)
+            {
+                Color c;
+                if (lineInfo.Line.Name == "1")
+                {
+                    c = Color.Red;
+                }
+                else if (lineInfo.Line.Name == "2")
+                {
+                    c = Color.DarkGreen;
+                }
+                else if (lineInfo.Line.Name == "3")
+                {
+                    c = Color.DarkBlue;
+                }
+                else
+                {
+                    c = Color.Orange;
+                }
+
+                foreach (var path in lineInfo.RouteInfos.Select(ri => ri.Path))
+                {
+                    var polyline = new SvgPolyline
+                    {
+                        StrokeWidth = 4f,
+                        Stroke = new SvgColourServer(c),
+                        Points = new SvgPointCollection(),
+                        Fill = SvgPaintServer.None
+                    };
+                    foreach (var pos in path)
+                    {
+                        polyline.Points.Add(pos.X);
+                        polyline.Points.Add(pos.Y);
+                    }
+                    document.Add(polyline);
+                }
+            }
+
+            var maxPeople = transferStationDic.Values.Max();
+            var minRadius = 16f;
+            var maxRadius = 64f;
+            foreach (var transferStation in dataManager.AllTransferStations)
+            {
+                var stations = transferStation.Stations.ToList();
+                var midpoint = stations[0].Position;
+                for (var i = 1; i < stations.Count; ++i)
+                {
+                    midpoint += stations[i].Position;
+                }
+                midpoint = new Position2f(midpoint.X / stations.Count, midpoint.Y / stations.Count);
+
+                var radius = minRadius;
+                var people = 0u;
+                if (transferStationDic.ContainsKey(transferStation))
+                {
+                    people = transferStationDic[transferStation];
+                    var ratio = people / (float)maxPeople;
+                    radius = minRadius + ratio * (maxRadius + minRadius);
+                }
+
+                var c = new SvgCircle
+                {
+                    CenterX = midpoint.X,
+                    CenterY = midpoint.Y,
+                    Radius = radius,
+                    Fill = new SvgColourServer(Color.White),
+                    Stroke = new SvgColourServer(Color.Black),
+                    StrokeWidth = 6f
+                };
+                document.Add(c);
+
+                var stationText = new SvgText(transferStation.Name)
+                {
+                    FontSize = new SvgUnit(64),
+                    X = new SvgUnitCollection { midpoint.X },
+                    Y = new SvgUnitCollection { midpoint.Y + radius + 64 }
+                };
+                document.Add(stationText);
+
+                var peopleText = new SvgText(people.ToString())
+                {
+                    FontSize = new SvgUnit(64),
+                    X = new SvgUnitCollection {midpoint.X},
+                    Y = new SvgUnitCollection {midpoint.Y + radius + 128}
+                };
+                document.Add(peopleText);
+            }
+
+            document.Save("busiestStations.svg");
+
+            Position2f CreateRandomPosition()
+            {
+                var x = random.NextDouble() * 10000;
+                var y = random.NextDouble() * 10000;
+                return new Position2f((float)x, (float)y);
+            }
+
+            Dictionary<Station<Position2f>, uint> GetBusiestStations(IEnumerable<List<Connection<Position2f>>> connectionsLists)
+            {
+                var dic = new Dictionary<Station<Position2f>, uint>();
+                foreach (var connectionsList in connectionsLists)
+                {
+                    foreach (var connection in connectionsList)
+                    {
+                        if (connection.Type == Connection<Position2f>.TypeEnum.Ride || connection.Type == Connection<Position2f>.TypeEnum.Undefined || connection.Type == Connection<Position2f>.TypeEnum.Walk)
+                        {
+                            continue;
+                        }
+
+                        if (connection.Type == Connection<Position2f>.TypeEnum.WalkToStation)
+                        {
+                            var station = connection.TargetStation;
+                            if (!dic.ContainsKey(station))
+                            {
+                                dic[station] = 1;
+                            }
+                            else
+                            {
+                                dic[station]++;
+                            }
+                        }
+                        else if (connection.Type == Connection<Position2f>.TypeEnum.WalkFromStation)
+                        {
+                            var station = connection.SourceStation;
+                            if (!dic.ContainsKey(station))
+                            {
+                                dic[station] = 1;
+                            }
+                            else
+                            {
+                                dic[station]++;
+                            }
+                        }
+                        else
+                        {
+                            var station1 = connection.SourceStation;
+                            if (!dic.ContainsKey(station1))
+                            {
+                                dic[station1] = 1;
+                            }
+                            else
+                            {
+                                dic[station1]++;
+                            }
+
+                            var station2 = connection.TargetStation;
+                            if (!dic.ContainsKey(station2))
+                            {
+                                dic[station2] = 1;
+                            }
+                            else
+                            {
+                                dic[station2]++;
+                            }
+                        }
+                    }
+                }
+
+                return dic;
+            }
         }
 
-        private static Line<Position2f> CreateLine1(Dictionary<string, TransferStation<Position2f>> tsd)
+        private static void RaptorPerformanceTest2()
         {
-            var station1A = CreateStation(new Position2f(1500, 996), "Stanmore", tsd);
-            var station2A = CreateStation(new Position2f(2502, 996), "Canons Park", tsd);
-            var station3A = CreateStation(new Position2f(3506, 1498), "Queensbury", tsd);
-            var station4A = CreateStation(new Position2f(4018, 2522), "Kingsbury", tsd);
-            var station5A = CreateStation(new Position2f(4506, 3498), "Wembley Park", tsd);
-            var station6A = CreateStation(new Position2f(5502, 3996), "Neasden", tsd);
-            var station7A = CreateStation(new Position2f(6524, 3996), "Clapham South", tsd);
-            var station8A = CreateStation(new Position2f(7505, 3996), "Dollis Hill", tsd);
-            var station9A = CreateStation(new Position2f(8008, 5003), "Willesden Green", tsd);
-            var station10A = CreateStation(new Position2f(8008, 6006), "Kilburn", tsd);
-            var station11A = CreateStation(new Position2f(7508, 7006), "West Hampstead", tsd);
-            var station12A = CreateStation(new Position2f(7508, 8003), "Finchley Road", tsd);
-            var station13A = CreateStation(new Position2f(8007, 9001), "Swiss Cottage", tsd);
+            var walkingSpeed = 2.2f;
+            var maxWalkingTime = TimeSpan.FromMinutes(10);
+            var maxWaitingTime = TimeSpan.FromMinutes(15);
+            var dataManager = new TestTransitData().DataManager;
+            var raptorWithDataManager = new RaptorWithDataManager(walkingSpeed, maxWalkingTime, maxWaitingTime, dataManager);
+            var raptorWithDataManagerBinarySearch = new RaptorWithDataManagerBinarySearch(walkingSpeed, maxWalkingTime, maxWaitingTime, dataManager);
+            var parallelRaptorWithDataManager = new ParallelRaptorWithDataManager(walkingSpeed, maxWalkingTime, maxWaitingTime, dataManager);
+            var raptorWithDataManagerBinarySearchTripLookup = new RaptorWithDataManagerBinarySearchTripLookup(walkingSpeed, maxWalkingTime, maxWaitingTime, dataManager);
 
-            var station1B = CreateStation(new Position2f(7993, 9008), "Swiss Cottage", tsd);
-            var station2B = CreateStation(new Position2f(7492, 8006), "Finchley Road", tsd);
-            var station3B = CreateStation(new Position2f(7492, 7003), "West Hampstead", tsd);
-            var station4B = CreateStation(new Position2f(7992, 6003), "Kilburn", tsd);
-            var station5B = CreateStation(new Position2f(7992, 5006), "Willesden Green", tsd);
-            var station6B = CreateStation(new Position2f(7495, 4012), "Dollis Hill", tsd);
-            var station7B = CreateStation(new Position2f(6524, 4012), "Clapham South", tsd);
-            var station8B = CreateStation(new Position2f(5498, 4012), "Neasden", tsd);
-            var station9B = CreateStation(new Position2f(4494, 3510), "Wembley Park", tsd);
-            var station10B = CreateStation(new Position2f(3999, 2520), "Kingsbury", tsd);
-            var station11B = CreateStation(new Position2f(3494, 1510), "Queensbury", tsd);
-            var station12B = CreateStation(new Position2f(2498, 1012), "Canons Park", tsd);
-            var station13B = CreateStation(new Position2f(1500, 1012), "Stanmore", tsd);
+            var source = new Position2f(500, 500);
+            var target = new Position2f(7800, 1200);
+            var time = new WeekTimePoint(DayOfWeek.Tuesday, 11, 30);
 
-            const float frequency = 300f;
-            var route1A = new Route<Position2f>(new[] { station1A, station2A, station3A, station4A, station5A, station6A, station7A, station8A, station9A, station10A, station11A, station12A, station13A }, frequency);
-            var route1B = new Route<Position2f>(new[] { station1B, station2B, station3B, station4B, station5B, station6B, station7B, station8B, station9B, station10B, station11B, station12B, station13B }, frequency);
-            return new Line<Position2f>("1", route1A, route1B);
-        }
+            const int tasks = 200000;
 
-        private static Line<Position2f> CreateLine2(Dictionary<string, TransferStation<Position2f>> tsd)
-        {
-            var station1A = CreateStation(new Position2f(1500, 8000), "Morden", tsd);
-            var station2A = CreateStation(new Position2f(2500, 7500), "South Wimbledon", tsd);
-            var station3A = CreateStation(new Position2f(3500, 7000), "Colliers Wood", tsd);
-            var station4A = CreateStation(new Position2f(4500, 6500), "Tooting Broadway", tsd);
-            var station5A = CreateStation(new Position2f(5500, 5500), "Tooting Bec", tsd);
-            var station6A = CreateStation(new Position2f(6000, 4750), "Balham", tsd);
-            var station7A = CreateStation(new Position2f(6500, 4000), "Clapham South", tsd);
-            var station8A = CreateStation(new Position2f(7000, 3000), "Clapham Common", tsd);
-            var station9A = CreateStation(new Position2f(7000, 2000), "Clapham North", tsd);
-            var station10A = CreateStation(new Position2f(8000, 1500), "Stockwell", tsd);
-            var station11A = CreateStation(new Position2f(9000, 1500), "Oval", tsd);
+            var taskList1 = new List<Task>();
+            var taskList2 = new List<Task>();
+            var taskList3 = new List<Task>();
+            var taskList4 = new List<Task>();
 
-            var station1B = CreateStation(new Position2f(9000, 1520), "Oval", tsd);
-            var station2B = CreateStation(new Position2f(8000, 1520), "Stockwell", tsd);
-            var station3B = CreateStation(new Position2f(7000, 2020), "Clapham North", tsd);
-            var station4B = CreateStation(new Position2f(7000, 3020), "Clapham Common", tsd);
-            var station5B = CreateStation(new Position2f(6500, 4020), "Clapham South", tsd);
-            var station6B = CreateStation(new Position2f(6000, 4770), "Balham", tsd);
-            var station7B = CreateStation(new Position2f(5500, 5520), "Tooting Bec", tsd);
-            var station8B = CreateStation(new Position2f(4500, 6520), "Tooting Broadway", tsd);
-            var station9B = CreateStation(new Position2f(3500, 7020), "Colliers Wood", tsd);
-            var station10B = CreateStation(new Position2f(2500, 7520), "South Wimbledon", tsd);
-            var station11B = CreateStation(new Position2f(1500, 8020), "Morden", tsd);
+            for (var i = 0; i < tasks; ++i)
+            {
+                taskList1.Add(Task.Factory.StartNew(() => raptorWithDataManager.Compute(source, time, target)));
+            }
 
-            const float frequency = 240f;
-            var route1A = new Route<Position2f>(new[] { station1A, station2A, station3A, station4A, station5A, station6A, station7A, station8A, station9A, station10A, station11A }, frequency);
-            var route1B = new Route<Position2f>(new[] { station1B, station2B, station3B, station4B, station5B, station6B, station7B, station8B, station9B, station10B, station11B }, frequency);
-            return new Line<Position2f>("2", route1A, route1B);
+            var sw1 = Stopwatch.StartNew();
+            Task.WaitAll(taskList1.ToArray());
+            sw1.Stop();
+            Console.WriteLine($"RaptorWithDataManager: {sw1.ElapsedMilliseconds}ms ({sw1.ElapsedTicks / tasks} ticks per task)");
+
+            for (var i = 0; i < tasks; ++i)
+            {
+                taskList2.Add(Task.Factory.StartNew(() => raptorWithDataManagerBinarySearch.Compute(source, time, target)));
+            }
+
+            var sw2 = Stopwatch.StartNew();
+            Task.WaitAll(taskList2.ToArray());
+            sw2.Stop();
+            Console.WriteLine($"RaptorWithDataManagerBinarySearch: {sw2.ElapsedMilliseconds}ms ({sw2.ElapsedTicks / tasks} ticks per task)");
+
+            for (var i = 0; i < tasks; ++i)
+            {
+                taskList3.Add(Task.Factory.StartNew(() => parallelRaptorWithDataManager.Compute(source, time, target)));
+            }
+
+            var sw3 = Stopwatch.StartNew();
+            Task.WaitAll(taskList3.ToArray());
+            sw3.Stop();
+            Console.WriteLine($"ParallelRaptorWithDataManager: {sw3.ElapsedMilliseconds}ms ({sw3.ElapsedTicks / tasks} ticks per task)");
+
+            for (var i = 0; i < tasks; ++i)
+            {
+                taskList4.Add(Task.Factory.StartNew(() => raptorWithDataManagerBinarySearchTripLookup.Compute(source, time, target)));
+            }
+
+            var sw4 = Stopwatch.StartNew();
+            Task.WaitAll(taskList4.ToArray());
+            sw4.Stop();
+            Console.WriteLine($"RaptorWithDataManagerBinarySearchTripLookup: {sw4.ElapsedMilliseconds}ms ({sw4.ElapsedTicks / tasks} ticks per task)");
         }
     }
 }
