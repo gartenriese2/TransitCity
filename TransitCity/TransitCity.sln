@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvgDrawingUnitTest", "SvgDr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitySimulation", "CitySimulation\CitySimulation.csproj", "{1247B810-D259-44B0-A520-64F5225DF770}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitySimulationUnitTest", "CitySimulationUnitTest\CitySimulationUnitTest.csproj", "{5987BC2F-64E9-4884-9574-3DA847E03FDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,10 @@ Global
 		{1247B810-D259-44B0-A520-64F5225DF770}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1247B810-D259-44B0-A520-64F5225DF770}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1247B810-D259-44B0-A520-64F5225DF770}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5987BC2F-64E9-4884-9574-3DA847E03FDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5987BC2F-64E9-4884-9574-3DA847E03FDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5987BC2F-64E9-4884-9574-3DA847E03FDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5987BC2F-64E9-4884-9574-3DA847E03FDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

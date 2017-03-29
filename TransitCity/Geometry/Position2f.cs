@@ -45,6 +45,8 @@ namespace Geometry
             return new Position2f(p.X * s, p.Y * s);
         }
 
+        public static Position2f operator *(float s, Position2f p) => p * s;
+
         public static Position2f Lerp(float t, Position2f p1, Position2f p2)
         {
             return p1 * (1 - t) + p1 * t;

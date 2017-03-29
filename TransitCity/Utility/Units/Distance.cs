@@ -1,4 +1,6 @@
-﻿namespace Utility.Units
+﻿using System;
+
+namespace Utility.Units
 {
     public class Distance
     {
@@ -6,6 +8,11 @@
 
         internal Distance(float meters)
         {
+            if (meters < 0f)
+            {
+                throw new ArgumentOutOfRangeException(nameof(meters));
+            }
+
             _meters = meters;
         } 
 
@@ -20,6 +27,8 @@
         public static Distance operator *(Distance d, float f) => new Distance(d.Meters * f);
 
         public static Distance operator *(float f, Distance d) => d * f;
+
+        public static Area operator *(Distance d1, Distance d2) => new Area(d1.Meters * d2.Meters);
 
         public static Distance operator /(Distance d, float f) => new Distance(d.Meters / f);
 
