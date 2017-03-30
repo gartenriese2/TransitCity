@@ -18,6 +18,11 @@ namespace SvgDrawing
                 return ((Triangle) shape).ToSvg();
             }
 
+            if (shape is Polygon)
+            {
+                return ((Polygon) shape).ToSvg();
+            }
+
             throw new ArgumentException();
         }
 
@@ -44,6 +49,20 @@ namespace SvgDrawing
                     shape.C.X,
                     shape.C.Y
                 }
+            };
+        }
+
+        public static SvgPolygon ToSvg(this Polygon shape)
+        {
+            var pointCollection = new SvgPointCollection();
+            foreach (var vertex in shape.Vertices)
+            {
+                pointCollection.Add(vertex.X);
+                pointCollection.Add(vertex.Y);
+            }
+            return new SvgPolygon
+            {
+                Points = pointCollection
             };
         }
     }

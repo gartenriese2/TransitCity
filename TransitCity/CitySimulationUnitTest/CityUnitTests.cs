@@ -83,10 +83,12 @@ namespace CitySimulationUnitTest
             var document = new SvgDocumentWrapper(10000, 10000);
             foreach (var shape in city.Districts.Select(d => d.Shape))
             {
-                var circle = shape.ToSvg();
-                circle.FillOpacity = 0.2f;
-                circle.Fill = new SvgColourServer(Color.Green);
-                document.Add(circle);
+                var svgVisualElement = shape.ToSvg();
+                svgVisualElement.FillOpacity = 0.2f;
+                svgVisualElement.Fill = new SvgColourServer(Color.Green);
+                svgVisualElement.StrokeWidth = 8;
+                svgVisualElement.Stroke = new SvgColourServer(Color.Gray);
+                document.Add(svgVisualElement);
             }
 
             AddNetworkToSvgDocument(dataManager, document);
@@ -151,15 +153,79 @@ namespace CitySimulationUnitTest
 
         private City CreateCity()
         {
-            var district1 = new RandomDistrict("District1", new Circle(new Position2f(1000, 1000), 1000), 5000, 2000);
-            var district2 = new RandomDistrict("District2", new Circle(new Position2f(3000, 1000), 1000), 6000, 1000);
-            var district3 = new RandomDistrict("District3", new Circle(new Position2f(5000, 1000), 1000), 5000, 9000);
-            var district4 = new RandomDistrict("District4", new Circle(new Position2f(7000, 1000), 1000), 8000, 4000);
-            var district5 = new RandomDistrict("District5", new Circle(new Position2f(9000, 1000), 1000), 4000, 1500);
-            var city = new RandomDistrict("City", new Circle(new Position2f(6000, 5000), 1500), 7000, 15000);
-            var tri = new RandomDistrict("Tri", new Triangle(new Position2f(3000, 4000), new Position2f(4000, 4000), new Position2f(3500, 3500)), 4000, 2000);
+            var balham = new RandomDistrict("Balham", new Polygon(
+                5000, 4500,
+                5250, 4550,
+                5500, 4625,
+                5750, 4675,
+                6000, 4700,
+                6250, 4610,
+                6500, 4500,
+                6750, 4340,
+                7000, 4150,
+                7000, 4500,
+                6500, 5500,
+                5500, 6000,
+                5000, 5500
+            ), 4500, 16000);
 
-            return new City(new List<IDistrict> { district1, district2, district3, district4, district5, city, tri });
+            var buckhurst = new RandomDistrict("Buckhurst", new Polygon(
+                2500, 5400,
+                2750, 5450,
+                3000, 5410,
+                3250, 5350,
+                3500, 5260,
+                3750, 5125,
+                4000, 5000,
+                4250, 4850,
+                4500, 4670,
+                4750, 4570,
+                5000, 4500,
+                5000, 5500,
+                5500, 6000,
+                4500, 6500,
+                2500, 6500
+            ), 8000, 3000);
+
+            var epping = new RandomDistrict("Epping", new Polygon(
+                0, 3600,
+                250, 3620,
+                500, 3660,
+                750, 3750,
+                1000, 4000,
+                1850, 5000,
+                2000, 5120,
+                2250, 5270,
+                2500, 5400,
+                2500, 6500,
+                1000, 7000,
+                0, 8000
+            ), 6000, 2000);
+
+            var morden = new RandomDistrict("Morden", new Polygon(
+                0, 10000,
+                0, 8000,
+                1000, 7000,
+                2500, 6500,
+                3000, 6500,
+                3000, 8000,
+                4500, 10000
+            ), 10000, 5000);
+
+            var neasden = new RandomDistrict("Neasden", new Polygon(
+                4500, 3500,
+                5000, 3000,
+                6000, 2500,
+                6000, 4270,
+                5750, 4300,
+                5500, 4260,
+                5250, 4150,
+                5000, 4120,
+                4750, 4160,
+                4500, 4250
+            ), 5000, 14000);
+
+            return new City(new List<IDistrict> { balham, buckhurst, epping, morden, neasden });
         }
     }
 }

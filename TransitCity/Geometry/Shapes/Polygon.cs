@@ -6,32 +6,50 @@ namespace Geometry.Shapes
 {
     public class Polygon : IShape
     {
-        private readonly List<Position2f> _vertices;
-
         private readonly List<Triangle> _triangulation = new List<Triangle>();
 
-        public Polygon(List<Position2f> vertices)
+        public Polygon(params float[] coords)
         {
-            _vertices = vertices ?? throw new ArgumentNullException(nameof(vertices));
-            if (_vertices.Count < 3)
+            if (coords == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            if (coords.Length % 2 != 0)
             {
                 throw new ArgumentException();
             }
 
-            Triangulate();
+            if (coords.Length < 6)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
 
-            Area = _triangulation.Aggregate(0f, (f, tri) => f + tri.Area);
+            Vertices = new List<Position2f>(coords.Length / 2);
+            for (var i = 0; i < coords.Length - 1; i += 2)
+            {
+                Vertices.Add(new Position2f(coords[i], coords[i + 1]));
+            }
 
-            var minX = _vertices.Min(p => p.X);
-            var minY = _vertices.Min(p => p.Y);
-            var maxX = _vertices.Max(p => p.X);
-            var maxY = _vertices.Max(p => p.Y);
-            Bounds = (new Position2f(minX, minY), new Position2f(maxX, maxY));
+            Initialize();
         }
 
-        public float Area { get; }
+        public Polygon(List<Position2f> vertices)
+        {
+            Vertices = vertices ?? throw new ArgumentNullException(nameof(vertices));
+            if (Vertices.Count < 3)
+            {
+                throw new ArgumentException();
+            }
 
-        public (Position2f, Position2f) Bounds { get; }
+            Initialize();
+        }
+
+        public List<Position2f> Vertices { get; }
+
+        public float Area { get; private set; }
+
+        public (Position2f, Position2f) Bounds { get; private set; }
 
         public Position2f CreateRandomPoint(Random rnd)
         {
@@ -51,22 +69,35 @@ namespace Geometry.Shapes
 
         public bool IsPointInside(Position2f point) => _triangulation.Any(t => t.IsPointInside(point));
 
+        private void Initialize()
+        {
+            Triangulate();
+
+            Area = _triangulation.Aggregate(0f, (f, tri) => f + tri.Area);
+
+            var minX = Vertices.Min(p => p.X);
+            var minY = Vertices.Min(p => p.Y);
+            var maxX = Vertices.Max(p => p.X);
+            var maxY = Vertices.Max(p => p.Y);
+            Bounds = (new Position2f(minX, minY), new Position2f(maxX, maxY));
+        }
+
         private void Triangulate()
         {
             _triangulation.Clear();
 
-            if (_vertices.Count < 3)
+            if (Vertices.Count < 3)
             {
                 return;
             }
 
-            if (_vertices.Count == 3)
+            if (Vertices.Count == 3)
             {
-                _triangulation.Add(new Triangle(_vertices[0], _vertices[1], _vertices[2]));
+                _triangulation.Add(new Triangle(Vertices[0], Vertices[1], Vertices[2]));
                 return;
             }
 
-            var untriangulatedVertices = new List<Position2f>(_vertices);
+            var untriangulatedVertices = new List<Position2f>(Vertices);
 
             while (untriangulatedVertices.Count > 3)
             {
