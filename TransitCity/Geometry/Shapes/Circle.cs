@@ -27,5 +27,12 @@ namespace Geometry.Shapes
             var y = r * Radius * Math.Sin(t);
             return Center + new Position2f((float) x, (float) y);
         }
+
+        public bool IsPointInside(Position2f point) => point.DistanceTo(Center) <= Radius;
+
+        public override string ToString()
+        {
+            return $"Center: {Center}, Radius: {Radius}";
+        }
     }
 }

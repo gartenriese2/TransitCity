@@ -6,6 +6,8 @@ namespace Geometry.Shapes
     {
         Position2f CreateRandomPoint(Random rnd);
 
+        bool IsPointInside(Position2f point);
+
         float Area { get; }
 
         (Position2f, Position2f) Bounds { get; }
