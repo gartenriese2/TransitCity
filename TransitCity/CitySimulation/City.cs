@@ -9,11 +9,14 @@ namespace CitySimulation
     {
         private readonly List<IDistrict> _districts;
 
-        public City(List<IDistrict> districts)
+        public City(string name, List<IDistrict> districts)
         {
+            Name = name;
             _districts = districts ?? throw new ArgumentNullException(nameof(districts));
             Connect();
         }
+
+        public string Name { get; }
 
         public IEnumerable<IDistrict> Districts => _districts;
 

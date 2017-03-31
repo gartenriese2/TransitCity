@@ -51,6 +51,8 @@ namespace Geometry.Shapes
 
         public (Position2f, Position2f) Bounds { get; private set; }
 
+        public Position2f Centroid { get; private set; }
+
         public Position2f CreateRandomPoint(Random rnd)
         {
             var val = rnd.NextDouble() * Area;
@@ -80,6 +82,9 @@ namespace Geometry.Shapes
             var maxX = Vertices.Max(p => p.X);
             var maxY = Vertices.Max(p => p.Y);
             Bounds = (new Position2f(minX, minY), new Position2f(maxX, maxY));
+
+            var centroid = _triangulation.Aggregate(new Position2f(), (current, triangle) => current + triangle.Area * triangle.Centroid);
+            Centroid = new Position2f(centroid.X / Area, centroid.Y / Area);
         }
 
         private void Triangulate()

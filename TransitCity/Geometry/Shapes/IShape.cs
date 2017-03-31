@@ -11,5 +11,7 @@ namespace Geometry.Shapes
         float Area { get; }
 
         (Position2f, Position2f) Bounds { get; }
+
+        Position2f Centroid { get; }
     }
 }

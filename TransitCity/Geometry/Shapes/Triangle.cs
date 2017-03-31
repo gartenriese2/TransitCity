@@ -21,6 +21,9 @@ namespace Geometry.Shapes
             var maxX = Math.Max(a.X, Math.Max(b.X, c.X));
             var maxY = Math.Max(a.Y, Math.Max(b.Y, c.Y));
             Bounds = (new Position2f(minX, minY), new Position2f(maxX, maxY));
+
+            var centroid = A + B + C;
+            Centroid = new Position2f(centroid.X / 3f, centroid.Y / 3f);
         }
 
         public Position2f A { get; }
@@ -32,6 +35,8 @@ namespace Geometry.Shapes
         public float Area { get; }
 
         public (Position2f, Position2f) Bounds { get; }
+
+        public Position2f Centroid { get; }
 
         public Position2f CreateRandomPoint(Random rnd)
         {

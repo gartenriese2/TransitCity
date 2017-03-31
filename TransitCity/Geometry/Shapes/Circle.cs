@@ -18,6 +18,8 @@ namespace Geometry.Shapes
 
         public (Position2f, Position2f) Bounds => (new Position2f(Center.X - Radius, Center.Y - Radius), new Position2f(Center.X + Radius, Center.Y + Radius));
 
+        public Position2f Centroid => Center;
+
         public Position2f CreateRandomPoint(Random rnd)
         {
             var t = 2 * Math.PI * rnd.NextDouble();

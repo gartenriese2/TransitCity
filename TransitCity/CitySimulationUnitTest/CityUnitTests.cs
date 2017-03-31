@@ -29,7 +29,7 @@ namespace CitySimulationUnitTest
             var district4 = new RandomDistrict("District4", new Circle(new Position2f(7000, 1000), 1000), 8000, 4000);
             var district5 = new RandomDistrict("District5", new Circle(new Position2f(9000, 1000), 1000), 4000, 1500);
 
-            var city = new City(new List<IDistrict>{district1, district2, district3, district4, district5});
+            var city = new City("City", new List<IDistrict>{district1, district2, district3, district4, district5});
 
             Console.WriteLine($"Populationdensity: {city.PopulationDensity}");
             Console.WriteLine($"Jobdensity: {city.JobDensity}");
@@ -44,7 +44,7 @@ namespace CitySimulationUnitTest
             var district4 = new RandomDistrict("District4", new Circle(new Position2f(7000, 1000), 1000), 8000, 4000);
             var district5 = new RandomDistrict("District5", new Circle(new Position2f(9000, 1000), 1000), 4000, 1500);
 
-            var city = new City(new List<IDistrict> { district1, district2, district3, district4, district5 });
+            var city = new City("City", new List<IDistrict> { district1, district2, district3, district4, district5 });
 
             var lowerLeft = new Position2f(0,0);
             var upperRight = new Position2f(10000, 10000);
@@ -94,6 +94,62 @@ namespace CitySimulationUnitTest
             AddNetworkToSvgDocument(dataManager, document);
 
             document.Save("linesAndDistricts.svg");
+        }
+
+        [TestMethod]
+        public void CityDensityTest()
+        {
+            var city = CreateCity();
+            Console.WriteLine("Population density");
+            Console.WriteLine($"{city.Name}: {city.PopulationDensity}");
+            foreach (var district in city.Districts.OrderByDescending(d => d.PopulationDensity))
+            {
+                Console.WriteLine($"District {district.Name}: {district.PopulationDensity}");
+            }
+            Console.WriteLine();
+            Console.WriteLine("Job density");
+            Console.WriteLine($"{city.Name}: {city.JobDensity}");
+            foreach (var district in city.Districts.OrderByDescending(d => d.JobDensity))
+            {
+                Console.WriteLine($"District {district.Name}: {district.JobDensity}");
+            }
+
+            var maxDensity = city.Districts.Max(d => d.PopulationDensity);
+            var maxDensity2 = city.Districts.Max(d => d.JobDensity);
+
+            var document1 = new SvgDocumentWrapper(10000, 10000);
+            var document2 = new SvgDocumentWrapper(10000, 10000);
+            foreach (var district in city.Districts)
+            {
+                var density = district.PopulationDensity;
+                var density2 = district.JobDensity;
+                var shape = district.Shape;
+                var svgVisualElement = shape.ToSvg();
+                svgVisualElement.FillOpacity = density / maxDensity;
+                svgVisualElement.Fill = new SvgColourServer(Color.Green);
+                svgVisualElement.StrokeWidth = 16;
+                svgVisualElement.Stroke = new SvgColourServer(Color.Black);
+                document1.Add(svgVisualElement);
+                var svgVisualElement2 = shape.ToSvg();
+                svgVisualElement2.FillOpacity = density2 / maxDensity2;
+                svgVisualElement2.Fill = new SvgColourServer(Color.Blue);
+                svgVisualElement2.StrokeWidth = 16;
+                svgVisualElement2.Stroke = new SvgColourServer(Color.Black);
+                document2.Add(svgVisualElement2);
+
+                var centroid = shape.Centroid;
+                var textElem = new SvgText(district.Name)
+                {
+                    FontSize = new SvgUnit(128),
+                    X = new SvgUnitCollection {centroid.X},
+                    Y = new SvgUnitCollection {centroid.Y}
+                };
+                document1.Add(textElem);
+                document2.Add(textElem);
+            }
+
+            document1.Save("populationDensity.svg");
+            document2.Save("jobDensity.svg");
         }
 
         private void AddNetworkToSvgDocument(DataManager dataManager, SvgDocumentWrapper document)
@@ -256,7 +312,7 @@ namespace CitySimulationUnitTest
                 7500, 2740
             ), 2000, 5000);
 
-            return new City(new List<IDistrict> { balham, buckhurst, epping, morden, neasden, clapham, stockwell });
+            return new City("London", new List<IDistrict> { balham, buckhurst, epping, morden, neasden, clapham, stockwell });
         }
     }
 }
