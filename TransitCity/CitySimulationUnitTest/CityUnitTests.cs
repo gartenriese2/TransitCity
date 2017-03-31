@@ -225,7 +225,38 @@ namespace CitySimulationUnitTest
                 4500, 4250
             ), 5000, 14000);
 
-            return new City(new List<IDistrict> { balham, buckhurst, epping, morden, neasden });
+            var clapham = new RandomDistrict("Clapham", new Polygon(
+                6000, 4270,
+                6000, 1500,
+                7000, 1000,
+                7500, 1500,
+                7500, 2740,
+                7250, 3010,
+                7000, 3400,
+                6750, 3840,
+                6500, 4050,
+                6250, 4170
+            ), 12000, 6000);
+
+            var stockwell = new RandomDistrict("Stockwell", new Polygon(
+                7500, 1500,
+                7000, 1000,
+                7500, 0,
+                10000, 0,
+                10000, 2300,
+                9750, 2200,
+                9500, 2100,
+                9250, 2060,
+                9000, 2040,
+                8750, 2080,
+                8500, 2150,
+                8250, 2250,
+                8000, 2390,
+                7750, 2550,
+                7500, 2740
+            ), 2000, 5000);
+
+            return new City(new List<IDistrict> { balham, buckhurst, epping, morden, neasden, clapham, stockwell });
         }
     }
 }
