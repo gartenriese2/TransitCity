@@ -65,8 +65,9 @@ namespace Transit.Data
             DataManager.AddSubwayLine(
                 new Dictionary<Position2f, string>
                 {
-                    [new Position2f(5500, 2000)] = "Chesham",
-                    [new Position2f(5500, 3000)] = "Amersham",
+                    [new Position2f(5500, 750)] = "Chesham",
+                    [new Position2f(5500, 2100)] = "Amersham",
+                    [new Position2f(5500, 3000)] = "Bow Church",
                     [new Position2f(5500, 4000)] = "Neasden",
                     [new Position2f(6060, 4850)] = "Balham",
                     [new Position2f(6750, 5750)] = "Chalfont",

@@ -312,7 +312,92 @@ namespace CitySimulationUnitTest
                 7500, 2740
             ), 2000, 5000);
 
-            return new City("London", new List<IDistrict> { balham, buckhurst, epping, morden, neasden, clapham, stockwell });
+            var debden = new RandomDistrict("Debden", new Polygon(
+                0, 3000,
+                5000, 3000,
+                4500, 3500,
+                4500, 4250,
+                3500, 4750,
+                3000, 4950,
+                2750, 5000,
+                2500, 4950,
+                2250, 4800,
+                2000, 4630,
+                1500, 4000,
+                1250, 3700,
+                1000, 3490,
+                750, 3350,
+                500, 3270,
+                0, 3270
+            ), 8000, 3000);
+
+            var amersham = new RandomDistrict("Amersham", new Polygon(
+                3000, 3000,
+                4000, 1500,
+                6000, 1500,
+                6000, 2500,
+                5000, 3000
+            ), 7500, 4000);
+
+            var chesham = new RandomDistrict("Chesham", new Polygon(
+                4000, 1500,
+                4000, 0,
+                7500, 0,
+                7000, 1000,
+                6000, 1500
+            ), 3000, 2000);
+
+            var stanmore = new RandomDistrict("Stanmore", new Polygon(
+                0, 3000,
+                0, 0,
+                4000, 0,
+                4000, 1500,
+                3000, 3000
+            ), 4500, 1500);
+
+            var tooting = new RandomDistrict("Tooting", new Polygon(
+                3000, 6500,
+                4500, 6500,
+                6500, 5500,
+                7500, 7500,
+                8000, 10000,
+                4500, 10000,
+                3000, 8000
+            ), 3000, 500);
+
+            var hampstead = new RandomDistrict("Hampstead", new Polygon(
+                7000, 6500,
+                10000, 6500,
+                10000, 10000,
+                8000, 10000,
+                7500, 7500
+            ), 4000, 1000);
+
+            var watfrord = new RandomDistrict("Watford", new Polygon(
+                7000, 4500,
+                10000, 4500,
+                10000, 6500,
+                7000, 6500,
+                6500, 5500
+            ), 8000, 4000);
+
+            var chigwell = new RandomDistrict("Chigwell", new Polygon(
+                7000, 4500,
+                7000, 4150,
+                7150, 4000,
+                7500, 3500,
+                7750, 3200,
+                8000, 3000,
+                8500, 2720,
+                8750, 2640,
+                9000, 2600,
+                9500, 2660,
+                9750, 2750,
+                10000, 2900,
+                10000, 4500
+            ), 7000, 2500);
+
+            return new City("London", new List<IDistrict> { balham, buckhurst, epping, morden, neasden, clapham, stockwell, debden, amersham, chesham, stanmore, tooting, hampstead, watfrord, chigwell });
         }
     }
 }
