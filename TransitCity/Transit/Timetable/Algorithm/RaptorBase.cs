@@ -20,7 +20,12 @@ namespace Transit.Timetable.Algorithm
             _transferStations = transferStations;
         }
 
-        public virtual List<Connection<TPos>> Compute(TPos startPos, WeekTimePoint startTime, TPos targetPos)
+        public virtual List<Connection<TPos>> Compute(TPos sourcePos, WeekTimePoint startTime, TPos targetPos)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Connection<TPos>> ComputeReverse(TPos sourcePos, WeekTimePoint latestArrivalTime, TPos targetPos)
         {
             throw new NotImplementedException();
         }

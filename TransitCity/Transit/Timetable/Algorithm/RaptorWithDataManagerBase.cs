@@ -25,7 +25,12 @@ namespace Transit.Timetable.Algorithm
             _dataManager = dataManager;
         }
 
-        public virtual List<Connection<Position2f>> Compute(Position2f startPos, WeekTimePoint startTime, Position2f targetPos)
+        public virtual List<Connection<Position2f>> Compute(Position2f sourcePos, WeekTimePoint startTime, Position2f targetPos)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual List<Connection2f> ComputeReverse(Position2f sourcePos, WeekTimePoint latestArrivalTime, Position2f targetPos)
         {
             throw new NotImplementedException();
         }
@@ -45,24 +50,74 @@ namespace Transit.Timetable.Algorithm
             return connectionList;
         }
 
-        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection2f>) GetInitialMarkedStations(Position2f startPos, WeekTimePoint startTime)
+        protected static List<Connection2f> GetTravelPathReverse(IReadOnlyCollection<Connection2f> latestConnections, Position2f sourcePos)
+        {
+            var con = latestConnections.FirstOrDefault(c => c.SourcePos != null && c.SourcePos.EqualPosition(sourcePos));
+
+            var connectionList = new List<Connection2f> { con };
+
+            while (con.Type == Connection2f.TypeEnum.Ride || con.Type == Connection2f.TypeEnum.Transfer || con.Type == Connection2f.TypeEnum.WalkToStation)
+            {
+                var newCon = latestConnections.FirstOrDefault(c => c.SourceStation == con.TargetStation);
+                if (newCon.Type == Connection2f.TypeEnum.Transfer || newCon.Type == Connection2f.TypeEnum.WalkFromStation)
+                {
+                    // change walking time
+                    if (newCon.Type == Connection2f.TypeEnum.Transfer)
+                    {
+                        newCon = Connection2f.CreateTransfer(newCon.SourceStation, con.TargetTime, newCon.TargetStation, newCon.TargetTime - (newCon.SourceTime - con.TargetTime));
+                    }
+                    else
+                    {
+                        newCon = Connection2f.CreateWalkFromStation(newCon.SourceStation, con.TargetTime, newCon.TargetPos, newCon.TargetTime - (newCon.SourceTime - con.TargetTime));
+                    }
+                    
+                }
+
+                connectionList.Add(newCon);
+                con = newCon;
+            }
+
+            return connectionList;
+        }
+
+        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection2f>) GetInitialMarkedStations(Position2f position, WeekTimePoint time)
         {
             var markedStations = new Dictionary<StationInfo, WeekTimePoint>();
-            var earliestConnections = new List<Connection2f>();
+            var connections = new List<Connection2f>();
             foreach (var stationInfo in _dataManager.AllStationInfos)
             {
-                var walkingTime = TimeSpan.FromSeconds(startPos.DistanceTo(stationInfo.Station.Position) / _walkingSpeed);
+                var walkingTime = TimeSpan.FromSeconds(position.DistanceTo(stationInfo.Station.Position) / _walkingSpeed);
                 if (walkingTime > _maxWalkingTime)
                 {
                     continue;
                 }
 
-                var arrivalTime = startTime + walkingTime;
-                markedStations.Add(stationInfo, arrivalTime);
-                earliestConnections.Add(Connection2f.CreateWalkToStation(startPos, startTime, stationInfo.Station, arrivalTime));
+                var timeAtStation = time + walkingTime;
+                markedStations.Add(stationInfo, timeAtStation);
+                connections.Add(Connection2f.CreateWalkToStation(position, time, stationInfo.Station, timeAtStation));
             }
 
-            return (markedStations, earliestConnections);
+            return (markedStations, connections);
+        }
+
+        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection2f>) GetInitialMarkedStationsReverse(Position2f position, WeekTimePoint time)
+        {
+            var markedStations = new Dictionary<StationInfo, WeekTimePoint>();
+            var connections = new List<Connection2f>();
+            foreach (var stationInfo in _dataManager.AllStationInfos)
+            {
+                var walkingTime = TimeSpan.FromSeconds(position.DistanceTo(stationInfo.Station.Position) / _walkingSpeed);
+                if (walkingTime > _maxWalkingTime)
+                {
+                    continue;
+                }
+
+                var timeAtStation = time - walkingTime;
+                markedStations.Add(stationInfo, timeAtStation);
+                connections.Add(Connection2f.CreateWalkFromStation(stationInfo.Station, timeAtStation, position, time));
+            }
+
+            return (markedStations, connections);
         }
     }
 }

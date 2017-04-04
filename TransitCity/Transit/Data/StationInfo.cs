@@ -120,5 +120,36 @@ namespace Transit.Data
 
             throw new InvalidOperationException();
         }
+
+        public (WeekTimePoint, Trip<Position2f>) GetLastArrivalAndTripArrayBinarySearch(WeekTimePoint time)
+        {
+            if (_arrivalsArray.Length == 0)
+            {
+                return (null, null);
+            }
+
+            var idx = Array.BinarySearch(_arrivalsArray, time);
+            if (idx >= 0)
+            {
+                return (_arrivalsArray[idx], _trips[idx]);
+            }
+
+            if (idx < 0)
+            {
+                idx = ~idx;
+            }
+
+            if (idx == 0)
+            {
+                return (_arrivalsArray.Last(), _trips.Last());
+            }
+
+            if (idx > 0)
+            {
+                return (_arrivalsArray[idx - 1], _trips[idx - 1]);
+            }
+
+            throw new InvalidOperationException();
+        }
     }
 }

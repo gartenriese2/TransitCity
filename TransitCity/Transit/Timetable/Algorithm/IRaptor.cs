@@ -6,6 +6,8 @@ namespace Transit.Timetable.Algorithm
 {
     public interface IRaptor<TPos> where TPos : IPosition
     {
-        List<Connection<TPos>> Compute(TPos startPos, WeekTimePoint startTime, TPos targetPos);
+        List<Connection<TPos>> Compute(TPos sourcePos, WeekTimePoint startTime, TPos targetPos);
+
+        List<Connection<TPos>> ComputeReverse(TPos sourcePos, WeekTimePoint latestArrivalTime, TPos targetPos);
     }
 }

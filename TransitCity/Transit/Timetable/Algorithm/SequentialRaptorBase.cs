@@ -12,15 +12,15 @@ namespace Transit.Timetable.Algorithm
         {
         }
 
-        public override List<Connection<TPos>> Compute(TPos startPos, WeekTimePoint startTime, TPos targetPos)
+        public override List<Connection<TPos>> Compute(TPos sourcePos, WeekTimePoint startTime, TPos targetPos)
         {
-            var earliestKnownTargetArrivalTime = startTime + TimeSpan.FromSeconds(startPos.DistanceTo(targetPos) / _walkingSpeed);
+            var earliestKnownTargetArrivalTime = startTime + TimeSpan.FromSeconds(sourcePos.DistanceTo(targetPos) / _walkingSpeed);
             var earliestConnections = new List<Connection<TPos>>
             {
-                Connection<TPos>.CreateWalk(startPos, startTime, targetPos, earliestKnownTargetArrivalTime)
+                Connection<TPos>.CreateWalk(sourcePos, startTime, targetPos, earliestKnownTargetArrivalTime)
             };
 
-            var (markedStations, connections) = GetInitialMarkedStations(startPos, startTime);
+            var (markedStations, connections) = GetInitialMarkedStations(sourcePos, startTime);
             earliestConnections.AddRange(connections);
 
             Compute(markedStations, targetPos, ref earliestKnownTargetArrivalTime, earliestConnections);

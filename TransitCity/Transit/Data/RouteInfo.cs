@@ -35,6 +35,17 @@ namespace Transit.Data
             return StationInfos.Skip(idx + 1);
         }
 
+        public IEnumerable<StationInfo> GetLastStationInfos(StationInfo stationInfo)
+        {
+            var idx = StationInfos.IndexOf(stationInfo);
+            if (idx == -1)
+            {
+                throw new ArgumentException();
+            }
+
+            return StationInfos.Take(idx).Reverse();
+        }
+
         public IEnumerable<WeekTimePoint> GetNextArrivalsOnTrip(Station<Position2f> station, WeekTimePoint departure)
         {
             foreach (var trip in Trips)

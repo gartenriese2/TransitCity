@@ -17,15 +17,15 @@ namespace Transit.Timetable.Algorithm
         {
         }
 
-        public override List<Connection2f> Compute(Position2f startPos, WeekTimePoint startTime, Position2f targetPos)
+        public override List<Connection2f> Compute(Position2f sourcePos, WeekTimePoint startTime, Position2f targetPos)
         {
-            var earliestKnownTargetArrivalTime = startTime + TimeSpan.FromSeconds(startPos.DistanceTo(targetPos) / _walkingSpeed);
+            var earliestKnownTargetArrivalTime = startTime + TimeSpan.FromSeconds(sourcePos.DistanceTo(targetPos) / _walkingSpeed);
             var earliestConnections = new List<Connection<Position2f>>
             {
-                Connection2f.CreateWalk(startPos, startTime, targetPos, earliestKnownTargetArrivalTime)
+                Connection2f.CreateWalk(sourcePos, startTime, targetPos, earliestKnownTargetArrivalTime)
             };
 
-            var (markedStations, connections) = GetInitialMarkedStations(startPos, startTime);
+            var (markedStations, connections) = GetInitialMarkedStations(sourcePos, startTime);
             earliestConnections.AddRange(connections);
 
             for (var k = 1; markedStations.Count > 0 && k <= NumRounds; ++k)

@@ -67,6 +67,7 @@
     <Compile Include="TimetableManagerUnitTests.cs" />
     <Compile Include="DataManagerUnitTests.cs" />
     <Compile Include="StationInfoUnitTests.cs" />
+    <Compile Include="RaptorUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

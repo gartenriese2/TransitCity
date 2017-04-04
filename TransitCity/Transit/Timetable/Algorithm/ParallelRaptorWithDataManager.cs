@@ -22,15 +22,15 @@ namespace Transit.Timetable.Algorithm
         {
         }
 
-        public override List<Connection2f> Compute(Position2f startPos, WeekTimePoint startTime, Position2f targetPos)
+        public override List<Connection2f> Compute(Position2f sourcePos, WeekTimePoint startTime, Position2f targetPos)
         {
-            var earliestKnownTargetArrivalTime = new Atomic<AtomicWeekTimePoint>(new AtomicWeekTimePoint(startTime + TimeSpan.FromSeconds(startPos.DistanceTo(targetPos) / _walkingSpeed)));
+            var earliestKnownTargetArrivalTime = new Atomic<AtomicWeekTimePoint>(new AtomicWeekTimePoint(startTime + TimeSpan.FromSeconds(sourcePos.DistanceTo(targetPos) / _walkingSpeed)));
             var earliestConnections = new ConcurrentBag<Connection2f>
             {
-                Connection2f.CreateWalk(startPos, startTime, targetPos, earliestKnownTargetArrivalTime.Data())
+                Connection2f.CreateWalk(sourcePos, startTime, targetPos, earliestKnownTargetArrivalTime.Data())
             };
 
-            var (markedStations, connections) = GetInitialMarkedStations(startPos, startTime);
+            var (markedStations, connections) = GetInitialMarkedStations(sourcePos, startTime);
             connections.ForEach(c => earliestConnections.Add(c));
 
             for (var k = 1; markedStations.Count > 0 && k <= NumRounds; ++k)

@@ -57,6 +57,17 @@ namespace Transit
             return _stationTimes.Skip(idx + 1).Select(vt => vt.Item2.Item1);
         }
 
+        public IEnumerable<Departure> GetLastDepartures(Station<TPos> station)
+        {
+            var idx = _stationTimes.FindIndex(vt => vt.Item1 == station);
+            if (idx == -1)
+            {
+                throw new ArgumentException();
+            }
+
+            return _stationTimes.Take(idx).Reverse().Select(vt => vt.Item2.Item2);
+        }
+
         public IEnumerable<Departure> GetNextDepartures(Station<TPos> station)
         {
             var idx = _stationTimes.FindIndex(vt => vt.Item1 == station);
