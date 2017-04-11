@@ -43,6 +43,8 @@
   <ItemGroup>
     <Compile Include="City.cs" />
     <Compile Include="Job.cs" />
+    <Compile Include="JobSchedule.cs" />
+    <Compile Include="Schedule.cs" />
     <Compile Include="RandomDistrict.cs" />
     <Compile Include="IDistrict.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -52,6 +54,10 @@
     <ProjectReference Include="..\Geometry\Geometry.csproj">
       <Project>{75eb7f70-ec1d-45ad-82ac-cb953003d1a3}</Project>
       <Name>Geometry</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Time\Time.csproj">
+      <Project>{E9ED2B02-1DE4-49FF-963C-DE6B0DEFE3EE}</Project>
+      <Name>Time</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utility\Utility.csproj">
       <Project>{D1E7778B-2C3C-4058-9CCF-757E12D3BEB1}</Project>
