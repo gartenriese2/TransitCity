@@ -12,5 +12,7 @@ namespace CitySimulation
         {
             _weekTimeSpans = weekTimeSpans ?? throw new ArgumentNullException(nameof(weekTimeSpans));
         }
+
+        public IEnumerable<WeekTimeSpan> WeekTimeSpans => _weekTimeSpans;
     }
 }

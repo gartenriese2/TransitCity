@@ -18,5 +18,15 @@ namespace Time
         {
             return WeekTimePoint.GetCorrectedDifference(Begin, End);
         }
+
+        public bool IsInside(WeekTimePoint wtp)
+        {
+            if (Begin <= End)
+            {
+                return wtp >= Begin && wtp <= End;
+            }
+
+            return wtp >= Begin || wtp <= End;
+        }
     }
 }

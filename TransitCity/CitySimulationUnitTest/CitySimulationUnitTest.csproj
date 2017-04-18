@@ -58,6 +58,7 @@
     <Compile Include="DistrictUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CityUnitTests.cs" />
+    <Compile Include="JobScheduleUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
