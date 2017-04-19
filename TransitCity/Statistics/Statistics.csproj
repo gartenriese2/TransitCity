@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AC4D9311-EBDF-4D30-BA19-5B45C8006ADD}</ProjectGuid>
+    <ProjectGuid>{1C648B4D-E159-495B-ADE8-F1BD53802904}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SvgDrawing</RootNamespace>
-    <AssemblyName>SvgDrawing</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <RootNamespace>Statistics</RootNamespace>
+    <AssemblyName>Statistics</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -30,12 +30,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Svg, Version=2.2.1.39233, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
-      <HintPath>..\packages\Svg.2.3.0\lib\net35\Svg.dll</HintPath>
+    <Reference Include="MiscUtil, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d3c42c4bfacf7596, processorArchitecture=MSIL">
+      <HintPath>..\packages\JonSkeet.MiscUtil.0.1\lib\net35-Client\MiscUtil.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,23 +43,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Charts\SvgBarChart.cs" />
-    <Compile Include="ShapeExtensions.cs" />
-    <Compile Include="SvgDocumentWrapper.cs" />
+    <Compile Include="Charts\BarChart.cs" />
+    <Compile Include="Data\Data.cs" />
+    <Compile Include="Data\Datapoint.cs" />
+    <Compile Include="Data\DatapointCollection.cs" />
+    <Compile Include="Data\NamedData.cs" />
+    <Compile Include="Data\NamedDatapoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Geometry\Geometry.csproj">
-      <Project>{75EB7F70-EC1D-45AD-82AC-CB953003D1A3}</Project>
-      <Name>Geometry</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Statistics\Statistics.csproj">
-      <Project>{1C648B4D-E159-495B-ADE8-F1BD53802904}</Project>
-      <Name>Statistics</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

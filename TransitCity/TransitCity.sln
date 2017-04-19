@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.10
+VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransitCity", "TransitCity\TransitCity.csproj", "{0CD661EF-7D39-4874-9DB0-4DBC0EAECD40}"
 EndProject
@@ -40,6 +40,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitySimulationUnitTest", "CitySimulationUnitTest\CitySimulationUnitTest.csproj", "{5987BC2F-64E9-4884-9574-3DA847E03FDB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeometryUnitTest", "GeometryUnitTest\GeometryUnitTest.csproj", "{4ADD40B8-526F-4723-A360-066467CB0FC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Statistics", "Statistics\Statistics.csproj", "{1C648B4D-E159-495B-ADE8-F1BD53802904}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +125,10 @@ Global
 		{4ADD40B8-526F-4723-A360-066467CB0FC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4ADD40B8-526F-4723-A360-066467CB0FC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4ADD40B8-526F-4723-A360-066467CB0FC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C648B4D-E159-495B-ADE8-F1BD53802904}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C648B4D-E159-495B-ADE8-F1BD53802904}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C648B4D-E159-495B-ADE8-F1BD53802904}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C648B4D-E159-495B-ADE8-F1BD53802904}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
