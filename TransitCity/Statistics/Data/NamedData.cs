@@ -17,6 +17,8 @@ namespace Statistics.Data
             Names = names.Select(n => n.ToString());
         }
 
+        public T this[string key] => DatapointCollection.Where(dp => ((NamedDatapoint<T>) dp).Name == key).Aggregate(Operator<T>.Zero, (sum, dp) => Operator<T>.Add(sum, ((NamedDatapoint<T>)dp).Value));
+
         public IEnumerable<string> Names { get; }
 
         public T Maximum => DatapointCollection.Aggregate(Operator<T>.Zero, (value, dp) => Operator<T>.GreaterThan(((NamedDatapoint<T>)dp).Value, value) ? ((NamedDatapoint<T>)dp).Value : value);

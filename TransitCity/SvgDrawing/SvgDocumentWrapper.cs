@@ -1,4 +1,6 @@
-﻿using Svg;
+﻿using System.Globalization;
+using Svg;
+using Svg.Transforms;
 
 namespace SvgDrawing
 {

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using MiscUtil;
 using Statistics.Data;
 
@@ -21,10 +22,17 @@ namespace Statistics.Charts
             Maximum = max;
         }
 
+        public T this[string key] => _data[key];
+
         public int BarCount { get; }
 
         public T Minimum { get; }
 
         public T Maximum { get; }
+
+        public IEnumerable<T> GetValues()
+        {
+            return _data.Names.Select(name => _data[name]);
+        }
     }
 }
