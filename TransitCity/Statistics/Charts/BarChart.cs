@@ -30,6 +30,8 @@ namespace Statistics.Charts
 
         public T Maximum { get; }
 
+        public IEnumerable<string> Names => _data.Names;
+
         public IEnumerable<T> GetValues()
         {
             return _data.Names.Select(name => _data[name]);

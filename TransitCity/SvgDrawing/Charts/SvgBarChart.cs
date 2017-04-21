@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Linq;
 using Statistics.Charts;
 using Svg;
+using Svg.Transforms;
 
 namespace SvgDrawing.Charts
 {
@@ -55,6 +56,15 @@ namespace SvgDrawing.Charts
                     Height = fVal,
                     Fill = _barColor
                 });
+
+                var textElement = new SvgText(chart.Names.ElementAt(i))
+                {
+                    FontSize = textSize,
+                    Y = new SvgUnitCollection { _borderThickness + maxBarHeight + textSize }
+                };
+                _document.Add(textElement);
+                var textWidth = textElement.Bounds.Width;
+                textElement.X = new SvgUnitCollection { offsetX + barWidth / 2 - textWidth / 2 };
             }
         }
 

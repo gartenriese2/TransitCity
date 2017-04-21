@@ -21,7 +21,7 @@ namespace SvgDrawingUnitTest
             data.AddDatapoint(new NamedDatapoint<int>(DayOfWeek.Tuesday, 27));
             data.AddDatapoint(new NamedDatapoint<int>(DayOfWeek.Friday, 64));
             var chart = new BarChart<int>(data);
-            var svgChart = new SvgBarChart(chart, 32, 16, 512, 12);
+            var svgChart = new SvgBarChart(chart, 64, 16, 512, 12);
             svgChart.Save("barChart.svg");
         }
 
