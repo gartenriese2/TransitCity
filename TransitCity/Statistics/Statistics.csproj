@@ -44,11 +44,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Charts\BarChart.cs" />
+    <Compile Include="Charts\LineChart.cs" />
     <Compile Include="Data\Data.cs" />
-    <Compile Include="Data\Datapoint.cs" />
+    <Compile Include="Data\FloatDatapoint.cs" />
+    <Compile Include="Data\IDatapoint.cs" />
     <Compile Include="Data\DatapointCollection.cs" />
     <Compile Include="Data\NamedData.cs" />
     <Compile Include="Data\NamedDatapoint.cs" />
+    <Compile Include="Data\RangedData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

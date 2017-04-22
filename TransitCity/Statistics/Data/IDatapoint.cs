@@ -1,6 +1,6 @@
 ﻿namespace Statistics.Data
 {
-    public class Datapoint
+    public interface IDatapoint
     {
     }
 }

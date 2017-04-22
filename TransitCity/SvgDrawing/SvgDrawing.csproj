@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Charts\SvgBarChart.cs" />
+    <Compile Include="Charts\SvgLineChart.cs" />
     <Compile Include="ShapeExtensions.cs" />
     <Compile Include="SvgDocumentWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

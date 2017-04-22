@@ -2,7 +2,7 @@
 
 namespace Statistics.Data
 {
-    public class NamedDatapoint<T> : Datapoint where T : struct 
+    public class NamedDatapoint<T> : IDatapoint where T : struct 
     {
         public NamedDatapoint(string name, T value)
         {

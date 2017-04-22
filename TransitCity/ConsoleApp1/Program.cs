@@ -4,9 +4,13 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
+using CitySimulation;
 using Geometry;
+using Statistics.Charts;
+using Statistics.Data;
 using Svg;
 using SvgDrawing;
+using SvgDrawing.Charts;
 using Time;
 using Transit;
 using Transit.Data;
@@ -21,7 +25,28 @@ namespace ConsoleApp1
         private static void Main(string[] args)
         {
             //RaptorPerformanceTest2();
-            DrawBusiestStations();
+            //DrawBusiestStations();
+            LineChartTest();
+        }
+
+        private static void LineChartTest()
+        {
+            const int count = 1000000;
+            var jobSchedules = Enumerable.Repeat(new Random(), count).Select(JobSchedule.CreateRandom).ToList();
+            var data = new RangedData(0f, 1f, 24 * 7 - 1);
+            for (var i = 0; i < 24 * 7 - 1; ++i)
+            {
+                data.AddDatapoint(new FloatDatapoint(i + 0.5f, CountWorkers(jobSchedules, new WeekTimeSpan(new WeekTimePoint((byte)(i / 24), (byte)(i % 24)), new WeekTimePoint((byte)((i + 1) / 24), (byte)((i + 1) % 24))))));
+                Console.WriteLine($"done with {i}");
+            }
+            var chart = new LineChart(data);
+            var svgChart = new SvgLineChart(chart, 1024, 512, 12);
+            svgChart.Save("workersPerHour.svg");
+        }
+
+        private static int CountWorkers(IEnumerable<JobSchedule> schedules, WeekTimeSpan targetWts)
+        {
+            return schedules.Count(js => js.WeekTimeSpans.Any(wts => targetWts.IsInside(wts.Begin) || wts.IsInside(targetWts.Begin)));
         }
 
         private static void DrawBusiestStations()

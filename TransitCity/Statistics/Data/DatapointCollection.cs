@@ -2,7 +2,7 @@
 
 namespace Statistics.Data
 {
-    public class DatapointCollection : List<Datapoint>
+    public class DatapointCollection : List<IDatapoint>
     {
     }
 }

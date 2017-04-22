@@ -55,6 +55,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CitySimulation\CitySimulation.csproj">
+      <Project>{1247B810-D259-44B0-A520-64F5225DF770}</Project>
+      <Name>CitySimulation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Geometry\Geometry.csproj">
       <Project>{75EB7F70-EC1D-45AD-82AC-CB953003D1A3}</Project>
       <Name>Geometry</Name>
@@ -62,6 +66,10 @@
     <ProjectReference Include="..\PathFinding\PathFinding.csproj">
       <Project>{88FF68AB-2F6D-4DE9-8B15-68C56C0DB206}</Project>
       <Name>PathFinding</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Statistics\Statistics.csproj">
+      <Project>{1C648B4D-E159-495B-ADE8-F1BD53802904}</Project>
+      <Name>Statistics</Name>
     </ProjectReference>
     <ProjectReference Include="..\SvgDrawing\SvgDrawing.csproj">
       <Project>{AC4D9311-EBDF-4D30-BA19-5B45C8006ADD}</Project>

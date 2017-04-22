@@ -4,7 +4,7 @@
     {
         protected readonly DatapointCollection DatapointCollection = new DatapointCollection();
 
-        protected void AddDatapoint(Datapoint dp)
+        protected void AddDatapoint(IDatapoint dp)
         {
             DatapointCollection.Add(dp);
         }

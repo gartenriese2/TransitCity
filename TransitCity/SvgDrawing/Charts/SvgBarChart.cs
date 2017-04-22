@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Linq;
 using Statistics.Charts;
 using Svg;
-using Svg.Transforms;
 
 namespace SvgDrawing.Charts
 {
@@ -15,7 +14,6 @@ namespace SvgDrawing.Charts
 
         public SvgBarChart(BarChart<int> chart, float barWidth, float gapWidth, float maxBarHeight, int textSize, float borderThickness = -1f)
         {
-            
             Initialize(chart, barWidth, gapWidth, maxBarHeight, textSize, borderThickness);
         }
 
