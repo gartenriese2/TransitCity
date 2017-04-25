@@ -64,6 +64,29 @@ namespace SvgDrawing.Charts
                 var textWidth = textElement.Bounds.Width;
                 textElement.X = new SvgUnitCollection { offsetX + barWidth / 2 - textWidth / 2 };
             }
+
+            // axes
+            var axisOffset = 4f;
+            var xAxis = new SvgLine
+            {
+                StartX = _borderThickness - axisOffset,
+                EndX = width - _borderThickness + axisOffset,
+                StartY = height - _borderThickness - textSize,
+                EndY = height - _borderThickness - textSize,
+                Stroke = new SvgColourServer(Color.Black),
+                StrokeWidth = 2
+            };
+            _document.Add(xAxis);
+            var yAxis = new SvgLine
+            {
+                StartX = _borderThickness,
+                EndX = _borderThickness,
+                StartY = height - _borderThickness - textSize + axisOffset,
+                EndY = _borderThickness - axisOffset,
+                Stroke = new SvgColourServer(Color.Black),
+                StrokeWidth = 2
+            };
+            _document.Add(yAxis);
         }
 
         private float CalculateWidth<T>(BarChart<T> chart, float barWidth, float gapWidth) where T : struct

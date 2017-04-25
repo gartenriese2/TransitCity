@@ -67,14 +67,15 @@ namespace SvgDrawingUnitTest
         {
             const int count = 1000000;
             var jobSchedules = Enumerable.Repeat(new Random(), count).Select(JobSchedule.CreateRandom).ToList();
-            var data = new RangedData(0f, 1f, 24 * 7);
-            for (var i = 0; i < 24 * 7; ++i)
+            var list = SortWorkers(jobSchedules, TimeSpan.FromMinutes(5));
+            var data = new RangedData(0f, 1f, list.Count - 1);
+            for (var i = 0; i < list.Count; ++i)
             {
-                data.AddDatapoint(new FloatDatapoint(i + 0.5f, CountWorkers(jobSchedules, new WeekTimeSpan(new WeekTimePoint((byte)(i / 24), (byte)(i % 24)), new WeekTimePoint((byte)((i + 1) / 24), (byte)((i + 1) % 24))))));
-                Console.WriteLine($"done with {i}");
+                data.AddDatapoint(new FloatDatapoint(i, list[i]));
             }
+
             var chart = new LineChart(data);
-            var svgChart = new SvgLineChart(chart, 512, 512, 12);
+            var svgChart = new SvgLineChart(chart, 512, 512, 12, 32, 1);
             svgChart.Save("workersPerHour.svg");
         }
 
@@ -89,6 +90,38 @@ namespace SvgDrawingUnitTest
         private static int CountWorkers(IEnumerable<JobSchedule> schedules, WeekTimeSpan targetWts)
         {
             return schedules.Count(js => js.WeekTimeSpans.Any(wts => targetWts.IsInside(wts.Begin) || wts.IsInside(targetWts.Begin)));
+        }
+
+        private static List<int> SortWorkers(IEnumerable<JobSchedule> schedules, TimeSpan delta)
+        {
+            var num = (int)Math.Ceiling(7.0 / delta.TotalDays);
+            var list = Enumerable.Range(0, num).Select(i => 0).ToList();
+            foreach (var wts in schedules.SelectMany(s => s.WeekTimeSpans))
+            {
+                var beginIdx = (int) (wts.Begin.TimePoint.TotalDays / delta.TotalDays);
+                var endIdx = (int) (wts.End.TimePoint.TotalDays / delta.TotalDays);
+                if (endIdx >= beginIdx)
+                {
+                    for (var i = beginIdx; i <= endIdx; ++i)
+                    {
+                        ++list[i];
+                    }
+                }
+                else
+                {
+                    for (var i = 0; i <= endIdx; ++i)
+                    {
+                        ++list[i];
+                    }
+
+                    for (var i = beginIdx; i < list.Count; ++i)
+                    {
+                        ++list[i];
+                    }
+                }
+            }
+
+            return list;
         }
     }
 }

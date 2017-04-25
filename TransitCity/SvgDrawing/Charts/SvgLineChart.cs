@@ -27,7 +27,7 @@ namespace SvgDrawing.Charts
             var xDelta = chartWidth / (numRanges - 1);
             var svgPolyline = new SvgPolyline
             {
-                StrokeWidth = lineThickness,
+                StrokeWidth = _lineThickness,
                 Stroke = _lineColor,
                 Fill = SvgPaintServer.None,
                 Points = new SvgPointCollection()
@@ -41,6 +41,29 @@ namespace SvgDrawing.Charts
                 svgPolyline.Points.Add(y);
             }
             _document.Add(svgPolyline);
+
+            // axes
+            var axisOffset = 4f;
+            var xAxis = new SvgLine
+            {
+                StartX = _borderThickness - axisOffset,
+                EndX = width - _borderThickness + axisOffset,
+                StartY = height - _borderThickness - textSize,
+                EndY = height - _borderThickness - textSize,
+                Stroke = new SvgColourServer(Color.Black),
+                StrokeWidth = 2
+            };
+            _document.Add(xAxis);
+            var yAxis = new SvgLine
+            {
+                StartX = _borderThickness,
+                EndX = _borderThickness,
+                StartY = height - _borderThickness - textSize + axisOffset,
+                EndY = _borderThickness - axisOffset,
+                Stroke = new SvgColourServer(Color.Black),
+                StrokeWidth = 2
+            };
+            _document.Add(yAxis);
         }
 
         public void Save(string path)
