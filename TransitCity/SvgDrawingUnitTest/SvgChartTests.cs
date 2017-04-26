@@ -21,7 +21,7 @@ namespace SvgDrawingUnitTest
             data.AddDatapoint(new NamedDatapoint<int>(DayOfWeek.Tuesday, 27));
             data.AddDatapoint(new NamedDatapoint<int>(DayOfWeek.Friday, 64));
             var chart = new BarChart<int>(data);
-            var svgChart = new SvgBarChart(chart, 64, 16, 512, 12);
+            var svgChart = new SvgBarChart(chart, 50, 64, 16, 512, 12);
             svgChart.Save("barChart.svg");
         }
 
@@ -46,7 +46,7 @@ namespace SvgDrawingUnitTest
             data.AddDatapoint(new NamedDatapoint<int>(DayOfWeek.Saturday, workersOnSaturday));
             data.AddDatapoint(new NamedDatapoint<int>(DayOfWeek.Sunday, workersOnSunday));
             var chart = new BarChart<int>(data);
-            var svgChart = new SvgBarChart(chart, 32, 16, 256, 12, 16);
+            var svgChart = new SvgBarChart(chart, 100000, 32, 16, 256, 12, 16);
             svgChart.Save("workersPerDay.svg");
         }
 
@@ -58,7 +58,7 @@ namespace SvgDrawingUnitTest
             data.AddDatapoint(new FloatDatapoint(21, 79));
             data.AddDatapoint(new FloatDatapoint(42, 37));
             var chart = new LineChart(data);
-            var svgChart = new SvgLineChart(chart, 512, 512, 12);
+            var svgChart = new SvgLineChart(chart, 512, 512, 100);
             svgChart.Save("lineChart.svg");
         }
 
@@ -67,7 +67,7 @@ namespace SvgDrawingUnitTest
         {
             const int count = 1000000;
             var jobSchedules = Enumerable.Repeat(new Random(), count).Select(JobSchedule.CreateRandom).ToList();
-            var list = SortWorkers(jobSchedules, TimeSpan.FromMinutes(5));
+            var list = SortWorkers(jobSchedules, TimeSpan.FromMinutes(10));
             var data = new RangedData(0f, 1f, list.Count - 1);
             for (var i = 0; i < list.Count; ++i)
             {
@@ -75,7 +75,7 @@ namespace SvgDrawingUnitTest
             }
 
             var chart = new LineChart(data);
-            var svgChart = new SvgLineChart(chart, 512, 512, 12, 32, 1);
+            var svgChart = new SvgLineChart(chart, 512, 512, 100000, 12, 32, 1);
             svgChart.Save("workersPerHour.svg");
         }
 
