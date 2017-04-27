@@ -24,7 +24,19 @@ namespace Time
                 wtp += frequency;
             }
 
-            _weekTimePoints = new List<WeekTimePoint>(_weekTimePoints.OrderBy(p => p));
+            _weekTimePoints.Sort();
+        }
+
+        public WeekTimeCollection(WeekTimePoint startWeekTimePoint, WeekTimePoint endWeekTimePoint, TimeSpan frequency)
+        {
+            var wtp = startWeekTimePoint;
+            while (wtp <= endWeekTimePoint)
+            {
+                _weekTimePoints.Add(wtp);
+                wtp += frequency;
+            }
+
+            _weekTimePoints.Sort();
         }
 
         public WeekTimeCollection(IEnumerable<WeekTimePoint> weekTimePoints)
@@ -45,6 +57,24 @@ namespace Time
         public int IndexOf(WeekTimePoint wtp)
         {
             return _weekTimePoints.IndexOf(wtp);
+        }
+
+        public void Add(WeekTimePoint wtp)
+        {
+            _weekTimePoints.Add(wtp);
+            _weekTimePoints.Sort();
+        }
+
+        public void AddRange(IEnumerable<WeekTimePoint> range)
+        {
+            _weekTimePoints.AddRange(range);
+            _weekTimePoints.Sort();
+        }
+
+        public void AddCollection(WeekTimeCollection collection)
+        {
+            _weekTimePoints.AddRange(collection.SortedWeekTimePoints);
+            _weekTimePoints.Sort();
         }
     }
 }
