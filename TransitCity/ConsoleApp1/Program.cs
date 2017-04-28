@@ -38,6 +38,7 @@ namespace ConsoleApp1
             var workerScheduleTuples = city.Residents.Where(r => r.HasJob).Select(r => (r, JobSchedule.CreateRandom(rnd))).ToList();
             var dataManager = new TestTransitData().DataManager;
             var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(5).MetersPerSecond, TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
+
             var taskList = new List<Task<List<Connection<Position2f>>>>();
             foreach (var (worker, schedule) in workerScheduleTuples)
             {

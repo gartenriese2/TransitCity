@@ -10,6 +10,7 @@ namespace Transit.Timetable.Algorithm
 {
     using Connection2f = Connection<Position2f>;
 
+    [Obsolete]
     public class RaptorWithDataManager : RaptorWithDataManagerBase
     {
         public RaptorWithDataManager(float walkingSpeed, TimeSpan maxWalkingTime, TimeSpan maxWaitingTime, DataManager dataManager)

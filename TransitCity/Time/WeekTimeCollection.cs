@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Time
 {
-    public class WeekTimeCollection : IEnumerable
+    public class WeekTimeCollection
     {
         private readonly List<WeekTimePoint> _weekTimePoints = new List<WeekTimePoint>();
+        private readonly List<WeekTimePoint> _sortedWeekTimePoints = new List<WeekTimePoint>();
 
         public WeekTimeCollection() { }
 
@@ -24,57 +24,54 @@ namespace Time
                 wtp += frequency;
             }
 
-            _weekTimePoints.Sort();
+            _sortedWeekTimePoints = new List<WeekTimePoint>(_weekTimePoints.OrderBy(p => p));
         }
 
         public WeekTimeCollection(WeekTimePoint startWeekTimePoint, WeekTimePoint endWeekTimePoint, TimeSpan frequency)
         {
             var wtp = startWeekTimePoint;
-            while (wtp <= endWeekTimePoint)
+            WeekTimeSpan wts;
+            do
             {
                 _weekTimePoints.Add(wtp);
+                wts = new WeekTimeSpan(wtp, wtp + frequency);
                 wtp += frequency;
-            }
+            } while (!wts.IsInside(endWeekTimePoint) || wts.End == endWeekTimePoint);
 
-            _weekTimePoints.Sort();
+            _sortedWeekTimePoints = new List<WeekTimePoint>(_weekTimePoints.OrderBy(p => p));
         }
 
         public WeekTimeCollection(IEnumerable<WeekTimePoint> weekTimePoints)
         {
-            _weekTimePoints.AddRange(weekTimePoints.OrderBy(wtp => wtp));
+            _weekTimePoints.AddRange(weekTimePoints);
+            _sortedWeekTimePoints = new List<WeekTimePoint>(_weekTimePoints.OrderBy(p => p));
         }
 
-        public WeekTimePoint this[int key] => _weekTimePoints[key];
+        public IEnumerable<WeekTimePoint> UnsortedWeekTimePoints => _weekTimePoints;
 
-        public IEnumerable<WeekTimePoint> SortedWeekTimePoints => _weekTimePoints;
+        public IEnumerable<WeekTimePoint> SortedWeekTimePoints => _sortedWeekTimePoints;
 
         public int Count => _weekTimePoints.Count;
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        public WeekTimeEnumerator GetEnumerator() => new WeekTimeEnumerator(_weekTimePoints);
-
-        public int IndexOf(WeekTimePoint wtp)
-        {
-            return _weekTimePoints.IndexOf(wtp);
-        }
 
         public void Add(WeekTimePoint wtp)
         {
             _weekTimePoints.Add(wtp);
-            _weekTimePoints.Sort();
+            _sortedWeekTimePoints.Add(wtp);
+            _sortedWeekTimePoints.Sort();
         }
 
         public void AddRange(IEnumerable<WeekTimePoint> range)
         {
             _weekTimePoints.AddRange(range);
-            _weekTimePoints.Sort();
+            _sortedWeekTimePoints.AddRange(range);
+            _sortedWeekTimePoints.Sort();
         }
 
         public void AddCollection(WeekTimeCollection collection)
         {
-            _weekTimePoints.AddRange(collection.SortedWeekTimePoints);
-            _weekTimePoints.Sort();
+            _weekTimePoints.AddRange(collection.UnsortedWeekTimePoints);
+            _sortedWeekTimePoints.AddRange(collection.UnsortedWeekTimePoints);
+            _sortedWeekTimePoints.Sort();
         }
     }
 }

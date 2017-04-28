@@ -15,7 +15,7 @@ namespace Transit.Timetable.Managers
         public void AddRoute(Line<TPos> line, Route<TPos> route, WeekTimeCollection timeCollection, List<TransferStation<TPos>> transferStations, Func<Station<TPos>, Station<TPos>, TimeEdgeCost> transitCostFunc)
         {
             var stations = route.Stations.ToList();
-            foreach (var weekTime in timeCollection)
+            foreach (var weekTime in timeCollection.SortedWeekTimePoints)
             {
                 var currentTime = weekTime;
                 for (var i = 0; i < route.Stations.Count() - 1; ++i)

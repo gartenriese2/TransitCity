@@ -45,6 +45,10 @@ namespace Transit.Timetable.Algorithm
             {
                 con = earliestConnections.FirstOrDefault(c => c.TargetStation == con.SourceStation);
                 connectionList.Insert(0, con);
+                if (connectionList.Count > earliestConnections.Count)
+                {
+                    throw new InvalidOperationException();
+                }
             }
 
             return connectionList;
@@ -75,6 +79,10 @@ namespace Transit.Timetable.Algorithm
 
                 connectionList.Add(newCon);
                 con = newCon;
+                if (connectionList.Count > latestConnections.Count)
+                {
+                    throw new InvalidOperationException();
+                }
             }
 
             return connectionList;

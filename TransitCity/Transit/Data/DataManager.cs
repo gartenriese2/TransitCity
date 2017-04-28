@@ -32,29 +32,11 @@ namespace Transit.Data
             var numStations = route.Count;
             var ((outwardRun, outwardPath), (inwardRun, inwardPath)) = CreateSubwayRoutes(route, _transferStationDictionary);
 
-            var (outwardArrivals, outwardDepartures) = CreateRouteArrivalsAndDepartures(outwardRun, outwardPath, initialOutwardDepartures, waitingTime, SubwayTravelTimeFunc);
-            var (inwardArrivals, inwardDepartures) = CreateRouteArrivalsAndDepartures(inwardRun, inwardPath, initialInwardDepartures, waitingTime, SubwayTravelTimeFunc);
+            var (outwardArrivals, outwardDepartures, outwardTripList) = CreateRouteArrivalsAndDepartures(outwardRun, outwardPath, initialOutwardDepartures, waitingTime, SubwayTravelTimeFunc);
+            var (inwardArrivals, inwardDepartures, inwardTripList) = CreateRouteArrivalsAndDepartures(inwardRun, inwardPath, initialInwardDepartures, waitingTime, SubwayTravelTimeFunc);
 
-            var numTrips = (int)outwardDepartures[0].Count;
-            var outwardTripList = new List<Trip<Position2f>>(numTrips);
-            var inwardTripList = new List<Trip<Position2f>>(numTrips);
-            for (var i = 0; i < numTrips; ++i)
-            {
-                var outwardStationTimes = new List<(Station<Position2f>, (WeekTimePoint, WeekTimePoint))>(numStations);
-                var inwardStationTimes = new List<(Station<Position2f>, (WeekTimePoint, WeekTimePoint))>(numStations);
-                for (var j = 0; j < numStations; ++j)
-                {
-                    var outwardArrival = j > 0 ? outwardArrivals[j - 1][i] : null;
-                    var outwardDeparture = j < numStations - 1 ? outwardDepartures[j][i] : null;
-                    var inwardArrival = j > 0 ? inwardArrivals[j - 1][i] : null;
-                    var inwardDeparture = j < numStations - 1 ? inwardDepartures[j][i] : null;
-                    outwardStationTimes.Add((outwardRun.Stations.ElementAt(j), (outwardArrival, outwardDeparture)));
-                    inwardStationTimes.Add((inwardRun.Stations.ElementAt(j), (inwardArrival, inwardDeparture)));
-                }
-
-                outwardTripList.Add(new Trip<Position2f>(outwardStationTimes));
-                inwardTripList.Add(new Trip<Position2f>(inwardStationTimes));
-            }
+            outwardTripList = outwardTripList.OrderBy(trip => trip.DepartureAtStation(trip.Stations.First())).ToList();
+            inwardTripList = inwardTripList.OrderBy(trip => trip.DepartureAtStation(trip.Stations.First())).ToList();
 
             var outwardStationInfos = new List<StationInfo>();
             var inwardStationInfos = new List<StationInfo>();
@@ -153,13 +135,22 @@ namespace Transit.Data
             return station;
         }
 
-        private static (List<WeekTimeCollection>, List<WeekTimeCollection>) CreateRouteArrivalsAndDepartures(Route<Position2f> route, Path path, WeekTimeCollection initialDepartures, IReadOnlyList<Duration> waitingTimes, Func<Distance, Duration> travelFunc)
+        private static (List<WeekTimeCollection>, List<WeekTimeCollection>, List<Trip<Position2f>>) CreateRouteArrivalsAndDepartures(Route<Position2f> route, Path path, WeekTimeCollection initialDepartures, IReadOnlyList<Duration> waitingTimes, Func<Distance, Duration> travelFunc)
         {
             if (waitingTimes.Count != route.Stations.Count() - 2)
             {
                 throw new ArgumentException();
             }
 
+            var numTrips = initialDepartures.Count;
+            var tripPrepareList = new List<List<(WeekTimePoint, WeekTimePoint)>>(numTrips);
+            for (var i = 0; i < numTrips; ++i)
+            {
+                tripPrepareList.Add(new List<(WeekTimePoint, WeekTimePoint)>(route.Stations.Count())
+                {
+                    (null, initialDepartures.UnsortedWeekTimePoints.ElementAt(i))
+                });
+            }
             var arrivals = new List<WeekTimeCollection>();
             var departures = new List<WeekTimeCollection> { initialDepartures };
 
@@ -172,20 +163,53 @@ namespace Transit.Data
                 var subPath = path.Subpath(startIndex, endIndex - startIndex);
                 var distance = Distance.FromMeters(subPath.Length());
                 var duration = travelFunc(distance);
-                var arrivalList = from WeekTimePoint departure in departures.Last() select departure + duration;
+                var arrivalList = (from WeekTimePoint departure in departures.Last().UnsortedWeekTimePoints select departure + duration).ToList();
                 arrivals.Add(new WeekTimeCollection(arrivalList));
                 if (i < route.Stations.Count() - 1)
                 {
-                    var departureList = from WeekTimePoint arrival in arrivalList select arrival + waitingTimes[i - 1];
+                    var departureList = (from WeekTimePoint arrival in arrivalList select arrival + waitingTimes[i - 1]).ToList();
                     departures.Add(new WeekTimeCollection(departureList));
+
+                    if (arrivalList.Count != departureList.Count)
+                    {
+                        throw new InvalidOperationException();
+                    }
+
+                    for (var j = 0; j < numTrips; ++j)
+                    {
+                        tripPrepareList[j].Add((arrivalList[j], departureList[j]));
+                    }
+                }
+                else
+                {
+                    for (var j = 0; j < numTrips; ++j)
+                    {
+                        tripPrepareList[j].Add((arrivalList[j], null));
+                    }
                 }
             }
 
-            return (arrivals, departures);
+            var tripList = new List<Trip<Position2f>>();
+            foreach (var c in tripPrepareList)
+            {
+                var trip = new Trip<Position2f>(c.Select((t, idx) => (route.Stations.ElementAt(idx), t)).ToList());
+                tripList.Add(trip);
+            }
+
+            return (arrivals, departures, tripList);
         }
 
-        private static (List<WeekTimeCollection>, List<WeekTimeCollection>) CreateRouteArrivalsAndDepartures(Route<Position2f> route, Path path, WeekTimeCollection initialDepartures, Duration waitingTime, Func<Distance, Duration> travelFunc)
+        private static (List<WeekTimeCollection>, List<WeekTimeCollection>, List<Trip<Position2f>>) CreateRouteArrivalsAndDepartures(Route<Position2f> route, Path path, WeekTimeCollection initialDepartures, Duration waitingTime, Func<Distance, Duration> travelFunc)
         {
+            var numTrips = initialDepartures.Count;
+            var tripPrepareList = new List<List<(WeekTimePoint, WeekTimePoint)>>(numTrips);
+            for (var i = 0; i < numTrips; ++i)
+            {
+                tripPrepareList.Add(new List<(WeekTimePoint, WeekTimePoint)>(route.Stations.Count())
+                {
+                    (null, initialDepartures.UnsortedWeekTimePoints.ElementAt(i))
+                });
+            }
             var arrivals = new List<WeekTimeCollection>();
             var departures = new List<WeekTimeCollection> { initialDepartures };
 
@@ -198,16 +222,40 @@ namespace Transit.Data
                 var subPath = path.Subpath(startIndex, endIndex - startIndex + 1);
                 var distance = Distance.FromMeters(subPath.Length());
                 var duration = travelFunc(distance);
-                var arrivalList = from WeekTimePoint departure in departures.Last() select departure + duration;
+                var arrivalList = (from WeekTimePoint departure in departures.Last().UnsortedWeekTimePoints select departure + duration).ToList();
                 arrivals.Add(new WeekTimeCollection(arrivalList));
                 if (i < route.Stations.Count() - 1)
                 {
-                    var departureList = from WeekTimePoint arrival in arrivalList select arrival + waitingTime;
+                    var departureList = (from WeekTimePoint arrival in arrivalList select arrival + waitingTime).ToList();
                     departures.Add(new WeekTimeCollection(departureList));
+
+                    if (arrivalList.Count != departureList.Count)
+                    {
+                        throw new InvalidOperationException();
+                    }
+
+                    for (var j = 0; j < numTrips; ++j)
+                    {
+                        tripPrepareList[j].Add((arrivalList[j], departureList[j]));
+                    }
+                }
+                else
+                {
+                    for (var j = 0; j < numTrips; ++j)
+                    {
+                        tripPrepareList[j].Add((arrivalList[j], null));
+                    }
                 }
             }
 
-            return (arrivals, departures);
+            var tripList = new List<Trip<Position2f>>();
+            foreach (var c in tripPrepareList)
+            {
+                var trip = new Trip<Position2f>(c.Select((t, idx) => (route.Stations.ElementAt(idx), t)).ToList());
+                tripList.Add(trip);
+            }
+
+            return (arrivals, departures, tripList);
         }
 
         private static Duration SubwayTravelTimeFunc(Distance distance)

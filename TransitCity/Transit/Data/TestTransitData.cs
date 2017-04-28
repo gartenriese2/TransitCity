@@ -40,8 +40,8 @@ namespace Transit.Data
                     [new Position2f(8000, 9000)] = "Swiss Cottage"
                 },
                 "1",
-                CreateTimetableLine1(),
-                new WeekTimeCollection(new TimeSpan(5, 30, 0), new TimeSpan(23, 30, 0), TimeSpan.FromMinutes(4), new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }),
+                CreateTimetableLine1Outward(),
+                CreateTimetableLine1Inward(),
                 Duration.FromSeconds(30));
             DataManager.AddSubwayLine(
                 new Dictionary<Position2f, string>
@@ -99,7 +99,7 @@ namespace Transit.Data
                 Duration.FromSeconds(30));
         }
 
-        private WeekTimeCollection CreateTimetableLine1()
+        private WeekTimeCollection CreateTimetableLine1Outward()
         {
             var wtc = new WeekTimeCollection();
             foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
@@ -111,6 +111,23 @@ namespace Transit.Data
                 wtc.AddCollection(new WeekTimeCollection(new WeekTimePoint(day, 15, 30), new WeekTimePoint(day, 18, 29), TimeSpan.FromMinutes(isWeekend ? 10 : 5)));
                 wtc.AddCollection(new WeekTimeCollection(new WeekTimePoint(day, 18, 30), new WeekTimePoint(day, 21, 59), TimeSpan.FromMinutes(10)));
                 wtc.AddCollection(new WeekTimeCollection(new WeekTimePoint(day, 22), new WeekTimePoint(day, 23, 59), TimeSpan.FromMinutes(20)));
+            }
+            return wtc;
+        }
+
+        private WeekTimeCollection CreateTimetableLine1Inward()
+        {
+            var offset = TimeSpan.FromMinutes(25);
+            var wtc = new WeekTimeCollection();
+            foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+            {
+                var isWeekend = day == DayOfWeek.Saturday || day == DayOfWeek.Sunday;
+                wtc.AddCollection(new WeekTimeCollection(new WeekTimePoint(day) + offset, new WeekTimePoint(day, 4, 59) + offset, TimeSpan.FromMinutes(isWeekend ? 20 : 30)));
+                wtc.AddCollection(new WeekTimeCollection(new WeekTimePoint(day, 5) + offset, new WeekTimePoint(day, 8, 59) + offset, TimeSpan.FromMinutes(isWeekend ? 10 : 5)));
+                wtc.AddCollection(new WeekTimeCollection(new WeekTimePoint(day, 9) + offset, new WeekTimePoint(day, 15, 29) + offset, TimeSpan.FromMinutes(10)));
+                wtc.AddCollection(new WeekTimeCollection(new WeekTimePoint(day, 15, 30) + offset, new WeekTimePoint(day, 18, 29) + offset, TimeSpan.FromMinutes(isWeekend ? 10 : 5)));
+                wtc.AddCollection(new WeekTimeCollection(new WeekTimePoint(day, 18, 30) + offset, new WeekTimePoint(day, 21, 59) + offset, TimeSpan.FromMinutes(10)));
+                wtc.AddCollection(new WeekTimeCollection(new WeekTimePoint(day, 22) + offset, new WeekTimePoint(day, 23, 59) + offset, TimeSpan.FromMinutes(20)));
             }
             return wtc;
         }
