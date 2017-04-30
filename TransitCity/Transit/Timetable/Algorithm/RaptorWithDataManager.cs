@@ -10,7 +10,7 @@ namespace Transit.Timetable.Algorithm
 {
     using Connection2f = Connection<Position2f>;
 
-    [Obsolete]
+    [Obsolete("Use RaptorWithDataManagerBinarySearchTripLookup instead")]
     public class RaptorWithDataManager : RaptorWithDataManagerBase
     {
         public RaptorWithDataManager(float walkingSpeed, TimeSpan maxWalkingTime, TimeSpan maxWaitingTime, DataManager dataManager)

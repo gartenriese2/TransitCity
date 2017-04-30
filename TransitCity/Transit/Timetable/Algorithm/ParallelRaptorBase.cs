@@ -9,6 +9,7 @@ using Utility.Threading;
 
 namespace Transit.Timetable.Algorithm
 {
+    [Obsolete("Use RaptorWithDataManagerBase instead")]
     public class ParallelRaptorBase<TPos> : RaptorBase<TPos> where TPos : IPosition
     {
         protected readonly object _lockObjConnections = new object();

@@ -6,6 +6,7 @@ using Time;
 
 namespace Transit.Timetable.Algorithm
 {
+    [Obsolete("Use RaptorWithDataManagerBase instead")]
     public abstract class RaptorBase<TPos> : IRaptor<TPos> where TPos : IPosition
     {
         protected const int NumRounds = 5;

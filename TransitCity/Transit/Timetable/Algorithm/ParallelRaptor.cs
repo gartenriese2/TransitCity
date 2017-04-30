@@ -10,6 +10,7 @@ using Utility.Threading;
 
 namespace Transit.Timetable.Algorithm
 {
+    [Obsolete("Use RaptorWithDataManagerBinarySearchTripLookup instead")]
     public class ParallelRaptor<TPos> : ParallelRaptorBase<TPos> where TPos : IPosition
     {
         private readonly ITimetableManager<TPos, Entry<TPos>> _timetableManager;

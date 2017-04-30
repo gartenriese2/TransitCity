@@ -13,6 +13,7 @@ namespace Transit.Timetable.Algorithm
 {
     using Connection2f = Connection<Position2f>;
 
+    [Obsolete("Use RaptorWithDataManagerBinarySearchTripLookup instead")]
     public class ParallelRaptorWithDataManager : RaptorWithDataManagerBase
     {
         private readonly object _lockObjConnections = new object();

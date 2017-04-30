@@ -5,6 +5,7 @@ using Time;
 
 namespace Transit.Timetable.Algorithm
 {
+    [Obsolete("Use RaptorWithDataManagerBase instead")]
     public class SequentialRaptorBase<TPos> : RaptorBase<TPos> where TPos : IPosition
     {
         protected SequentialRaptorBase(float walkingSpeed, TimeSpan maxWalkingTime, IReadOnlyCollection<TransferStation<TPos>> transferStations)

@@ -8,6 +8,7 @@ using Utility.Extensions;
 
 namespace Transit.Timetable.Algorithm
 {
+    [Obsolete("Use RaptorWithDataManagerBinarySearchTripLookup instead")]
     public class LinkedRaptor<TPos> : SequentialRaptorBase<TPos> where TPos : IPosition
     {
         private readonly ITimetableManager<TPos, LinkedEntry<TPos>> _timetableManager;
