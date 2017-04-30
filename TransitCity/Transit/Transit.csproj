@@ -52,6 +52,7 @@
     <Compile Include="Data\RouteInfo.cs" />
     <Compile Include="Data\StationInfo.cs" />
     <Compile Include="Data\TestTransitData.cs" />
+    <Compile Include="Data\TransitConnectionInfo.cs" />
     <Compile Include="Timetable\Algorithm\LinkedParallelRaptor.cs" />
     <Compile Include="Timetable\Algorithm\LinkedRaptor.cs" />
     <Compile Include="Timetable\Algorithm\ParallelRaptorBase.cs" />
@@ -87,6 +88,10 @@
     <Compile Include="Trip.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CitySimulation\CitySimulation.csproj">
+      <Project>{1247B810-D259-44B0-A520-64F5225DF770}</Project>
+      <Name>CitySimulation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Geometry\Geometry.csproj">
       <Project>{75EB7F70-EC1D-45AD-82AC-CB953003D1A3}</Project>
       <Name>Geometry</Name>

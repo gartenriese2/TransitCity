@@ -19,7 +19,7 @@ using Transit.Timetable;
 using Transit.Timetable.Algorithm;
 using Utility.Units;
 
-namespace ConsoleApp1
+namespace TestApp
 {
     internal static class Program
     {
@@ -39,19 +39,24 @@ namespace ConsoleApp1
             var dataManager = new TestTransitData().DataManager;
             var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(5).MetersPerSecond, TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
 
-            var taskList = new List<Task<List<Connection<Position2f>>>>();
+            var workerConnectionsDictionary = new Dictionary<Resident, List<List<Connection<Position2f>>>>();
             foreach (var (worker, schedule) in workerScheduleTuples)
             {
+                var workerTaskList = new List<Task<List<Connection<Position2f>>>>();
                 foreach (var scheduleWts in schedule.WeekTimeSpans)
                 {
-                    taskList.Add(Task.Factory.StartNew(() => raptor.ComputeReverse(worker.Position, scheduleWts.Begin, worker.Job.Position)));
-                    taskList.Add(Task.Factory.StartNew(() => raptor.Compute(worker.Job.Position, scheduleWts.End, worker.Position)));
+                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.ComputeReverse(worker.Position, scheduleWts.Begin, worker.Job.Position)));
+                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.Compute(worker.Job.Position, scheduleWts.End, worker.Position)));
                 }
+
+                Task.WaitAll(workerTaskList.ToArray());
+                workerConnectionsDictionary.Add(worker, workerTaskList.Select(t => t.Result).ToList());
             }
-            Task.WaitAll(taskList.ToArray());
-            var results = taskList.Select(t => t.Result).ToList();
-            var percentageTransit = (float)results.Count(r => r.Count > 1) / results.Count * 100f;
-            Console.WriteLine($"{percentageTransit}% of workers use transit.");
+
+            var info = new TransitConnectionInfo(workerConnectionsDictionary);
+            Console.WriteLine($"{info.GetPercentagOfConnectionsWithTransit()}% of connections are made with transit.");
+            Console.WriteLine($"{info.GetPercentageOfWorkersUsingTransitAtLeastOnce()}% of workers use transit at least once.");
+            Console.WriteLine($"{info.GetPercentageOfWorkersUsingTransitOnly()}% of workers use transit only.");
         }
 
         private static City CreateCity()
