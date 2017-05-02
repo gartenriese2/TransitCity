@@ -28,7 +28,95 @@ namespace TestApp
             //RaptorPerformanceTest2();
             //DrawBusiestStations();
             //LineChartTest();
-            TransitWithSchedules();
+            //TransitWithSchedules();
+            DrawActiveVehicles();
+        }
+
+        private static void DrawActiveVehicles()
+        {
+            var dataManager = new TestTransitData().DataManager;
+            var numDocuments = 10;
+            var numSeconds = 20;
+            for (var i = 0; i < numDocuments; ++i)
+            {
+                var activeVehicles = dataManager.GetActiveVehiclePositions(new WeekTimePoint(DayOfWeek.Monday, 8) + TimeSpan.FromSeconds(numSeconds * i));
+                var document = new SvgDocumentWrapper(10000, 10000);
+                document.Add(new SvgRectangle
+                {
+                    Width = 10000,
+                    Height = 10000,
+                    Fill = new SvgColourServer(Color.White)
+                });
+
+                foreach (var station in dataManager.AllStations)
+                {
+                    var c = new SvgCircle
+                    {
+                        CenterX = station.Position.X,
+                        CenterY = station.Position.Y,
+                        Radius = 8f,
+                        Fill = new SvgColourServer(Color.White),
+                        Stroke = new SvgColourServer(Color.Black),
+                        StrokeWidth = 2f
+                    };
+                    document.Add(c);
+                }
+
+                foreach (var lineInfo in dataManager.AllLineInfos)
+                {
+                    Color c;
+                    if (lineInfo.Line.Name == "1")
+                    {
+                        c = Color.Red;
+                    }
+                    else if (lineInfo.Line.Name == "2")
+                    {
+                        c = Color.DarkGreen;
+                    }
+                    else if (lineInfo.Line.Name == "3")
+                    {
+                        c = Color.DarkBlue;
+                    }
+                    else
+                    {
+                        c = Color.Orange;
+                    }
+
+                    foreach (var path in lineInfo.RouteInfos.Select(ri => ri.Path))
+                    {
+                        var polyline = new SvgPolyline
+                        {
+                            StrokeWidth = 4f,
+                            Stroke = new SvgColourServer(c),
+                            Points = new SvgPointCollection(),
+                            Fill = SvgPaintServer.None
+                        };
+                        foreach (var pos in path)
+                        {
+                            polyline.Points.Add(pos.X);
+                            polyline.Points.Add(pos.Y);
+                        }
+                        document.Add(polyline);
+                    }
+                }
+
+                foreach (var activeVehicle in activeVehicles)
+                {
+                    var c = new SvgCircle
+                    {
+                        CenterX = activeVehicle.X,
+                        CenterY = activeVehicle.Y,
+                        Radius = 64f,
+                        Fill = new SvgColourServer(Color.Gray),
+                        Stroke = new SvgColourServer(Color.Black),
+                        StrokeWidth = 4f
+                    };
+                    document.Add(c);
+                }
+
+                var numWithLeadingZeroes = i < 10 ? $"0{i}" : $"{i}";
+                document.Save($"activeVehicles{numWithLeadingZeroes}.svg");
+            }            
         }
 
         private static void TransitWithSchedules()

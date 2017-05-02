@@ -20,6 +20,11 @@ namespace Utility.Units
 
         public float Kilometers => _meters / 1000;
 
+        public override string ToString()
+        {
+            return $"{_meters}m";
+        }
+
         public static Distance operator +(Distance d1, Distance d2) => new Distance(d1.Meters + d2.Meters);
 
         public static Distance operator -(Distance d1, Distance d2) => new Distance(d1.Meters - d2.Meters);

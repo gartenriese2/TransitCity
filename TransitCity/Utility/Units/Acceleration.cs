@@ -11,6 +11,11 @@
 
         public float MetersPerSecondSquared => _metersPerSecondsSquared;
 
+        public override string ToString()
+        {
+            return $"{_metersPerSecondsSquared}m/s²";
+        }
+
         public static Acceleration operator +(Acceleration a1, Acceleration a2) => new Acceleration(a1.MetersPerSecondSquared + a2.MetersPerSecondSquared);
 
         public static Acceleration operator -(Acceleration a1, Acceleration a2) => new Acceleration(a1.MetersPerSecondSquared - a2.MetersPerSecondSquared);

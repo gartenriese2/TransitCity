@@ -13,6 +13,11 @@
 
         public float KilometersPerHour => _metersPerSecond * 3.6f;
 
+        public override string ToString()
+        {
+            return $"{_metersPerSecond}m/s";
+        }
+
         public static Speed operator +(Speed s1, Speed s2) => new Speed(s1.MetersPerSecond + s2.MetersPerSecond);
 
         public static Speed operator -(Speed s1, Speed s2) => new Speed(s1.MetersPerSecond - s2.MetersPerSecond);

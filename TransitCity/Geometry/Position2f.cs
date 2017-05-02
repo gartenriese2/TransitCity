@@ -49,7 +49,7 @@ namespace Geometry
 
         public static Position2f Lerp(float t, Position2f p1, Position2f p2)
         {
-            return p1 * (1 - t) + p1 * t;
+            return p1 * (1 - t) + p2 * t;
         }
 
         public override string ToString()

@@ -20,6 +20,11 @@ namespace Utility.Units
 
         public float SquareKilometers => _squareMeters / 1000000f;
 
+        public override string ToString()
+        {
+            return $"{_squareMeters}m²";
+        }
+
         public static Area operator +(Area a1, Area a2) => new Area(a1.SquareMeters + a2.SquareMeters);
 
         public static Area operator -(Area a1, Area a2) => new Area(a1.SquareMeters - a2.SquareMeters);

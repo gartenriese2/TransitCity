@@ -17,6 +17,11 @@ namespace Utility.Units
 
         public float Hours => _seconds / 3600f;
 
+        public override string ToString()
+        {
+            return $"{_seconds}s";
+        }
+
         public static implicit operator TimeSpan(Duration d) => TimeSpan.FromSeconds(d.Seconds);
 
         public static Duration operator +(Duration t1, Duration t2) => new Duration(t1.Seconds + t2.Seconds);

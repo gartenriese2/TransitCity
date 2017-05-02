@@ -178,6 +178,21 @@ namespace TransitUnitTest
             Assert.IsTrue(activeTrips1Count < activeTrips2Count, $"{activeTrips1Count} >= {activeTrips2Count}");
         }
 
+        [TestMethod]
+        public void ActivePositionsTest()
+        {
+            var dataManager = new TestTransitData().DataManager;
+            var activePositions0 = dataManager.GetActiveVehiclePositions(new WeekTimePoint(DayOfWeek.Monday, 3));
+            var activePositions1 = dataManager.GetActiveVehiclePositions(new WeekTimePoint(DayOfWeek.Monday, 11));
+            var activePositions2 = dataManager.GetActiveVehiclePositions(new WeekTimePoint(DayOfWeek.Monday, 8));
+
+            var activePositions0Count = activePositions0.Count();
+            var activePositions1Count = activePositions1.Count();
+            var activePositions2Count = activePositions2.Count();
+            Assert.IsTrue(activePositions0Count < activePositions1Count, $"{activePositions0Count} >= {activePositions1Count}");
+            Assert.IsTrue(activePositions1Count < activePositions2Count, $"{activePositions1Count} >= {activePositions2Count}");
+        }
+
         private static readonly Random Random = new Random();
 
         private static Position2f CreateRandomPosition()
