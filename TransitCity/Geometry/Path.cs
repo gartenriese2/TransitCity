@@ -99,5 +99,24 @@ namespace Geometry
 
             return Position2f.Lerp((len - lengthCounter) / (_path[idx] - _path[idx - 1]).Length(), _path[idx - 1], _path[idx]);
         }
+
+        public Vector2f DirectionLerp(float t)
+        {
+            if (t < 0f || t > 1f)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            var len = t * Length();
+            var idx = 1;
+            var lengthCounter = 0f;
+            while ((_path[idx] - _path[idx - 1]).Length() + lengthCounter < len)
+            {
+                lengthCounter += (_path[idx] - _path[idx - 1]).Length();
+                ++idx;
+            }
+
+            return idx == 0 ? _path[idx + 1] - _path[idx] : _path[idx] - _path[idx - 1];
+        }
     }
 }

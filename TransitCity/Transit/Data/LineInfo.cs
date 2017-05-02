@@ -21,5 +21,7 @@ namespace Transit.Data
         public IEnumerable<Trip<Position2f>> GetActiveTrips(WeekTimePoint wtp) => RouteInfos.SelectMany(ri => ri.GetActiveTrips(wtp));
 
         public IEnumerable<Position2f> GetActiveVehiclePositions(WeekTimePoint wtp) => RouteInfos.SelectMany(ri => ri.GetActiveVehiclePositions(wtp));
+
+        public IEnumerable<(Position2f, Vector2f)> GetActiveVehiclePositionsAndDirections(WeekTimePoint wtp) => RouteInfos.SelectMany(ri => ri.GetActiveVehiclePositionsAndDirections(wtp));
     }
 }

@@ -29,17 +29,9 @@ namespace Transit.Data
 
         public IEnumerable<Trip<Position2f>> GetActiveTrips(WeekTimePoint wtp) => AllLineInfos.SelectMany(li => li.GetActiveTrips(wtp));
 
-        public IEnumerable<Position2f> GetActiveVehiclePositions(WeekTimePoint wtp)
-        {
-            var list = new List<Position2f>();
-            foreach (var lineInfo in AllLineInfos)
-            {
-                var tmpList = lineInfo.GetActiveVehiclePositions(wtp);
-                list.AddRange(tmpList);
-            }
-            //var tmp = AllLineInfos.SelectMany(li => li.GetActiveVehiclePositions(wtp));
-            return list;
-        }
+        public IEnumerable<Position2f> GetActiveVehiclePositions(WeekTimePoint wtp) => AllLineInfos.SelectMany(li => li.GetActiveVehiclePositions(wtp));
+
+        public IEnumerable<(Position2f, Vector2f)> GetActiveVehiclePositionsAndDirections(WeekTimePoint wtp) => AllLineInfos.SelectMany(li => li.GetActiveVehiclePositionsAndDirections(wtp));
 
         public void AddSubwayLine(Dictionary<Position2f, string> route, string name, WeekTimeCollection initialOutwardDepartures, WeekTimeCollection initialInwardDepartures, Duration waitingTime)
         {

@@ -36,10 +36,10 @@ namespace TestApp
         {
             var dataManager = new TestTransitData().DataManager;
             var numDocuments = 10;
-            var numSeconds = 20;
+            var numSeconds = 10;
             for (var i = 0; i < numDocuments; ++i)
             {
-                var activeVehicles = dataManager.GetActiveVehiclePositions(new WeekTimePoint(DayOfWeek.Monday, 8) + TimeSpan.FromSeconds(numSeconds * i));
+                var activeVehicles = dataManager.GetActiveVehiclePositionsAndDirections(new WeekTimePoint(DayOfWeek.Monday, 8) + TimeSpan.FromSeconds(numSeconds * i));
                 var document = new SvgDocumentWrapper(10000, 10000);
                 document.Add(new SvgRectangle
                 {
@@ -47,20 +47,6 @@ namespace TestApp
                     Height = 10000,
                     Fill = new SvgColourServer(Color.White)
                 });
-
-                foreach (var station in dataManager.AllStations)
-                {
-                    var c = new SvgCircle
-                    {
-                        CenterX = station.Position.X,
-                        CenterY = station.Position.Y,
-                        Radius = 8f,
-                        Fill = new SvgColourServer(Color.White),
-                        Stroke = new SvgColourServer(Color.Black),
-                        StrokeWidth = 2f
-                    };
-                    document.Add(c);
-                }
 
                 foreach (var lineInfo in dataManager.AllLineInfos)
                 {
@@ -100,18 +86,33 @@ namespace TestApp
                     }
                 }
 
-                foreach (var activeVehicle in activeVehicles)
+                foreach (var station in dataManager.AllStations)
                 {
                     var c = new SvgCircle
                     {
-                        CenterX = activeVehicle.X,
-                        CenterY = activeVehicle.Y,
-                        Radius = 64f,
+                        CenterX = station.Position.X,
+                        CenterY = station.Position.Y,
+                        Radius = 8f,
+                        Fill = new SvgColourServer(Color.White),
+                        Stroke = new SvgColourServer(Color.Black),
+                        StrokeWidth = 2f
+                    };
+                    document.Add(c);
+                }
+
+                foreach (var (pos, vec) in activeVehicles)
+                {
+                    var tip = pos + vec.Normalize() * 32f;
+                    var right = pos - vec.Normalize() * 32f + vec.RotateRight().Normalize() * 16f;
+                    var left = pos - vec.Normalize() * 32f + vec.RotateLeft().Normalize() * 16f;
+                    var t = new SvgPolygon
+                    {
+                        Points = new SvgPointCollection { tip.X, tip.Y, right.X, right.Y, left.X, left.Y },
                         Fill = new SvgColourServer(Color.Gray),
                         Stroke = new SvgColourServer(Color.Black),
                         StrokeWidth = 4f
                     };
-                    document.Add(c);
+                    document.Add(t);
                 }
 
                 var numWithLeadingZeroes = i < 10 ? $"0{i}" : $"{i}";
