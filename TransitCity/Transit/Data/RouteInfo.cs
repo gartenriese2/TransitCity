@@ -75,5 +75,10 @@ namespace Transit.Data
 
             throw new ArgumentException("Could not find a trip with the specified departure time.");
         }
-    }
+
+        public IEnumerable<Trip<Position2f>> GetActiveTrips(WeekTimePoint wtp)
+        {
+            return Trips.Where(trip => new WeekTimeSpan(trip.DepartureAtStation(trip.Stations.First()), trip.ArrivalAtStation(trip.Stations.Last())).IsInside(wtp));
+        }
+    } 
 }

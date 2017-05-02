@@ -163,6 +163,21 @@ namespace TransitUnitTest
             }
         }
 
+        [TestMethod]
+        public void ActiveTripsTest()
+        {
+            var dataManager = new TestTransitData().DataManager;
+            var activeTrips0 = dataManager.GetActiveTrips(new WeekTimePoint(DayOfWeek.Monday, 3));
+            var activeTrips1 = dataManager.GetActiveTrips(new WeekTimePoint(DayOfWeek.Monday, 11));
+            var activeTrips2 = dataManager.GetActiveTrips(new WeekTimePoint(DayOfWeek.Monday, 8));
+
+            var activeTrips0Count = activeTrips0.Count();
+            var activeTrips1Count = activeTrips1.Count();
+            var activeTrips2Count = activeTrips2.Count();
+            Assert.IsTrue(activeTrips0Count < activeTrips1Count, $"{activeTrips0Count} >= {activeTrips1Count}");
+            Assert.IsTrue(activeTrips1Count < activeTrips2Count, $"{activeTrips1Count} >= {activeTrips2Count}");
+        }
+
         private static readonly Random Random = new Random();
 
         private static Position2f CreateRandomPosition()

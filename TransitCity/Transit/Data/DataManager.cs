@@ -27,6 +27,8 @@ namespace Transit.Data
 
         public IEnumerable<LineInfo> AllLineInfos => _lineInfos;
 
+        public IEnumerable<Trip<Position2f>> GetActiveTrips(WeekTimePoint wtp) => AllLineInfos.SelectMany(li => li.GetActiveTrips(wtp));
+
         public void AddSubwayLine(Dictionary<Position2f, string> route, string name, WeekTimeCollection initialOutwardDepartures, WeekTimeCollection initialInwardDepartures, Duration waitingTime)
         {
             var numStations = route.Count;

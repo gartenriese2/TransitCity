@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Geometry;
+using Time;
 
 namespace Transit.Data
 {
@@ -15,5 +17,10 @@ namespace Transit.Data
         public Line<Position2f> Line { get; }
 
         public List<RouteInfo> RouteInfos { get; }
+
+        public IEnumerable<Trip<Position2f>> GetActiveTrips(WeekTimePoint wtp)
+        {
+            return RouteInfos.SelectMany(ri => ri.GetActiveTrips(wtp));
+        }
     }
 }
