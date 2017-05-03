@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransitCity", "TransitCity\TransitCity.csproj", "{0CD661EF-7D39-4874-9DB0-4DBC0EAECD40}"
 EndProject
@@ -46,6 +46,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulation", "Simulation", "{FC20DEB0-E22E-40E4-AB55-B1E9F55C5252}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rendering", "Rendering", "{5E7F0DF2-FB38-4801-9CAE-795442014398}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfDrawing", "WpfDrawing\WpfDrawing.csproj", "{31DF70BB-F397-4EC2-AF6E-B34270C6245C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfTestApp", "WpfTestApp\WpfTestApp.csproj", "{B728DC8A-0E7E-4AA3-9DC3-4A0D31D97DC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -133,6 +137,14 @@ Global
 		{1C648B4D-E159-495B-ADE8-F1BD53802904}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C648B4D-E159-495B-ADE8-F1BD53802904}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C648B4D-E159-495B-ADE8-F1BD53802904}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31DF70BB-F397-4EC2-AF6E-B34270C6245C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31DF70BB-F397-4EC2-AF6E-B34270C6245C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31DF70BB-F397-4EC2-AF6E-B34270C6245C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31DF70BB-F397-4EC2-AF6E-B34270C6245C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B728DC8A-0E7E-4AA3-9DC3-4A0D31D97DC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B728DC8A-0E7E-4AA3-9DC3-4A0D31D97DC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B728DC8A-0E7E-4AA3-9DC3-4A0D31D97DC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B728DC8A-0E7E-4AA3-9DC3-4A0D31D97DC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -144,5 +156,6 @@ Global
 		{39F642F4-64A7-4E42-9CD7-DEA9337E055E} = {5E7F0DF2-FB38-4801-9CAE-795442014398}
 		{1247B810-D259-44B0-A520-64F5225DF770} = {FC20DEB0-E22E-40E4-AB55-B1E9F55C5252}
 		{5987BC2F-64E9-4884-9574-3DA847E03FDB} = {FC20DEB0-E22E-40E4-AB55-B1E9F55C5252}
+		{31DF70BB-F397-4EC2-AF6E-B34270C6245C} = {5E7F0DF2-FB38-4801-9CAE-795442014398}
 	EndGlobalSection
 EndGlobal
