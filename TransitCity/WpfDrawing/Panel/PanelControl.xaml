@@ -16,9 +16,9 @@
             </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
         <ItemsControl.ItemContainerStyle>
-            <Style TargetType="ContentPresenter">
-                <Setter Property="Canvas.Left" Value="{Binding RelativeSource={RelativeSource Self}, Converter={StaticResource ElementToXConverter}}"/>
-                <Setter Property="Canvas.Top" Value="{Binding RelativeSource={RelativeSource Self}, Converter={StaticResource ElementToXConverter}}"/>
+            <Style>
+                <Setter Property="Canvas.Left" Value="{Binding X, RelativeSource={RelativeSource Self}}"/>
+                <Setter Property="Canvas.Top" Value="{Binding Y, RelativeSource={RelativeSource Self}}"/>
             </Style>
         </ItemsControl.ItemContainerStyle>
         <!--<ItemsControl.ItemTemplate>

@@ -6,8 +6,7 @@
         xmlns:panel="clr-namespace:WpfDrawing.Panel;assembly=WpfDrawing"
         xmlns:wpfTestApp="clr-namespace:WpfTestApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800"
-        Loaded="MainWindow_OnLoaded">
+        Title="MainWindow" Height="600" Width="800">
     <Window.DataContext>
         <wpfTestApp:MainWindowViewModel/>
     </Window.DataContext>

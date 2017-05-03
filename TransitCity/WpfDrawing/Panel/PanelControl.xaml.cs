@@ -3,8 +3,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Shapes;
 using WpfDrawing.Annotations;
+using WpfDrawing.Objects;
 
 namespace WpfDrawing.Panel
 {
@@ -15,9 +15,9 @@ namespace WpfDrawing.Panel
     {
         public static readonly DependencyProperty ElementsProperty = DependencyProperty.Register(
             "Elements",
-            typeof(ObservableCollection<Shape>),
+            typeof(ObservableCollection<PanelObject>),
             typeof(PanelControl),
-            new PropertyMetadata(new ObservableCollection<Shape>()));
+            new PropertyMetadata(new ObservableCollection<PanelObject>()));
 
         public PanelControl()
         {
@@ -28,9 +28,9 @@ namespace WpfDrawing.Panel
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ObservableCollection<Shape> Elements
+        public ObservableCollection<PanelObject> Elements
         {
-            get => (ObservableCollection<Shape>)GetValue(ElementsProperty);
+            get => (ObservableCollection<PanelObject>)GetValue(ElementsProperty);
             set => SetValue(ElementsProperty, value);
         }
 

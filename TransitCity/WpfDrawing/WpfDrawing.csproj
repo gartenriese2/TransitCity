@@ -46,6 +46,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converter\ElementToXConverter.cs" />
+    <Compile Include="Objects\PanelObject.cs" />
+    <Compile Include="Objects\Station.xaml.cs">
+      <DependentUpon>Station.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Panel\PanelControl.xaml.cs">
       <DependentUpon>PanelControl.xaml</DependentUpon>
     </Compile>
@@ -53,6 +57,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Objects\Station.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Panel\PanelControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

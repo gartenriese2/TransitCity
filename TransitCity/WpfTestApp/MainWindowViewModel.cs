@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Shapes;
+using System.Windows.Media;
+using WpfDrawing.Objects;
 
 namespace WpfTestApp
 {
@@ -8,13 +8,16 @@ namespace WpfTestApp
     {
         public MainWindowViewModel()
         {
-            PanelElements.Add(new Rectangle
+            PanelElements.Add(new Station
             {
                 Width = 100,
-                Height = 200
+                Height = 200,
+                Fill = Brushes.Red,
+                X = 20,
+                Y = 120
             });
         }
 
-        public ObservableCollection<FrameworkElement> PanelElements { get; } = new ObservableCollection<FrameworkElement>();
+        public ObservableCollection<PanelObject> PanelElements { get; } = new ObservableCollection<PanelObject>();
     }
 }
