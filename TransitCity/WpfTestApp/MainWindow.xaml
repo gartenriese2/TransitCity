@@ -10,5 +10,8 @@
     <Window.DataContext>
         <wpfTestApp:MainWindowViewModel/>
     </Window.DataContext>
-    <panel:PanelControl Elements="{Binding PanelElements}"/>
+    <!--<panel:PanelControl Elements="{Binding PanelElements}"/>-->
+    <wpfTestApp:DataDisplay6Control HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    DataPoints="{Binding DataPoints}"/>
 </Window>

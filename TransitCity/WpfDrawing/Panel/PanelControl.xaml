@@ -15,12 +15,17 @@
                 <Canvas/>
             </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
-        <ItemsControl.ItemContainerStyle>
+        <!--<ItemsControl.ItemContainerStyle>
             <Style>
                 <Setter Property="Canvas.Left" Value="{Binding X, RelativeSource={RelativeSource Self}}"/>
                 <Setter Property="Canvas.Top" Value="{Binding Y, RelativeSource={RelativeSource Self}}"/>
             </Style>
-        </ItemsControl.ItemContainerStyle>
+        </ItemsControl.ItemContainerStyle>-->
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Rectangle Width="20" Height="20" Fill="Red"/>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
         <!--<ItemsControl.ItemTemplate>
             <DataTemplate>
                 <Rectangle Width="{Binding Width}"

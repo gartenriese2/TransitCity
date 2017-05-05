@@ -55,6 +55,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DataDisplay6Control.xaml.cs">
+      <DependentUpon>DataDisplay6Control.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataPoint.cs" />
+    <Compile Include="DataRandomizer.cs" />
+    <Compile Include="ItemPropertyChangedEventArgs.cs" />
+    <Compile Include="ObservableNotifiableCollection.cs" />
+    <Compile Include="ScatterPlotRender.cs" />
+    <Compile Include="ScatterPlotVisuals.cs" />
+    <Page Include="DataDisplay6Control.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -100,6 +113,9 @@
       <Project>{31DF70BB-F397-4EC2-AF6E-B34270C6245C}</Project>
       <Name>WpfDrawing</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Add16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
