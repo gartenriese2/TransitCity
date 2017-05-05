@@ -62,8 +62,8 @@
     <Compile Include="DataRandomizer.cs" />
     <Compile Include="ItemPropertyChangedEventArgs.cs" />
     <Compile Include="ObservableNotifiableCollection.cs" />
-    <Compile Include="ScatterPlotRender.cs" />
     <Compile Include="ScatterPlotVisuals.cs" />
+    <Compile Include="Station.cs" />
     <Page Include="DataDisplay6Control.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -104,6 +104,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Resources\Station.ai" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -115,7 +116,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Add16.png" />
+    <Resource Include="Resources\Station.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

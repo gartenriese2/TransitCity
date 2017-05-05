@@ -4,9 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:wpfTestApp="clr-namespace:WpfTestApp"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-         <wpfTestApp:ScatterPlotVisuals Width="800" Height="800" 
-                                        Background="Azure"
-                                        ItemsSource="{Binding DataPoints}"/>
+             mc:Ignorable="d">
+    <wpfTestApp:ScatterPlotVisuals Width="800" Height="800" 
+                                   ItemsSource="{Binding DataPoints}"/>
 </UserControl>

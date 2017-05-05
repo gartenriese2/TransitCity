@@ -22,8 +22,8 @@ namespace WpfTestApp
                 typeof(ScatterPlotVisuals),
                 new PropertyMetadata(OnItemsSourceChanged));
 
-        public static readonly DependencyProperty BackgroundProperty =
-            Panel.BackgroundProperty.AddOwner(typeof(ScatterPlotRender));
+        //public static readonly DependencyProperty BackgroundProperty =
+        //    Panel.BackgroundProperty.AddOwner(typeof(ScatterPlotRender));
 
         public ScatterPlotVisuals()
         {
@@ -37,11 +37,11 @@ namespace WpfTestApp
             get => (ObservableNotifiableCollection<DataPoint>)GetValue(ItemsSourceProperty);
         }
 
-        public Brush Background
-        {
-            set => SetValue(BackgroundProperty, value);
-            get => (Brush)GetValue(BackgroundProperty);
-        }
+        //public Brush Background
+        //{
+        //    set => SetValue(BackgroundProperty, value);
+        //    get => (Brush)GetValue(BackgroundProperty);
+        //}
 
         static void OnItemsSourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
@@ -116,8 +116,7 @@ namespace WpfTestApp
                 var drawingVisual = new DrawingVisualPlus {DataPoint = dataPoint};
                 var dc = drawingVisual.RenderOpen();
 
-                var uriSource = new Uri("pack://application:,,,/Resources/Add16.png");
-                dc.DrawImage(new BitmapImage(uriSource), new Rect(new Size(16, 16)));
+                dc.DrawDrawing(dataPoint.GetDrawing());
 
                 drawingVisual.Transform = new TranslateTransform(RenderSize.Width * dataPoint.VariableX,
                     RenderSize.Height * dataPoint.VariableY);
@@ -176,7 +175,7 @@ namespace WpfTestApp
 
         protected override void OnRender(DrawingContext dc)
         {
-            dc.DrawRectangle(Background, null, new Rect(RenderSize));
+            dc.DrawRectangle(new SolidColorBrush(Colors.White), null, new Rect(RenderSize));
         }
 
         protected override void OnToolTipOpening(ToolTipEventArgs e)

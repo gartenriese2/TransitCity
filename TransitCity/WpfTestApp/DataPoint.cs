@@ -2,10 +2,11 @@
 
 using System;
 using System.ComponentModel;
+using System.Windows.Media;
 
 namespace WpfTestApp
 {
-    public class DataPoint : INotifyPropertyChanged
+    public abstract class DataPoint : INotifyPropertyChanged
     {
         private int _type;
         private double _variableX, _variableY;
@@ -65,7 +66,9 @@ namespace WpfTestApp
             get => _id;
         }
 
-        protected virtual void OnPropertyChanged(string propertyName)
+        public abstract Drawing GetDrawing();
+
+        private void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

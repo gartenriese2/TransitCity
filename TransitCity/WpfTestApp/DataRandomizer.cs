@@ -7,18 +7,18 @@ using WpfDrawing.Objects;
 
 namespace WpfTestApp
 {
-    public class DataRandomizer<T> where T : DataPoint, new()
+    public class DataRandomizer
     {
-        private readonly IList<T> _collection;
+        private readonly IList<DataPoint> _collection;
         private readonly Random _rand = new Random();
 
-        public DataRandomizer(IList<T> collection, int numPoints)
+        public DataRandomizer(IList<DataPoint> collection, int numPoints)
         {
             _collection = collection;
 
             for (var i = 0; i < numPoints; i++)
             {
-                var dataPoint = new T
+                var dataPoint = new Station
                 {
                     Id = FabricateIdString(),
                     Type = _rand.Next(6)
