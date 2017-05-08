@@ -2,7 +2,7 @@
 
 using System.ComponentModel;
 
-namespace WpfTestApp
+namespace WpfDrawing.Utility
 {
     public class ItemPropertyChangedEventArgs : PropertyChangedEventArgs
     {

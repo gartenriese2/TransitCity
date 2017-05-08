@@ -46,21 +46,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converter\ElementToXConverter.cs" />
-    <Compile Include="Objects\PanelObject.cs" />
-    <Compile Include="Objects\Station.xaml.cs">
-      <DependentUpon>Station.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Objects\Station.cs" />
+    <Compile Include="Panel\PanelDrawingVisual.cs" />
+    <Compile Include="Panel\PanelObject.cs" />
     <Compile Include="Panel\PanelControl.xaml.cs">
       <DependentUpon>PanelControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Panel\PanelVisuals.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\ItemPropertyChangedEventArgs.cs" />
+    <Compile Include="Utility\ObservableNotifiableCollection.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Objects\Station.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Panel\PanelControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

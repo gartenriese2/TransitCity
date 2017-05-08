@@ -3,35 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:converter="clr-namespace:WpfDrawing.Converter"
+             xmlns:panel="clr-namespace:WpfDrawing.Panel"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
-    <UserControl.Resources>
-        <converter:ElementToXConverter x:Key="ElementToXConverter"/>
-    </UserControl.Resources>
-    <ItemsControl ItemsSource="{Binding Elements, RelativeSource={RelativeSource AncestorType=UserControl}}">
-        <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-                <Canvas/>
-            </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        <!--<ItemsControl.ItemContainerStyle>
-            <Style>
-                <Setter Property="Canvas.Left" Value="{Binding X, RelativeSource={RelativeSource Self}}"/>
-                <Setter Property="Canvas.Top" Value="{Binding Y, RelativeSource={RelativeSource Self}}"/>
-            </Style>
-        </ItemsControl.ItemContainerStyle>-->
-        <ItemsControl.ItemTemplate>
-            <DataTemplate>
-                <Rectangle Width="20" Height="20" Fill="Red"/>
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-        <!--<ItemsControl.ItemTemplate>
-            <DataTemplate>
-                <Rectangle Width="{Binding Width}"
-                           Height="{Binding Height}"
-                           Fill="{Binding Fill}"/>
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>-->
-    </ItemsControl>
+    <panel:PanelVisuals Width="800" Height="800"
+                        ItemsSource="{Binding DataPoints, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
 </UserControl>

@@ -55,19 +55,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="DataDisplay6Control.xaml.cs">
-      <DependentUpon>DataDisplay6Control.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="DataPoint.cs" />
-    <Compile Include="DataRandomizer.cs" />
-    <Compile Include="ItemPropertyChangedEventArgs.cs" />
-    <Compile Include="ObservableNotifiableCollection.cs" />
-    <Compile Include="ScatterPlotVisuals.cs" />
-    <Compile Include="Station.cs" />
-    <Page Include="DataDisplay6Control.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

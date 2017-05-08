@@ -1,10 +1,10 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
+using WpfDrawing.Panel;
 
-namespace WpfTestApp
+namespace WpfDrawing.Objects
 {
-    public class Station : DataPoint
+    public class Station : PanelObject
     {
         private static readonly Drawing Drawing;
 
