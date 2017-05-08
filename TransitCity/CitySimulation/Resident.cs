@@ -4,12 +4,12 @@ namespace CitySimulation
 {
     public class Resident
     {
-        public Resident(Position2f position)
+        public Resident(Position2d position)
         {
             Position = position;
         }
 
-        public Position2f Position { get; }
+        public Position2d Position { get; }
 
         public Job Job { get; set; }
 

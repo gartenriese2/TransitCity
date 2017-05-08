@@ -6,11 +6,12 @@
         xmlns:wpfTestApp="clr-namespace:WpfTestApp"
         xmlns:panel="clr-namespace:WpfDrawing.Panel;assembly=WpfDrawing"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800">
+        Title="MainWindow" Height="1000" Width="1000"
+        WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <wpfTestApp:MainWindowViewModel/>
     </Window.DataContext>
     <panel:PanelControl HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        DataPoints="{Binding DataPoints}"/>
+                        Objects="{Binding PanelObjects}"/>
 </Window>

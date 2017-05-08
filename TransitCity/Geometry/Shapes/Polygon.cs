@@ -8,7 +8,7 @@ namespace Geometry.Shapes
     {
         private readonly List<Triangle> _triangulation = new List<Triangle>();
 
-        public Polygon(params float[] coords)
+        public Polygon(params double[] coords)
         {
             if (coords == null)
             {
@@ -25,16 +25,16 @@ namespace Geometry.Shapes
                 throw new ArgumentOutOfRangeException();
             }
 
-            Vertices = new List<Position2f>(coords.Length / 2);
+            Vertices = new List<Position2d>(coords.Length / 2);
             for (var i = 0; i < coords.Length - 1; i += 2)
             {
-                Vertices.Add(new Position2f(coords[i], coords[i + 1]));
+                Vertices.Add(new Position2d(coords[i], coords[i + 1]));
             }
 
             Initialize();
         }
 
-        public Polygon(List<Position2f> vertices)
+        public Polygon(List<Position2d> vertices)
         {
             Vertices = vertices ?? throw new ArgumentNullException(nameof(vertices));
             if (Vertices.Count < 3)
@@ -45,18 +45,18 @@ namespace Geometry.Shapes
             Initialize();
         }
 
-        public List<Position2f> Vertices { get; }
+        public List<Position2d> Vertices { get; }
 
-        public float Area { get; private set; }
+        public double Area { get; private set; }
 
-        public (Position2f, Position2f) Bounds { get; private set; }
+        public (Position2d, Position2d) Bounds { get; private set; }
 
-        public Position2f Centroid { get; private set; }
+        public Position2d Centroid { get; private set; }
 
-        public Position2f CreateRandomPoint(Random rnd)
+        public Position2d CreateRandomPoint(Random rnd)
         {
             var val = rnd.NextDouble() * Area;
-            var areaSum = 0f;
+            var areaSum = 0.0;
             foreach (var tri in _triangulation)
             {
                 areaSum += tri.Area;
@@ -69,22 +69,22 @@ namespace Geometry.Shapes
             throw new InvalidOperationException();
         }
 
-        public bool IsPointInside(Position2f point) => _triangulation.Any(t => t.IsPointInside(point));
+        public bool IsPointInside(Position2d point) => _triangulation.Any(t => t.IsPointInside(point));
 
         private void Initialize()
         {
             Triangulate();
 
-            Area = _triangulation.Aggregate(0f, (f, tri) => f + tri.Area);
+            Area = _triangulation.Aggregate(0.0, (f, tri) => f + tri.Area);
 
             var minX = Vertices.Min(p => p.X);
             var minY = Vertices.Min(p => p.Y);
             var maxX = Vertices.Max(p => p.X);
             var maxY = Vertices.Max(p => p.Y);
-            Bounds = (new Position2f(minX, minY), new Position2f(maxX, maxY));
+            Bounds = (new Position2d(minX, minY), new Position2d(maxX, maxY));
 
-            var centroid = _triangulation.Aggregate(new Position2f(), (current, triangle) => current + triangle.Area * triangle.Centroid);
-            Centroid = new Position2f(centroid.X / Area, centroid.Y / Area);
+            var centroid = _triangulation.Aggregate(new Position2d(), (current, triangle) => current + triangle.Area * triangle.Centroid);
+            Centroid = new Position2d(centroid.X / Area, centroid.Y / Area);
         }
 
         private void Triangulate()
@@ -102,7 +102,7 @@ namespace Geometry.Shapes
                 return;
             }
 
-            var untriangulatedVertices = new List<Position2f>(Vertices);
+            var untriangulatedVertices = new List<Position2d>(Vertices);
 
             while (untriangulatedVertices.Count > 3)
             {

@@ -4,20 +4,19 @@ using System.Linq;
 using Geometry;
 using Time;
 using Transit.Data;
+using Utility.Units;
 
 namespace Transit.Timetable.Algorithm
 {
-    using Connection2f = Connection<Position2f>;
-
-    public class RaptorWithDataManagerBase : IRaptor<Position2f>
+    public class RaptorWithDataManagerBase : IRaptor
     {
         protected const int NumRounds = 5;
-        protected readonly float _walkingSpeed;
+        protected readonly Speed _walkingSpeed;
         protected readonly TimeSpan _maxWalkingTime;
         protected readonly TimeSpan _maxWaitingTime;
         protected readonly DataManager _dataManager;
 
-        protected RaptorWithDataManagerBase(float walkingSpeed, TimeSpan maxWalkingTime, TimeSpan maxWaitingTime, DataManager dataManager)
+        protected RaptorWithDataManagerBase(Speed walkingSpeed, TimeSpan maxWalkingTime, TimeSpan maxWaitingTime, DataManager dataManager)
         {
             _walkingSpeed = walkingSpeed;
             _maxWalkingTime = maxWalkingTime;
@@ -25,23 +24,23 @@ namespace Transit.Timetable.Algorithm
             _dataManager = dataManager;
         }
 
-        public virtual List<Connection<Position2f>> Compute(Position2f sourcePos, WeekTimePoint startTime, Position2f targetPos)
+        public virtual List<Connection> Compute(Position2d sourcePos, WeekTimePoint startTime, Position2d targetPos)
         {
             throw new NotImplementedException();
         }
 
-        public virtual List<Connection2f> ComputeReverse(Position2f sourcePos, WeekTimePoint latestArrivalTime, Position2f targetPos)
+        public virtual List<Connection> ComputeReverse(Position2d sourcePos, WeekTimePoint latestArrivalTime, Position2d targetPos)
         {
             throw new NotImplementedException();
         }
 
-        protected static List<Connection2f> GetTravelPath(IReadOnlyCollection<Connection2f> earliestConnections, IPosition targetPos)
+        protected static List<Connection> GetTravelPath(IReadOnlyCollection<Connection> earliestConnections, IPosition targetPos)
         {
             var con = earliestConnections.FirstOrDefault(c => c.TargetPos != null && c.TargetPos.DistanceTo(targetPos) < float.Epsilon);
 
-            var connectionList = new List<Connection2f> { con };
+            var connectionList = new List<Connection> { con };
 
-            while (con.Type == Connection2f.TypeEnum.Ride || con.Type == Connection2f.TypeEnum.Transfer || con.Type == Connection2f.TypeEnum.WalkFromStation)
+            while (con.Type == Connection.TypeEnum.Ride || con.Type == Connection.TypeEnum.Transfer || con.Type == Connection.TypeEnum.WalkFromStation)
             {
                 con = earliestConnections.FirstOrDefault(c => c.TargetStation == con.SourceStation);
                 connectionList.Insert(0, con);
@@ -54,25 +53,25 @@ namespace Transit.Timetable.Algorithm
             return connectionList;
         }
 
-        protected static List<Connection2f> GetTravelPathReverse(IReadOnlyCollection<Connection2f> latestConnections, Position2f sourcePos)
+        protected static List<Connection> GetTravelPathReverse(IReadOnlyCollection<Connection> latestConnections, Position2d sourcePos)
         {
             var con = latestConnections.FirstOrDefault(c => c.SourcePos != null && c.SourcePos.EqualPosition(sourcePos));
 
-            var connectionList = new List<Connection2f> { con };
+            var connectionList = new List<Connection> { con };
 
-            while (con.Type == Connection2f.TypeEnum.Ride || con.Type == Connection2f.TypeEnum.Transfer || con.Type == Connection2f.TypeEnum.WalkToStation)
+            while (con.Type == Connection.TypeEnum.Ride || con.Type == Connection.TypeEnum.Transfer || con.Type == Connection.TypeEnum.WalkToStation)
             {
                 var newCon = latestConnections.FirstOrDefault(c => c.SourceStation == con.TargetStation);
-                if (newCon.Type == Connection2f.TypeEnum.Transfer || newCon.Type == Connection2f.TypeEnum.WalkFromStation)
+                if (newCon.Type == Connection.TypeEnum.Transfer || newCon.Type == Connection.TypeEnum.WalkFromStation)
                 {
                     // change walking time
-                    if (newCon.Type == Connection2f.TypeEnum.Transfer)
+                    if (newCon.Type == Connection.TypeEnum.Transfer)
                     {
-                        newCon = Connection2f.CreateTransfer(newCon.SourceStation, con.TargetTime, newCon.TargetStation, newCon.TargetTime - (newCon.SourceTime - con.TargetTime));
+                        newCon = Connection.CreateTransfer(newCon.SourceStation, con.TargetTime, newCon.TargetStation, newCon.TargetTime - (newCon.SourceTime - con.TargetTime));
                     }
                     else
                     {
-                        newCon = Connection2f.CreateWalkFromStation(newCon.SourceStation, con.TargetTime, newCon.TargetPos, newCon.TargetTime - (newCon.SourceTime - con.TargetTime));
+                        newCon = Connection.CreateWalkFromStation(newCon.SourceStation, con.TargetTime, newCon.TargetPos, newCon.TargetTime - (newCon.SourceTime - con.TargetTime));
                     }
                     
                 }
@@ -88,13 +87,13 @@ namespace Transit.Timetable.Algorithm
             return connectionList;
         }
 
-        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection2f>) GetInitialMarkedStations(Position2f position, WeekTimePoint time)
+        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection>) GetInitialMarkedStations(Position2d position, WeekTimePoint time)
         {
             var markedStations = new Dictionary<StationInfo, WeekTimePoint>();
-            var connections = new List<Connection2f>();
+            var connections = new List<Connection>();
             foreach (var stationInfo in _dataManager.AllStationInfos)
             {
-                var walkingTime = TimeSpan.FromSeconds(position.DistanceTo(stationInfo.Station.Position) / _walkingSpeed);
+                var walkingTime = TimeSpan.FromSeconds(position.DistanceTo(stationInfo.Station.Position) / _walkingSpeed.MetersPerSecond);
                 if (walkingTime > _maxWalkingTime)
                 {
                     continue;
@@ -102,19 +101,19 @@ namespace Transit.Timetable.Algorithm
 
                 var timeAtStation = time + walkingTime;
                 markedStations.Add(stationInfo, timeAtStation);
-                connections.Add(Connection2f.CreateWalkToStation(position, time, stationInfo.Station, timeAtStation));
+                connections.Add(Connection.CreateWalkToStation(position, time, stationInfo.Station, timeAtStation));
             }
 
             return (markedStations, connections);
         }
 
-        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection2f>) GetInitialMarkedStationsReverse(Position2f position, WeekTimePoint time)
+        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection>) GetInitialMarkedStationsReverse(Position2d position, WeekTimePoint time)
         {
             var markedStations = new Dictionary<StationInfo, WeekTimePoint>();
-            var connections = new List<Connection2f>();
+            var connections = new List<Connection>();
             foreach (var stationInfo in _dataManager.AllStationInfos)
             {
-                var walkingTime = TimeSpan.FromSeconds(position.DistanceTo(stationInfo.Station.Position) / _walkingSpeed);
+                var walkingTime = TimeSpan.FromSeconds(position.DistanceTo(stationInfo.Station.Position) / _walkingSpeed.MetersPerSecond);
                 if (walkingTime > _maxWalkingTime)
                 {
                     continue;
@@ -122,7 +121,7 @@ namespace Transit.Timetable.Algorithm
 
                 var timeAtStation = time - walkingTime;
                 markedStations.Add(stationInfo, timeAtStation);
-                connections.Add(Connection2f.CreateWalkFromStation(stationInfo.Station, timeAtStation, position, time));
+                connections.Add(Connection.CreateWalkFromStation(stationInfo.Station, timeAtStation, position, time));
             }
 
             return (markedStations, connections);

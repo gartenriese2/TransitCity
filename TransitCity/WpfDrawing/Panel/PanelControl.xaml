@@ -7,5 +7,5 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
     <panel:PanelVisuals Width="800" Height="800"
-                        ItemsSource="{Binding DataPoints, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                        ItemsSource="{Binding Objects, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
 </UserControl>

@@ -30,9 +30,9 @@ namespace SvgDrawing
         {
             return new SvgCircle
             {
-                CenterX = shape.Center.X,
-                CenterY = shape.Center.Y,
-                Radius = shape.Radius
+                CenterX = (SvgUnit) shape.Center.X,
+                CenterY = (SvgUnit) shape.Center.Y,
+                Radius = (SvgUnit) shape.Radius
             };
         }
 
@@ -42,12 +42,12 @@ namespace SvgDrawing
             {
                 Points = new SvgPointCollection
                 {
-                    shape.A.X,
-                    shape.A.Y,
-                    shape.B.X,
-                    shape.B.Y,
-                    shape.C.X,
-                    shape.C.Y
+                    (SvgUnit) shape.A.X,
+                    (SvgUnit) shape.A.Y,
+                    (SvgUnit) shape.B.X,
+                    (SvgUnit) shape.B.Y,
+                    (SvgUnit) shape.C.X,
+                    (SvgUnit) shape.C.Y
                 }
             };
         }
@@ -57,8 +57,8 @@ namespace SvgDrawing
             var pointCollection = new SvgPointCollection();
             foreach (var vertex in shape.Vertices)
             {
-                pointCollection.Add(vertex.X);
-                pointCollection.Add(vertex.Y);
+                pointCollection.Add((SvgUnit) vertex.X);
+                pointCollection.Add((SvgUnit) vertex.Y);
             }
             return new SvgPolygon
             {

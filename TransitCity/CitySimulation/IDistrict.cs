@@ -16,8 +16,8 @@ namespace CitySimulation
 
         Area Area { get; }
 
-        float PopulationDensity { get; }
+        double PopulationDensity { get; }
 
-        float JobDensity { get; }
+        double JobDensity { get; }
     }
 }

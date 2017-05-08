@@ -125,8 +125,8 @@ namespace WpfDrawing.Panel
 
         private void OnItemPropertyChanged(object sender, ItemPropertyChangedEventArgs args)
         {
-            var dataPoint = args.Item as PanelObject;
-            if (dataPoint == null)
+            var panelObject = args.Item as PanelObject;
+            if (panelObject == null)
             {
                 return;
             }
@@ -134,24 +134,24 @@ namespace WpfDrawing.Panel
             foreach (var child in _visualChildren)
             {
                 var drawingVisual = child as PanelDrawingVisual;
-                if (drawingVisual == null || drawingVisual.PanelObject != dataPoint)
+                if (drawingVisual == null || drawingVisual.PanelObject != panelObject)
                 {
                     continue;
                 }
 
-                var xform = drawingVisual.Transform as TranslateTransform;
-                if (xform == null)
+                var transform = drawingVisual.Transform as TranslateTransform;
+                if (transform == null)
                 {
                     continue;
                 }
 
-                if (args.PropertyName == nameof(dataPoint.VariableX))
+                if (args.PropertyName == nameof(panelObject.VariableX))
                 {
-                    xform.X = RenderSize.Width * dataPoint.VariableX;
+                    transform.X = RenderSize.Width * panelObject.VariableX;
                 }
-                else if (args.PropertyName == nameof(dataPoint.VariableY))
+                else if (args.PropertyName == nameof(panelObject.VariableY))
                 {
-                    xform.Y = RenderSize.Height * dataPoint.VariableY;
+                    transform.Y = RenderSize.Height * panelObject.VariableY;
                 }
             }
         }
@@ -179,8 +179,8 @@ namespace WpfDrawing.Panel
         {
             foreach (var obj in coll)
             {
-                var dataPoint = obj as PanelObject;
-                if (dataPoint == null)
+                var panelObject = obj as PanelObject;
+                if (panelObject == null)
                 {
                     continue;
                 }
@@ -194,7 +194,7 @@ namespace WpfDrawing.Panel
                         continue;
                     }
 
-                    if (drawingVisual.PanelObject == dataPoint)
+                    if (drawingVisual.PanelObject == panelObject)
                     {
                         removeList.Add(drawingVisual);
                         break;

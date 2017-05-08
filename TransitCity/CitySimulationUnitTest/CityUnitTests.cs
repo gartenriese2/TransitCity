@@ -23,11 +23,11 @@ namespace CitySimulationUnitTest
         [TestMethod]
         public void CreateCityTest()
         {
-            var district1 = new RandomDistrict("District1", new Circle(new Position2f(1000, 1000), 1000), 5000, 2000);
-            var district2 = new RandomDistrict("District2", new Circle(new Position2f(3000, 1000), 1000), 6000, 1000);
-            var district3 = new RandomDistrict("District3", new Circle(new Position2f(5000, 1000), 1000), 5000, 9000);
-            var district4 = new RandomDistrict("District4", new Circle(new Position2f(7000, 1000), 1000), 8000, 4000);
-            var district5 = new RandomDistrict("District5", new Circle(new Position2f(9000, 1000), 1000), 4000, 1500);
+            var district1 = new RandomDistrict("District1", new Circle(new Position2d(1000, 1000), 1000), 5000, 2000);
+            var district2 = new RandomDistrict("District2", new Circle(new Position2d(3000, 1000), 1000), 6000, 1000);
+            var district3 = new RandomDistrict("District3", new Circle(new Position2d(5000, 1000), 1000), 5000, 9000);
+            var district4 = new RandomDistrict("District4", new Circle(new Position2d(7000, 1000), 1000), 8000, 4000);
+            var district5 = new RandomDistrict("District5", new Circle(new Position2d(9000, 1000), 1000), 4000, 1500);
 
             var city = new City("City", new List<IDistrict>{district1, district2, district3, district4, district5});
 
@@ -38,11 +38,11 @@ namespace CitySimulationUnitTest
         [TestMethod]
         public void DrawCityTest()
         {
-            var district1 = new RandomDistrict("District1", new Circle(new Position2f(1000, 1000), 1000), 5000, 2000);
-            var district2 = new RandomDistrict("District2", new Circle(new Position2f(3000, 1000), 1000), 6000, 1000);
-            var district3 = new RandomDistrict("District3", new Circle(new Position2f(5000, 1000), 1000), 5000, 9000);
-            var district4 = new RandomDistrict("District4", new Circle(new Position2f(7000, 1000), 1000), 8000, 4000);
-            var district5 = new RandomDistrict("District5", new Circle(new Position2f(9000, 1000), 1000), 4000, 1500);
+            var district1 = new RandomDistrict("District1", new Circle(new Position2d(1000, 1000), 1000), 5000, 2000);
+            var district2 = new RandomDistrict("District2", new Circle(new Position2d(3000, 1000), 1000), 6000, 1000);
+            var district3 = new RandomDistrict("District3", new Circle(new Position2d(5000, 1000), 1000), 5000, 9000);
+            var district4 = new RandomDistrict("District4", new Circle(new Position2d(7000, 1000), 1000), 8000, 4000);
+            var district5 = new RandomDistrict("District5", new Circle(new Position2d(9000, 1000), 1000), 4000, 1500);
 
             var city = new City("City", new List<IDistrict> { district1, district2, district3, district4, district5 });
 
@@ -67,9 +67,9 @@ namespace CitySimulationUnitTest
         {
             var city = CreateCity();
             var dataManager = new TestTransitData().DataManager;
-            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(5).MetersPerSecond, TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
+            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(5), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
             var time = new WeekTimePoint(DayOfWeek.Wednesday, 7, 30);
-            var taskList = new List<Task<List<Connection<Position2f>>>>();
+            var taskList = new List<Task<List<Connection>>>();
             foreach (var resident in city.Residents.Where(r => r.HasJob))
             {
                 taskList.Add(Task.Factory.StartNew(() => raptor.Compute(resident.Position, time, resident.Job.Position)));
@@ -125,13 +125,13 @@ namespace CitySimulationUnitTest
                 var density2 = district.JobDensity;
                 var shape = district.Shape;
                 var svgVisualElement = shape.ToSvg();
-                svgVisualElement.FillOpacity = density / maxDensity;
+                svgVisualElement.FillOpacity = (float) (density / maxDensity);
                 svgVisualElement.Fill = new SvgColourServer(Color.Green);
                 svgVisualElement.StrokeWidth = 16;
                 svgVisualElement.Stroke = new SvgColourServer(Color.Black);
                 document1.Add(svgVisualElement);
                 var svgVisualElement2 = shape.ToSvg();
-                svgVisualElement2.FillOpacity = density2 / maxDensity2;
+                svgVisualElement2.FillOpacity = (float) (density2 / maxDensity2);
                 svgVisualElement2.Fill = new SvgColourServer(Color.Blue);
                 svgVisualElement2.StrokeWidth = 16;
                 svgVisualElement2.Stroke = new SvgColourServer(Color.Black);
@@ -141,8 +141,8 @@ namespace CitySimulationUnitTest
                 var textElem = new SvgText(district.Name)
                 {
                     FontSize = new SvgUnit(128),
-                    X = new SvgUnitCollection {centroid.X},
-                    Y = new SvgUnitCollection {centroid.Y}
+                    X = new SvgUnitCollection {(SvgUnit) centroid.X},
+                    Y = new SvgUnitCollection {(SvgUnit) centroid.Y}
                 };
                 document1.Add(textElem);
                 document2.Add(textElem);
@@ -158,8 +158,8 @@ namespace CitySimulationUnitTest
             {
                 var c = new SvgCircle
                 {
-                    CenterX = station.Position.X,
-                    CenterY = station.Position.Y,
+                    CenterX = (SvgUnit) station.Position.X,
+                    CenterY = (SvgUnit) station.Position.Y,
                     Radius = 8f,
                     Fill = new SvgColourServer(Color.White),
                     Stroke = new SvgColourServer(Color.Black),
@@ -199,8 +199,8 @@ namespace CitySimulationUnitTest
                     };
                     foreach (var pos in path)
                     {
-                        polyline.Points.Add(pos.X);
-                        polyline.Points.Add(pos.Y);
+                        polyline.Points.Add((SvgUnit) pos.X);
+                        polyline.Points.Add((SvgUnit) pos.Y);
                     }
                     document.Add(polyline);
                 }

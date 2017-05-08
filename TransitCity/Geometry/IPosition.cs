@@ -2,6 +2,6 @@
 {
     public interface IPosition
     {
-        float DistanceTo(IPosition other);
+        double DistanceTo(IPosition other);
     }
 }

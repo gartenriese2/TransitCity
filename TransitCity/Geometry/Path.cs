@@ -4,42 +4,42 @@ using System.Collections.Generic;
 
 namespace Geometry
 {
-    public class Path : IReadOnlyList<Position2f>
+    public class Path : IReadOnlyList<Position2d>
     {
-        private readonly List<Position2f> _path;
+        private readonly List<Position2d> _path;
 
-        public Path(List<Position2f> path)
+        public Path(List<Position2d> path)
         {
             _path = path ?? throw new ArgumentNullException(nameof(path));
         }
 
         public int Count => _path.Count;
 
-        public Position2f this[int index] => _path[index];
+        public Position2d this[int index] => _path[index];
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
 
-        public IEnumerator<Position2f> GetEnumerator()
+        public IEnumerator<Position2d> GetEnumerator()
         {
             return _path.GetEnumerator();
         }
 
-        public int FindIndex(Predicate<Position2f> match)
+        public int FindIndex(Predicate<Position2d> match)
         {
             return _path.FindIndex(match);
         }
 
-        public int IndexOf(Position2f pos)
+        public int IndexOf(Position2d pos)
         {
             return _path.IndexOf(pos);
         }
 
-        public float Length()
+        public double Length()
         {
-            var length = 0f;
+            var length = 0.0;
             for (var i = 1; i < Count; ++i)
             {
                 length += (_path[i] - _path[i - 1]).Length();
@@ -48,10 +48,10 @@ namespace Geometry
             return length;
         }
 
-        public (Path, Path) OffsetPaths(float offset)
+        public (Path, Path) OffsetPaths(double offset)
         {
-            var r1 = new List<Position2f>();
-            var r2 = new List<Position2f>();
+            var r1 = new List<Position2d>();
+            var r2 = new List<Position2d>();
             for (var i = 0; i < _path.Count; ++i)
             {
                 var b = _path[i];
@@ -81,35 +81,35 @@ namespace Geometry
             return new Path(_path.GetRange(startIndex, length));
         }
 
-        public Position2f Lerp(float t)
+        public Position2d Lerp(double t)
         {
-            if (t < 0f || t > 1f)
+            if (t < 0.0 || t > 1.0)
             {
                 throw new ArgumentOutOfRangeException();
             }
 
-            var len = t * Length();
+            var absoluteT = t * Length();
             var idx = 1;
-            var lengthCounter = 0f;
-            while ((_path[idx] - _path[idx - 1]).Length() + lengthCounter < len)
+            var lengthCounter = 0.0;
+            while ((_path[idx] - _path[idx - 1]).Length() + lengthCounter < absoluteT)
             {
                 lengthCounter += (_path[idx] - _path[idx - 1]).Length();
                 ++idx;
             }
 
-            return Position2f.Lerp((len - lengthCounter) / (_path[idx] - _path[idx - 1]).Length(), _path[idx - 1], _path[idx]);
+            return Position2d.Lerp((absoluteT - lengthCounter) / (_path[idx] - _path[idx - 1]).Length(), _path[idx - 1], _path[idx]);
         }
 
-        public Vector2f DirectionLerp(float t)
+        public Vector2d DirectionLerp(double t)
         {
-            if (t < 0f || t > 1f)
+            if (t < 0.0 || t > 1.0)
             {
                 throw new ArgumentOutOfRangeException();
             }
 
             var len = t * Length();
             var idx = 1;
-            var lengthCounter = 0f;
+            var lengthCounter = 0.0;
             while ((_path[idx] - _path[idx - 1]).Length() + lengthCounter < len)
             {
                 lengthCounter += (_path[idx] - _path[idx - 1]).Length();

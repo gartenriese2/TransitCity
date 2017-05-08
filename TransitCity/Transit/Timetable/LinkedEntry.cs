@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using Geometry;
 using Time;
 
 namespace Transit.Timetable
 {
-    public class LinkedEntry<TPos> where TPos : IPosition
+    public class LinkedEntry
     {
-        internal LinkedEntry(long id, WeekTimePoint weekTimePoint, Line<TPos> line, Route<TPos> route, TransferStation<TPos> transferStation, Station<TPos> station, List<long> nextEntries = null)
+        internal LinkedEntry(long id, WeekTimePoint weekTimePoint, Line line, Route route, TransferStation transferStation, Station station, List<long> nextEntries = null)
         {
             Id = id;
             WeekTimePoint = weekTimePoint;
@@ -24,13 +23,13 @@ namespace Transit.Timetable
 
         public WeekTimePoint WeekTimePoint { get; }
 
-        internal Line<TPos> Line { get; }
+        internal Line Line { get; }
 
-        internal Route<TPos> Route { get; }
+        internal Route Route { get; }
 
-        internal TransferStation<TPos> TransferStation { get; }
+        internal TransferStation TransferStation { get; }
 
-        internal Station<TPos> Station { get; }
+        internal Station Station { get; }
 
         internal List<long> NextEntries { get; } = new List<long>();
     }

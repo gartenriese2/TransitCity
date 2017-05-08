@@ -2,20 +2,20 @@
 
 namespace Transit
 {
-    public class Station<P> where P : IPosition
+    public class Station
     {
-        public Station(P position)
+        public Station(Position2d position)
         {
             Position = position;
             EntryPosition = position;
             ExitPosition = position;
         }
 
-        public P Position { get; }
+        public Position2d Position { get; }
 
-        public P EntryPosition { get; }
+        public Position2d EntryPosition { get; }
 
-        public P ExitPosition { get; }
+        public Position2d ExitPosition { get; }
 
         public override string ToString()
         {

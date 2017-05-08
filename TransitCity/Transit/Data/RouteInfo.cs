@@ -9,7 +9,7 @@ namespace Transit.Data
 {
     public class RouteInfo
     {
-        public RouteInfo(Route<Position2f> route, Path path, List<StationInfo> stationInfos, List<Trip<Position2f>> trips)
+        public RouteInfo(Route route, Path path, List<StationInfo> stationInfos, List<Trip> trips)
         {
             Route = route ?? throw new ArgumentNullException(nameof(route));
             Path = path ?? throw new ArgumentNullException(nameof(path));
@@ -17,13 +17,13 @@ namespace Transit.Data
             Trips = trips ?? throw new ArgumentNullException(nameof(trips));
         }
 
-        public Route<Position2f> Route { get; }
+        public Route Route { get; }
 
         public Path Path { get; }
 
         public List<StationInfo> StationInfos { get; }
 
-        public List<Trip<Position2f>> Trips { get; }
+        public List<Trip> Trips { get; }
 
         public IEnumerable<StationInfo> GetNextStationInfos(StationInfo stationInfo)
         {
@@ -47,7 +47,7 @@ namespace Transit.Data
             return StationInfos.Take(idx).Reverse();
         }
 
-        public IEnumerable<WeekTimePoint> GetNextArrivalsOnTrip(Station<Position2f> station, WeekTimePoint departure)
+        public IEnumerable<WeekTimePoint> GetNextArrivalsOnTrip(Station station, WeekTimePoint departure)
         {
             foreach (var trip in Trips)
             {
@@ -62,7 +62,7 @@ namespace Transit.Data
             throw new ArgumentException("Could not find a trip with the specified departure time.");
         }
 
-        public IEnumerable<WeekTimePoint> GetNextDeparturesOnTrip(Station<Position2f> station, WeekTimePoint departure)
+        public IEnumerable<WeekTimePoint> GetNextDeparturesOnTrip(Station station, WeekTimePoint departure)
         {
             foreach (var trip in Trips)
             {
@@ -77,15 +77,15 @@ namespace Transit.Data
             throw new ArgumentException("Could not find a trip with the specified departure time.");
         }
 
-        public IEnumerable<Trip<Position2f>> GetActiveTrips(WeekTimePoint wtp)
+        public IEnumerable<Trip> GetActiveTrips(WeekTimePoint wtp)
         {
             return Trips.Where(trip => new WeekTimeSpan(trip.DepartureAtStation(trip.Stations.First()), trip.ArrivalAtStation(trip.Stations.Last())).IsInside(wtp));
         }
 
-        public IEnumerable<Position2f> GetActiveVehiclePositions(WeekTimePoint wtp)
+        public IEnumerable<Position2d> GetActiveVehiclePositions(WeekTimePoint wtp)
         {
             var trips = GetActiveTrips(wtp).ToList();
-            var positions = new List<Position2f>(trips.Count);
+            var positions = new List<Position2d>(trips.Count);
             foreach (var trip in trips)
             {
                 var (lastArrival, lastDeparture, stationIdx) = GetArrivalDepartureInfoFromTrip(trip, wtp);
@@ -106,10 +106,10 @@ namespace Transit.Data
             return positions;
         }
 
-        public IEnumerable<(Position2f, Vector2f)> GetActiveVehiclePositionsAndDirections(WeekTimePoint wtp)
+        public IEnumerable<(Position2d, Vector2d)> GetActiveVehiclePositionsAndDirections(WeekTimePoint wtp)
         {
             var trips = GetActiveTrips(wtp).ToList();
-            var positions = new List<(Position2f, Vector2f)>(trips.Count);
+            var positions = new List<(Position2d, Vector2d)>(trips.Count);
             foreach (var trip in trips)
             {
                 var (lastArrival, lastDeparture, stationIdx) = GetArrivalDepartureInfoFromTrip(trip, wtp);
@@ -125,7 +125,7 @@ namespace Transit.Data
                 {
                     var departurePosition = trip.Stations.ElementAt(stationIdx).Position;
                     var arrivalPosition = trip.Stations.ElementAt(stationIdx + 1).Position;
-                    var (pos, vec) = GetPositionAndDirectionOnPath(wtp, lastDeparture, lastArrival, departurePosition, arrivalPosition);
+                    var (pos, vec) = GetPositionAndDirectionOnPath(wtp.TimePoint, lastDeparture.TimePoint, lastArrival.TimePoint, departurePosition, arrivalPosition);
                     positions.Add((pos, vec));
                 }
             }
@@ -133,13 +133,13 @@ namespace Transit.Data
             return positions;
         }
 
-        private static (WeekTimePoint, WeekTimePoint, int) GetArrivalDepartureInfoFromTrip(Trip<Position2f> trip, WeekTimePoint wtp)
+        private static (WeekTimePoint, WeekTimePoint, int) GetArrivalDepartureInfoFromTrip(Trip trip, WeekTimePoint wtp)
         {
             var lastArrival = trip.DepartureAtStation(trip.Stations.First()) - TimeSpan.FromSeconds(30); // TODO
             var lastDeparture = trip.DepartureAtStation(trip.Stations.First());
             var stationIdx = 0;
-            var lastIsArrival = true;
-            while (lastArrival < wtp && lastDeparture < wtp)
+            var lastIsArrival = true; // arrival must be less than departure if true
+            while ((lastIsArrival && lastDeparture < wtp) || (!lastIsArrival && lastArrival < wtp))
             {
                 if (lastIsArrival)
                 {
@@ -157,12 +157,12 @@ namespace Transit.Data
             return (lastArrival, lastDeparture, stationIdx);
         }
 
-        private Position2f GetPositionOnPath(
+        private Position2d GetPositionOnPath(
             WeekTimePoint wtp,
             WeekTimePoint departureFromLastStation,
             WeekTimePoint arrivalAtNextStation,
-            Position2f departurePosition,
-            Position2f arrivalPosition)
+            Position2d departurePosition,
+            Position2d arrivalPosition)
         {
             var traveledDistance = SubwayTravelDistanceFunc(Duration.FromSeconds((float)(wtp - departureFromLastStation).TotalSeconds), Duration.FromSeconds((float)(arrivalAtNextStation - departureFromLastStation).TotalSeconds));
             var departureStationIndex = Path.FindIndex(f => f.EqualPosition(departurePosition));
@@ -182,13 +182,18 @@ namespace Transit.Data
             return pathBetweenStations.Lerp(relativeDistance);
         }
 
-        private (Position2f, Vector2f) GetPositionAndDirectionOnPath(
-            WeekTimePoint wtp,
-            WeekTimePoint departureFromLastStation,
-            WeekTimePoint arrivalAtNextStation,
-            Position2f departurePosition,
-            Position2f arrivalPosition)
+        private (Position2d, Vector2d) GetPositionAndDirectionOnPath(
+            TimeSpan wtp,
+            TimeSpan departureFromLastStation,
+            TimeSpan arrivalAtNextStation,
+            Position2d departurePosition,
+            Position2d arrivalPosition)
         {
+            if (wtp < departureFromLastStation || wtp > arrivalAtNextStation)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
             var traveledDistance = SubwayTravelDistanceFunc(Duration.FromSeconds((float)(wtp - departureFromLastStation).TotalSeconds), Duration.FromSeconds((float)(arrivalAtNextStation - departureFromLastStation).TotalSeconds));
             var departureStationIndex = Path.FindIndex(f => f.EqualPosition(departurePosition));
             var arrivalStationIndex = Path.FindIndex(f => f.EqualPosition(arrivalPosition));

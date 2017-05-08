@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Geometry;
 
 namespace Transit
 {
-    public class Line<P> where P : IPosition
+    public class Line
     {
-        private readonly List<Route<P>> _routes = new List<Route<P>>();
+        private readonly List<Route> _routes = new List<Route>();
 
-        public Line(string name, params Route<P>[] routes)
+        public Line(string name, params Route[] routes)
         {
             if (routes.Length == 0)
             {
@@ -19,7 +18,7 @@ namespace Transit
             Name = name;
         }
 
-        public IEnumerable<Route<P>> Routes => _routes;
+        public IEnumerable<Route> Routes => _routes;
 
         public string Name { get; }
 

@@ -4,7 +4,7 @@ using Time;
 
 namespace Transit.Timetable
 {
-    public class Connection<TPos> where TPos : IPosition
+    public class Connection
     {
         private Connection() { }
 
@@ -20,23 +20,23 @@ namespace Transit.Timetable
 
         public TypeEnum Type { get; private set; } = TypeEnum.Undefined;
 
-        public TPos SourcePos { get; private set; }
+        public Position2d SourcePos { get; private set; }
 
-        public Station<TPos> SourceStation { get; private set; }
+        public Station SourceStation { get; private set; }
 
         public WeekTimePoint SourceTime { get; private set; }
 
-        public TPos TargetPos { get; private set; }
+        public Position2d TargetPos { get; private set; }
 
-        public Station<TPos> TargetStation { get; private set; }
+        public Station TargetStation { get; private set; }
 
         public WeekTimePoint TargetTime { get; private set; }
 
-        public Line<TPos> Line { get; private set; }
+        public Line Line { get; private set; }
 
-        public static Connection<TPos> CreateWalkToStation(TPos sourcePos, WeekTimePoint sourceTime, Station<TPos> targetStation, WeekTimePoint targetTime)
+        public static Connection CreateWalkToStation(Position2d sourcePos, WeekTimePoint sourceTime, Station targetStation, WeekTimePoint targetTime)
         {
-            return new Connection<TPos>
+            return new Connection
             {
                 Type = TypeEnum.WalkToStation,
                 SourcePos = sourcePos,
@@ -46,9 +46,9 @@ namespace Transit.Timetable
             };
         }
 
-        public static Connection<TPos> CreateWalkFromStation(Station<TPos> sourceStation, WeekTimePoint sourceTime, TPos targetPos, WeekTimePoint targetTime)
+        public static Connection CreateWalkFromStation(Station sourceStation, WeekTimePoint sourceTime, Position2d targetPos, WeekTimePoint targetTime)
         {
-            return new Connection<TPos>
+            return new Connection
             {
                 Type = TypeEnum.WalkFromStation,
                 SourceStation = sourceStation,
@@ -58,9 +58,9 @@ namespace Transit.Timetable
             };
         }
 
-        public static Connection<TPos> CreateTransfer(Station<TPos> sourceStation, WeekTimePoint sourceTime, Station<TPos> targetStation, WeekTimePoint targetTime)
+        public static Connection CreateTransfer(Station sourceStation, WeekTimePoint sourceTime, Station targetStation, WeekTimePoint targetTime)
         {
-            return new Connection<TPos>
+            return new Connection
             {
                 Type = TypeEnum.Transfer,
                 SourceStation = sourceStation,
@@ -70,9 +70,9 @@ namespace Transit.Timetable
             };
         }
 
-        public static Connection<TPos> CreateRide(Station<TPos> sourceStation, WeekTimePoint sourceTime, Station<TPos> targetStation, WeekTimePoint targetTime, Line<TPos> line)
+        public static Connection CreateRide(Station sourceStation, WeekTimePoint sourceTime, Station targetStation, WeekTimePoint targetTime, Line line)
         {
-            return new Connection<TPos>
+            return new Connection
             {
                 Type = TypeEnum.Ride,
                 SourceStation = sourceStation,
@@ -83,9 +83,9 @@ namespace Transit.Timetable
             };
         }
 
-        public static Connection<TPos> CreateWalk(TPos sourcePos, WeekTimePoint sourceTime, TPos targetPos, WeekTimePoint targetTime)
+        public static Connection CreateWalk(Position2d sourcePos, WeekTimePoint sourceTime, Position2d targetPos, WeekTimePoint targetTime)
         {
-            return new Connection<TPos>
+            return new Connection
             {
                 Type = TypeEnum.Walk,
                 SourcePos = sourcePos,

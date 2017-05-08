@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
-using Geometry;
 
 namespace Transit
 {
-    public class TransferStation<P> where P : IPosition
+    public class TransferStation
     {
-        private readonly List<Station<P>> _stations = new List<Station<P>>();
+        private readonly List<Station> _stations = new List<Station>();
 
         public TransferStation(string name)
         {
             Name = name;
         }
 
-        public TransferStation(string name, params Station<P>[] stations)
+        public TransferStation(string name, params Station[] stations)
         {
             Name = name;
             _stations.AddRange(stations);
@@ -20,14 +19,14 @@ namespace Transit
 
         public string Name { get; }
 
-        public IEnumerable<Station<P>> Stations => _stations;
+        public IEnumerable<Station> Stations => _stations;
 
         public override string ToString()
         {
             return Name;
         }
 
-        public void AddStation(Station<P> station)
+        public void AddStation(Station station)
         {
             if (!_stations.Contains(station))
             {

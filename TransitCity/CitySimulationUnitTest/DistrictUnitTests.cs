@@ -12,7 +12,7 @@ namespace CitySimulationUnitTest
         [TestMethod]
         public void CreateDistrictTest()
         {
-            var shape = new Circle(new Position2f(5000f, 5000f), 961f);
+            var shape = new Circle(new Position2d(5000f, 5000f), 961.0);
             var disctrict = new RandomDistrict("City", shape, 7000, 300000);
             Console.WriteLine($"Populationsdensity: {disctrict.PopulationDensity} ppl/km²");
             Console.WriteLine($"Jobsdensity: {disctrict.JobDensity} jobs/km²");

@@ -46,7 +46,9 @@
   <ItemGroup>
     <Compile Include="CentripetalCatmullRomSpline.cs" />
     <Compile Include="IPosition.cs" />
+    <Compile Include="IVector.cs" />
     <Compile Include="Path.cs" />
+    <Compile Include="Position2d.cs" />
     <Compile Include="Position2f.cs" />
     <Compile Include="Position2i.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -54,6 +56,7 @@
     <Compile Include="Shapes\IShape.cs" />
     <Compile Include="Shapes\Polygon.cs" />
     <Compile Include="Shapes\Triangle.cs" />
+    <Compile Include="Vector2d.cs" />
     <Compile Include="Vector2f.cs" />
   </ItemGroup>
   <ItemGroup>

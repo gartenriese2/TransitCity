@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Geometry
+﻿namespace Geometry
 {
     public class Position2f : IPosition
     {
@@ -57,7 +55,7 @@ namespace Geometry
             return $"({X}|{Y})";
         }
 
-        public float DistanceTo(IPosition other)
+        public double DistanceTo(IPosition other)
         {
             return DistanceTo((Position2f) other);
         }

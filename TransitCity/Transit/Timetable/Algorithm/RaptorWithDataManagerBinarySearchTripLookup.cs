@@ -5,24 +5,23 @@ using Geometry;
 using Time;
 using Transit.Data;
 using Utility.Extensions;
+using Utility.Units;
 
 namespace Transit.Timetable.Algorithm
 {
-    using Connection2f = Connection<Position2f>;
-
     public class RaptorWithDataManagerBinarySearchTripLookup : RaptorWithDataManagerBase
     {
-        public RaptorWithDataManagerBinarySearchTripLookup(float walkingSpeed, TimeSpan maxWalkingTime, TimeSpan maxWaitingTime, DataManager dataManager)
+        public RaptorWithDataManagerBinarySearchTripLookup(Speed walkingSpeed, TimeSpan maxWalkingTime, TimeSpan maxWaitingTime, DataManager dataManager)
             : base(walkingSpeed, maxWalkingTime, maxWaitingTime, dataManager)
         {
         }
 
-        public override List<Connection2f> Compute(Position2f sourcePos, WeekTimePoint startTime, Position2f targetPos)
+        public override List<Connection> Compute(Position2d sourcePos, WeekTimePoint startTime, Position2d targetPos)
         {
-            var earliestKnownTargetArrivalTime = startTime + TimeSpan.FromSeconds(sourcePos.DistanceTo(targetPos) / _walkingSpeed);
-            var earliestConnections = new List<Connection2f>
+            var earliestKnownTargetArrivalTime = startTime + TimeSpan.FromSeconds(sourcePos.DistanceTo(targetPos) / _walkingSpeed.MetersPerSecond);
+            var earliestConnections = new List<Connection>
             {
-                Connection2f.CreateWalk(sourcePos, startTime, targetPos, earliestKnownTargetArrivalTime)
+                Connection.CreateWalk(sourcePos, startTime, targetPos, earliestKnownTargetArrivalTime)
             };
 
             var (markedStations, connections) = GetInitialMarkedStations(sourcePos, startTime);
@@ -36,12 +35,12 @@ namespace Transit.Timetable.Algorithm
             return GetTravelPath(earliestConnections, targetPos);
         }
 
-        public override List<Connection2f> ComputeReverse(Position2f sourcePos, WeekTimePoint latestArrivalTime, Position2f targetPos)
+        public override List<Connection> ComputeReverse(Position2d sourcePos, WeekTimePoint latestArrivalTime, Position2d targetPos)
         {
-            var latestKnownSourceDepartureTime = latestArrivalTime - TimeSpan.FromSeconds(sourcePos.DistanceTo(targetPos) / _walkingSpeed);
-            var latestConnections = new List<Connection2f>
+            var latestKnownSourceDepartureTime = latestArrivalTime - TimeSpan.FromSeconds(sourcePos.DistanceTo(targetPos) / _walkingSpeed.MetersPerSecond);
+            var latestConnections = new List<Connection>
             {
-                Connection2f.CreateWalk(sourcePos, latestKnownSourceDepartureTime, targetPos, latestArrivalTime)
+                Connection.CreateWalk(sourcePos, latestKnownSourceDepartureTime, targetPos, latestArrivalTime)
             };
 
             var (markedStations, connections) = GetInitialMarkedStationsReverse(targetPos, latestArrivalTime);
@@ -55,7 +54,7 @@ namespace Transit.Timetable.Algorithm
             return GetTravelPathReverse(latestConnections, sourcePos);
         }
 
-        private void ComputeRound(Position2f targetPos, List<Connection2f> earliestKnownConnections, IDictionary<StationInfo, WeekTimePoint> markedStations, ref WeekTimePoint earliestKnownTargetArrivalTime)
+        private void ComputeRound(Position2d targetPos, List<Connection> earliestKnownConnections, IDictionary<StationInfo, WeekTimePoint> markedStations, ref WeekTimePoint earliestKnownTargetArrivalTime)
         {
             var newlyMarkedStations = new Dictionary<StationInfo, WeekTimePoint>();
 
@@ -71,7 +70,7 @@ namespace Transit.Timetable.Algorithm
             }
         }
 
-        private void ComputeRoundReverse(Position2f sourcePos, List<Connection2f> latestKnownConnections,
+        private void ComputeRoundReverse(Position2d sourcePos, List<Connection> latestKnownConnections,
             IDictionary<StationInfo, WeekTimePoint> markedStations, ref WeekTimePoint latestKnownSourceDepartureTime)
         {
             var newlyMarkedStations = new Dictionary<StationInfo, WeekTimePoint>();
@@ -89,7 +88,7 @@ namespace Transit.Timetable.Algorithm
         }
 
         private void ComputeRoundForStation(StationInfo station, WeekTimePoint startTime, ref WeekTimePoint earliestKnownTargetArrivalTime,
-            List<Connection2f> earliestKnownConnections, Position2f targetPos, IDictionary<StationInfo, WeekTimePoint> newlyMarkedStations)
+            List<Connection> earliestKnownConnections, Position2d targetPos, IDictionary<StationInfo, WeekTimePoint> newlyMarkedStations)
         {
             var (nextDeparture, trip) = station.GetNextDepartureAndTripArrayBinarySearch(startTime);
             if (nextDeparture == null)
@@ -113,7 +112,7 @@ namespace Transit.Timetable.Algorithm
         }
 
         private void ComputeRoundForStationReverse(StationInfo station, WeekTimePoint departureTime, ref WeekTimePoint latestKnownSourceDepartureTime,
-            List<Connection2f> latestKnownConnections, Position2f sourcePos, IDictionary<StationInfo, WeekTimePoint> newlyMarkedStations)
+            List<Connection> latestKnownConnections, Position2d sourcePos, IDictionary<StationInfo, WeekTimePoint> newlyMarkedStations)
         {
             var (lastArrival, trip) = station.GetLastArrivalAndTripArrayBinarySearch(departureTime);
             if (lastArrival == null)
@@ -136,7 +135,7 @@ namespace Transit.Timetable.Algorithm
             }
         }
 
-        private Dictionary<StationInfo, WeekTimePoint> CheckRoute(StationInfo currentStationInfo, WeekTimePoint currentDeparture, Trip<Position2f> trip, ref WeekTimePoint earliestKnownTargetArrivalTime, List<Connection2f> earliestKnownConnections, Position2f targetPos)
+        private Dictionary<StationInfo, WeekTimePoint> CheckRoute(StationInfo currentStationInfo, WeekTimePoint currentDeparture, Trip trip, ref WeekTimePoint earliestKnownTargetArrivalTime, List<Connection> earliestKnownConnections, Position2d targetPos)
         {
             var newlyMarkedStations = new Dictionary<StationInfo, WeekTimePoint>();
             var (lineInfo, routeInfo, stationInfo) = _dataManager.GetInfos(currentStationInfo.Station);
@@ -157,7 +156,7 @@ namespace Transit.Timetable.Algorithm
                     break;
                 }
 
-                var exitWalkingTime = TimeSpan.FromSeconds(nextStation.ExitPosition.DistanceTo(targetPos) / _walkingSpeed);
+                var exitWalkingTime = TimeSpan.FromSeconds(nextStation.ExitPosition.DistanceTo(targetPos) / _walkingSpeed.MetersPerSecond);
                 if (exitWalkingTime < TimeSpan.FromMinutes(10))
                 {
                     var arrivalAtTargetPos = nextTime + exitWalkingTime;
@@ -165,7 +164,7 @@ namespace Transit.Timetable.Algorithm
                     {
                         earliestKnownTargetArrivalTime = arrivalAtTargetPos;
                         var idx = earliestKnownConnections.FindIndex(c => c.TargetPos.DistanceTo(targetPos) < float.Epsilon);
-                        earliestKnownConnections[idx] = Connection2f.CreateWalkFromStation(nextStation, nextTime, targetPos, arrivalAtTargetPos);
+                        earliestKnownConnections[idx] = Connection.CreateWalkFromStation(nextStation, nextTime, targetPos, arrivalAtTargetPos);
                     }
                 }
 
@@ -176,13 +175,13 @@ namespace Transit.Timetable.Algorithm
 
                 if (earliestKnownConnections.All(c => c.TargetStation != nextStation))
                 {
-                    var connection = Connection2f.CreateRide(stationInfo.Station, currentDeparture, nextStation, nextTime, lineInfo.Line);
+                    var connection = Connection.CreateRide(stationInfo.Station, currentDeparture, nextStation, nextTime, lineInfo.Line);
                     earliestKnownConnections.Add(connection);
                     newlyMarkedStations.Add(nextStationInfo, nextTime);
                 }
                 else if (earliestKnownConnections.Any(c => c.TargetStation == nextStation && c.TargetTime > nextTime))
                 {
-                    var connection = Connection2f.CreateRide(stationInfo.Station, currentDeparture, nextStation, nextTime, lineInfo.Line);
+                    var connection = Connection.CreateRide(stationInfo.Station, currentDeparture, nextStation, nextTime, lineInfo.Line);
                     var idx = earliestKnownConnections.FindIndex(c => c.TargetStation == nextStation && c.TargetTime > nextTime);
                     earliestKnownConnections[idx] = connection;
                     newlyMarkedStations.Add(nextStationInfo, nextTime);
@@ -193,7 +192,7 @@ namespace Transit.Timetable.Algorithm
                 foreach (var otherStation in otherStations)
                 {
                     const float exitTime = 10f;
-                    var transferTime = nextStation.ExitPosition.DistanceTo(otherStation.EntryPosition) / _walkingSpeed;
+                    var transferTime = nextStation.ExitPosition.DistanceTo(otherStation.EntryPosition) / _walkingSpeed.MetersPerSecond;
                     var timespan = TimeSpan.FromSeconds(transferTime + exitTime);
                     var arrivalTime = nextTime + timespan;
                     if (arrivalTime >= earliestKnownTargetArrivalTime)
@@ -201,7 +200,7 @@ namespace Transit.Timetable.Algorithm
                         continue;
                     }
 
-                    var connection = Connection2f.CreateTransfer(nextStation, nextTime, otherStation, arrivalTime);
+                    var connection = Connection.CreateTransfer(nextStation, nextTime, otherStation, arrivalTime);
                     var otherStationInfo = _dataManager.GetInfos(otherStation).stationInfo;
                     if (earliestKnownConnections.All(c => c.TargetStation != otherStation))
                     {
@@ -220,7 +219,7 @@ namespace Transit.Timetable.Algorithm
             return newlyMarkedStations;
         }
 
-        private Dictionary<StationInfo, WeekTimePoint> CheckRouteReverse(StationInfo currentStationInfo, WeekTimePoint currentArrival, Trip<Position2f> trip, ref WeekTimePoint latestKnownSourceDepartureTime, List<Connection2f> latestKnownConnections, Position2f sourcePos)
+        private Dictionary<StationInfo, WeekTimePoint> CheckRouteReverse(StationInfo currentStationInfo, WeekTimePoint currentArrival, Trip trip, ref WeekTimePoint latestKnownSourceDepartureTime, List<Connection> latestKnownConnections, Position2d sourcePos)
         {
             var newlyMarkedStations = new Dictionary<StationInfo, WeekTimePoint>();
             var (lineInfo, routeInfo, stationInfo) = _dataManager.GetInfos(currentStationInfo.Station);
@@ -241,7 +240,7 @@ namespace Transit.Timetable.Algorithm
                     break;
                 }
 
-                var entryWalkingTime = TimeSpan.FromSeconds(lastStation.EntryPosition.DistanceTo(sourcePos) / _walkingSpeed);
+                var entryWalkingTime = TimeSpan.FromSeconds(lastStation.EntryPosition.DistanceTo(sourcePos) / _walkingSpeed.MetersPerSecond);
                 if (entryWalkingTime < TimeSpan.FromMinutes(10))
                 {
                     var departureAtSorucePos = lastTime - entryWalkingTime;
@@ -249,7 +248,7 @@ namespace Transit.Timetable.Algorithm
                     {
                         latestKnownSourceDepartureTime = departureAtSorucePos;
                         var idx = latestKnownConnections.FindIndex(c => c.SourcePos.DistanceTo(sourcePos) < float.Epsilon);
-                        latestKnownConnections[idx] = Connection2f.CreateWalkToStation(sourcePos, departureAtSorucePos, lastStation, lastTime);
+                        latestKnownConnections[idx] = Connection.CreateWalkToStation(sourcePos, departureAtSorucePos, lastStation, lastTime);
                     }
                 }
 
@@ -260,13 +259,13 @@ namespace Transit.Timetable.Algorithm
 
                 if (latestKnownConnections.All(c => c.SourceStation != lastStation))
                 {
-                    var connection = Connection2f.CreateRide(lastStation, lastTime, stationInfo.Station, currentArrival, lineInfo.Line);
+                    var connection = Connection.CreateRide(lastStation, lastTime, stationInfo.Station, currentArrival, lineInfo.Line);
                     latestKnownConnections.Add(connection);
                     newlyMarkedStations.Add(lastStationInfo, lastTime);
                 }
                 else if (latestKnownConnections.Any(c => c.SourceStation == lastStation && c.SourceTime < lastTime))
                 {
-                    var connection = Connection2f.CreateRide(lastStation, lastTime, stationInfo.Station, currentArrival, lineInfo.Line);
+                    var connection = Connection.CreateRide(lastStation, lastTime, stationInfo.Station, currentArrival, lineInfo.Line);
                     var idx = latestKnownConnections.FindIndex(c => c.SourceStation == lastStation && c.SourceTime < lastTime);
                     latestKnownConnections[idx] = connection;
                     newlyMarkedStations.Add(lastStationInfo, lastTime);
@@ -277,7 +276,7 @@ namespace Transit.Timetable.Algorithm
                 foreach (var otherStation in otherStations)
                 {
                     const float exitTime = 10f;
-                    var transferTime = lastStation.EntryPosition.DistanceTo(otherStation.ExitPosition) / _walkingSpeed;
+                    var transferTime = lastStation.EntryPosition.DistanceTo(otherStation.ExitPosition) / _walkingSpeed.MetersPerSecond;
                     var timespan = TimeSpan.FromSeconds(transferTime + exitTime);
                     var departureTime = lastTime - timespan;
                     if (departureTime <= latestKnownSourceDepartureTime)
@@ -285,7 +284,7 @@ namespace Transit.Timetable.Algorithm
                         continue;
                     }
 
-                    var connection = Connection2f.CreateTransfer(otherStation, departureTime, lastStation, lastTime);
+                    var connection = Connection.CreateTransfer(otherStation, departureTime, lastStation, lastTime);
                     var otherStationInfo = _dataManager.GetInfos(otherStation).stationInfo;
                     if (latestKnownConnections.All(c => c.SourceStation != otherStation))
                     {

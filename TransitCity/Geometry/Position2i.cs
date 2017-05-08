@@ -19,7 +19,7 @@ namespace Geometry
             return $"({X}|{Y})";
         }
 
-        public float DistanceTo(IPosition other)
+        public double DistanceTo(IPosition other)
         {
             return DistanceTo((Position2i) other);
         }

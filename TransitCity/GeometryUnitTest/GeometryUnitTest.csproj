@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="ShapeUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PathUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -2,7 +2,7 @@
 
 namespace Geometry
 {
-    public class Vector2f
+    public class Vector2f : IVector
     {
         public Vector2f()
         {

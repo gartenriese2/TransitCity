@@ -7,27 +7,27 @@ using Time;
 
 namespace Transit.Timetable.Queries
 {
-    public class DeparturesQueryEntry<TPos> : IQuery<Entry<TPos>> where TPos : IPosition
+    public class DeparturesQueryEntry : IQuery<Entry>
     {
         private readonly WeekTimePoint _startTimePoint;
         private readonly WeekTimePoint _endTimePoint;
-        private readonly List<Station<TPos>> _stations = new List<Station<TPos>>();
+        private readonly List<Station> _stations = new List<Station>();
 
-        public DeparturesQueryEntry(Station<TPos> station, WeekTimePoint startTimePoint, WeekTimePoint endTimePoint = null)
+        public DeparturesQueryEntry(Station station, WeekTimePoint startTimePoint, WeekTimePoint endTimePoint = null)
         {
             _startTimePoint = startTimePoint ?? throw new ArgumentNullException(nameof(startTimePoint));
             _endTimePoint = endTimePoint;
             _stations.Add(station);
         }
 
-        public DeparturesQueryEntry(TransferStation<TPos> station, WeekTimePoint startTimePoint, WeekTimePoint endTimePoint = null)
+        public DeparturesQueryEntry(TransferStation station, WeekTimePoint startTimePoint, WeekTimePoint endTimePoint = null)
         {
             _startTimePoint = startTimePoint ?? throw new ArgumentNullException(nameof(startTimePoint));
             _endTimePoint = endTimePoint;
             _stations.AddRange(station.Stations);
         }
 
-        public IEnumerable<Entry<TPos>> Execute(IEnumerable<Entry<TPos>> table)
+        public IEnumerable<Entry> Execute(IEnumerable<Entry> table)
         {
             if (_endTimePoint == null || _startTimePoint <= _endTimePoint)
             {
@@ -49,27 +49,27 @@ namespace Transit.Timetable.Queries
         }
     }
 
-    public class DeparturesQueryLinkedEntry<TPos> : IQuery<KeyValuePair<long, LinkedEntry<TPos>>> where TPos : IPosition
+    public class DeparturesQueryLinkedEntry : IQuery<KeyValuePair<long, LinkedEntry>>
     {
         private readonly WeekTimePoint _startTimePoint;
         private readonly WeekTimePoint _endTimePoint;
-        private readonly List<Station<TPos>> _stations = new List<Station<TPos>>();
+        private readonly List<Station> _stations = new List<Station>();
 
-        public DeparturesQueryLinkedEntry(Station<TPos> station, WeekTimePoint startTimePoint, WeekTimePoint endTimePoint = null)
+        public DeparturesQueryLinkedEntry(Station station, WeekTimePoint startTimePoint, WeekTimePoint endTimePoint = null)
         {
             _startTimePoint = startTimePoint ?? throw new ArgumentNullException(nameof(startTimePoint));
             _endTimePoint = endTimePoint;
             _stations.Add(station);
         }
 
-        public DeparturesQueryLinkedEntry(TransferStation<TPos> station, WeekTimePoint startTimePoint, WeekTimePoint endTimePoint = null)
+        public DeparturesQueryLinkedEntry(TransferStation station, WeekTimePoint startTimePoint, WeekTimePoint endTimePoint = null)
         {
             _startTimePoint = startTimePoint ?? throw new ArgumentNullException(nameof(startTimePoint));
             _endTimePoint = endTimePoint;
             _stations.AddRange(station.Stations);
         }
 
-        public IEnumerable<KeyValuePair<long, LinkedEntry<TPos>>> Execute(IEnumerable<KeyValuePair<long, LinkedEntry<TPos>>> table)
+        public IEnumerable<KeyValuePair<long, LinkedEntry>> Execute(IEnumerable<KeyValuePair<long, LinkedEntry>> table)
         {
             if (_endTimePoint == null || _startTimePoint <= _endTimePoint)
             {

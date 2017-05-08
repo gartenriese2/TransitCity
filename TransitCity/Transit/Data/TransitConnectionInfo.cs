@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using CitySimulation;
-using Geometry;
 using Transit.Timetable;
 
 namespace Transit.Data
 {
-    using ConnectionList = List<Connection<Position2f>>;
+    using ConnectionList = List<Connection>;
 
     public class TransitConnectionInfo
     {

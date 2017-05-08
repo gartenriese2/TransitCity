@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Converter\ElementToXConverter.cs" />
     <Compile Include="Objects\Station.cs" />
+    <Compile Include="Objects\Vehicle.cs" />
     <Compile Include="Panel\PanelDrawingVisual.cs" />
     <Compile Include="Panel\PanelObject.cs" />
     <Compile Include="Panel\PanelControl.xaml.cs">

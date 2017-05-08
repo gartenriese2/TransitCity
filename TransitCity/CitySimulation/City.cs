@@ -26,9 +26,9 @@ namespace CitySimulation
 
         public Area Area => _districts.Aggregate(Area.FromSqaureMeters(0), (a, d) => a + d.Area);
 
-        public float PopulationDensity => Residents.Count() / Area.SquareKilometers;
+        public double PopulationDensity => Residents.Count() / Area.SquareKilometers;
 
-        public float JobDensity => Jobs.Count() / Area.SquareKilometers;
+        public double JobDensity => Jobs.Count() / Area.SquareKilometers;
 
         private void Connect()
         {

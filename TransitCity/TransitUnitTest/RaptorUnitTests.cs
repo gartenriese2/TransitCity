@@ -16,11 +16,11 @@ namespace TransitUnitTest
         public void TestReverse()
         {
             var dataManager = new TestTransitData().DataManager;
-            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(8).MetersPerSecond, TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
+            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(8), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
 
-            var source = new Position2f(1000, 1000);
+            var source = new Position2d(1000, 1000);
             var departure = new WeekTimePoint(DayOfWeek.Wednesday, 7, 30);
-            var target = new Position2f(8000, 2000);
+            var target = new Position2d(8000, 2000);
             var connectionList = raptor.Compute(source, departure, target);
             var arrival = connectionList.Last().TargetTime;
             var reverseConnectionList = raptor.ComputeReverse(source, arrival, target);

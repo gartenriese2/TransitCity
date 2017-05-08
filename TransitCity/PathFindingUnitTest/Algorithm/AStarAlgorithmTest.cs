@@ -13,7 +13,7 @@ namespace PathFindingUnitTest.Algorithm
         [TestMethod]
         public void ComputeTest()
         {
-            Func<Node<Position2f>, Node<Position2f>, BasicEdgeCost> heuristicCostEstimateFunc = (a, b) => new BasicEdgeCost(a.Position.DistanceTo(b.Position));
+            Func<Node<Position2f>, Node<Position2f>, BasicEdgeCost> heuristicCostEstimateFunc = (a, b) => new BasicEdgeCost((float) a.Position.DistanceTo(b.Position));
             IGraphAlgorithm<Position2f, BasicEdgeCost> algorithm = new AStarAlgorithm<Position2f, BasicEdgeCost>(heuristicCostEstimateFunc);
 
             var network = new Network<Position2f, BasicEdgeCost>();
@@ -21,9 +21,9 @@ namespace PathFindingUnitTest.Algorithm
             var node00 = network.CreateNode(new Position2f(0, 0));
             var node10 = network.CreateNode(new Position2f(1, 0));
             var node11 = network.CreateNode(new Position2f(1, 1));
-            network.AddDirectedEdge(new DirectedEdge<BasicEdgeCost, Position2f>(node00, node10, new BasicEdgeCost(node00.Position.DistanceTo(node10.Position))));
-            network.AddDirectedEdge(new DirectedEdge<BasicEdgeCost, Position2f>(node00, node11, new BasicEdgeCost(node00.Position.DistanceTo(node11.Position))));
-            network.AddDirectedEdge(new DirectedEdge<BasicEdgeCost, Position2f>(node10, node11, new BasicEdgeCost(node10.Position.DistanceTo(node11.Position))));
+            network.AddDirectedEdge(new DirectedEdge<BasicEdgeCost, Position2f>(node00, node10, new BasicEdgeCost((float) node00.Position.DistanceTo(node10.Position))));
+            network.AddDirectedEdge(new DirectedEdge<BasicEdgeCost, Position2f>(node00, node11, new BasicEdgeCost((float) node00.Position.DistanceTo(node11.Position))));
+            network.AddDirectedEdge(new DirectedEdge<BasicEdgeCost, Position2f>(node10, node11, new BasicEdgeCost((float) node10.Position.DistanceTo(node11.Position))));
 
             var tuple = algorithm.Compute(network, node00, node11);
             Assert.IsTrue(tuple.Item1.GreaterOrEquals(new BasicEdgeCost(1.41421359f)));
@@ -97,13 +97,13 @@ namespace PathFindingUnitTest.Algorithm
 
         private Tuple<TimeEdgeCost, List<DirectedEdge<TimeEdgeCost, Position2f>>> ComputeTransitPath(Position2f fromPos, Position2f toPos)
         {
-            Func<Node<Position2f>, Node<Position2f>, TimeEdgeCost> heuristicCostEstimateFunc = (a, b) => new TimeEdgeCost(a.Position.DistanceTo(b.Position) / 28f); // 100 km/h
+            Func<Node<Position2f>, Node<Position2f>, TimeEdgeCost> heuristicCostEstimateFunc = (a, b) => new TimeEdgeCost((float) (a.Position.DistanceTo(b.Position) / 28f)); // 100 km/h
             IGraphAlgorithm<Position2f, TimeEdgeCost> algorithm = new AStarAlgorithm<Position2f, TimeEdgeCost>(heuristicCostEstimateFunc);
 
             var network = GetTransitNetwork();
 
-            Func<Node<Position2f>, Node<Position2f>, TimeEdgeCost> costFuncWalkingWaiting = (a, b) => new TimeEdgeCost(a.Position.DistanceTo(b.Position) / 2.2f + 120f); // 8km/h + 2 min waiting
-            Func<Node<Position2f>, Node<Position2f>, TimeEdgeCost> costFuncWalking = (a, b) => new TimeEdgeCost(a.Position.DistanceTo(b.Position) / 2.2f); // 8km/h
+            Func<Node<Position2f>, Node<Position2f>, TimeEdgeCost> costFuncWalkingWaiting = (a, b) => new TimeEdgeCost((float) (a.Position.DistanceTo(b.Position) / 2.2f + 120f)); // 8km/h + 2 min waiting
+            Func<Node<Position2f>, Node<Position2f>, TimeEdgeCost> costFuncWalking = (a, b) => new TimeEdgeCost((float) (a.Position.DistanceTo(b.Position) / 2.2f)); // 8km/h
 
             var from = network.CreateNode(fromPos);
             var to = network.CreateNode(toPos);
@@ -156,7 +156,7 @@ namespace PathFindingUnitTest.Algorithm
                 const float maximalSpeed = 70f / 3.6f; // 70 km/h
                 const float timeToReachMaximalSpeed = maximalSpeed / meanAcceleration;
                 const float neededDistanceToReachMaximalSpeed = meanAcceleration / 2 * timeToReachMaximalSpeed * timeToReachMaximalSpeed;
-                var distance = a.Position.DistanceTo(b.Position);
+                var distance = (float)a.Position.DistanceTo(b.Position);
                 var baseTime = 30f; // waiting time at station
                 if (distance < 2 * neededDistanceToReachMaximalSpeed) // distance is too small to reach maximalSpeed
                 {

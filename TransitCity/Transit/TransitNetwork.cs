@@ -6,12 +6,14 @@ using PathFinding.Network;
 
 namespace Transit
 {
-    public class TransitNetwork<P> : Network<P, TimeEdgeCost> where P : IPosition
-    {
-        private readonly Dictionary<Station<P>, Tuple<Node<P>, Node<P>, Node<P>>> _stationNodeDictionary = new Dictionary<Station<P>, Tuple<Node<P>, Node<P>, Node<P>>>();
-        private readonly List<TransferStation<P>> _transferStations = new List<TransferStation<P>>();
+    using Node = Node<Position2d>;
 
-        public void ConnectLine(Line<P> line, Func<Node<P>, Node<P>, TimeEdgeCost> transitCostFunc)
+    public class TransitNetwork : Network<Position2d, TimeEdgeCost>
+    {
+        private readonly Dictionary<Station, Tuple<Node, Node, Node>> _stationNodeDictionary = new Dictionary<Station, Tuple<Node, Node, Node>>();
+        private readonly List<TransferStation> _transferStations = new List<TransferStation>();
+
+        public void ConnectLine(Line line, Func<Node, Node, TimeEdgeCost> transitCostFunc)
         {
             foreach (var route in line.Routes)
             {
@@ -20,7 +22,7 @@ namespace Transit
             }
         }
 
-        public void ConnectTransferStation(TransferStation<P> transferStation, Func<Node<P>, Node<P>, TimeEdgeCost> walkingCostFunc)
+        public void ConnectTransferStation(TransferStation transferStation, Func<Node, Node, TimeEdgeCost> walkingCostFunc)
         {
             if (_transferStations.Contains(transferStation))
             {
@@ -40,7 +42,7 @@ namespace Transit
             }
         }
 
-        public Node<P> ConnectToStations(P position, float radius, Func<Node<P>, Node<P>, TimeEdgeCost> walkingCostFunc)
+        public Node ConnectToStations(Position2d position, float radius, Func<Node, Node, TimeEdgeCost> walkingCostFunc)
         {
             var node = CreateNode(position);
             foreach (var station in _transferStations.SelectMany(t => t.Stations))
@@ -55,7 +57,7 @@ namespace Transit
             return node;
         }
 
-        private void ConnectRoute(Route<P> route, Func<Node<P>, Node<P>, TimeEdgeCost> transitCostFunc)
+        private void ConnectRoute(Route route, Func<Node, Node, TimeEdgeCost> transitCostFunc)
         {
             for (var i = 0; i < route.Stations.Count() - 1; ++i)
             {
@@ -65,7 +67,7 @@ namespace Transit
             }
         }
 
-        private void ConnectEntryExit(Route<P> route, Func<Node<P>, Node<P>, TimeEdgeCost> entryCostFunc, Func<Node<P>, Node<P>, TimeEdgeCost> exitCostFunc)
+        private void ConnectEntryExit(Route route, Func<Node, Node, TimeEdgeCost> entryCostFunc, Func<Node, Node, TimeEdgeCost> exitCostFunc)
         {
             foreach (var station in route.Stations)
             {
@@ -78,26 +80,26 @@ namespace Transit
             }
         }
 
-        private Node<P> GetEntryNode(Station<P> station)
+        private Node GetEntryNode(Station station)
         {
             return GetNodeTuple(station).Item1;
         }
 
-        private Node<P> GetTransitNode(Station<P> station)
+        private Node GetTransitNode(Station station)
         {
             return GetNodeTuple(station).Item2;
         }
 
-        private Node<P> GetExitNode(Station<P> station)
+        private Node GetExitNode(Station station)
         {
             return GetNodeTuple(station).Item3;
         }
 
-        private Tuple<Node<P>, Node<P>, Node<P>> GetNodeTuple(Station<P> station)
+        private Tuple<Node, Node, Node> GetNodeTuple(Station station)
         {
             if (!_stationNodeDictionary.ContainsKey(station))
             {
-                _stationNodeDictionary.Add(station, new Tuple<Node<P>, Node<P>, Node<P>>(CreateNode(station.EntryPosition), CreateNode(station.Position), CreateNode(station.ExitPosition)));
+                _stationNodeDictionary.Add(station, new Tuple<Node, Node, Node>(CreateNode(station.EntryPosition), CreateNode(station.Position), CreateNode(station.ExitPosition)));
             }
 
             return _stationNodeDictionary[station];

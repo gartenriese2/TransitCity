@@ -9,31 +9,31 @@ namespace Transit.Data
 {
     public class DataManager
     {
-        private readonly Dictionary<Station<Position2f>, TransferStation<Position2f>> _stationToTransferStationDictionary = new Dictionary<Station<Position2f>, TransferStation<Position2f>>();
+        private readonly Dictionary<Station, TransferStation> _stationToTransferStationDictionary = new Dictionary<Station, TransferStation>();
 
-        private readonly Dictionary<string, TransferStation<Position2f>> _transferStationDictionary = new Dictionary<string, TransferStation<Position2f>>();
+        private readonly Dictionary<string, TransferStation> _transferStationDictionary = new Dictionary<string, TransferStation>();
 
-        private readonly Dictionary<Station<Position2f>, (LineInfo, RouteInfo, StationInfo)> _stationToRouteInfoDictionary = new Dictionary<Station<Position2f>, (LineInfo, RouteInfo, StationInfo)>();
+        private readonly Dictionary<Station, (LineInfo, RouteInfo, StationInfo)> _stationToRouteInfoDictionary = new Dictionary<Station, (LineInfo, RouteInfo, StationInfo)>();
 
-        private readonly List<Line<Position2f>> _lines = new List<Line<Position2f>>();
+        private readonly List<Line> _lines = new List<Line>();
 
         private readonly List<LineInfo> _lineInfos = new List<LineInfo>();
 
-        public IEnumerable<Station<Position2f>> AllStations => _stationToTransferStationDictionary.Keys;
+        public IEnumerable<Station> AllStations => _stationToTransferStationDictionary.Keys;
 
-        public IEnumerable<TransferStation<Position2f>> AllTransferStations => _transferStationDictionary.Values;
+        public IEnumerable<TransferStation> AllTransferStations => _transferStationDictionary.Values;
 
         public IEnumerable<StationInfo> AllStationInfos => _lineInfos.SelectMany(li => li.RouteInfos).SelectMany(ri => ri.StationInfos);
 
         public IEnumerable<LineInfo> AllLineInfos => _lineInfos;
 
-        public IEnumerable<Trip<Position2f>> GetActiveTrips(WeekTimePoint wtp) => AllLineInfos.SelectMany(li => li.GetActiveTrips(wtp));
+        public IEnumerable<Trip> GetActiveTrips(WeekTimePoint wtp) => AllLineInfos.SelectMany(li => li.GetActiveTrips(wtp));
 
-        public IEnumerable<Position2f> GetActiveVehiclePositions(WeekTimePoint wtp) => AllLineInfos.SelectMany(li => li.GetActiveVehiclePositions(wtp));
+        public IEnumerable<Position2d> GetActiveVehiclePositions(WeekTimePoint wtp) => AllLineInfos.SelectMany(li => li.GetActiveVehiclePositions(wtp));
 
-        public IEnumerable<(Position2f, Vector2f)> GetActiveVehiclePositionsAndDirections(WeekTimePoint wtp) => AllLineInfos.SelectMany(li => li.GetActiveVehiclePositionsAndDirections(wtp));
+        public IEnumerable<(Position2d, Vector2d)> GetActiveVehiclePositionsAndDirections(WeekTimePoint wtp) => AllLineInfos.SelectMany(li => li.GetActiveVehiclePositionsAndDirections(wtp));
 
-        public void AddSubwayLine(Dictionary<Position2f, string> route, string name, WeekTimeCollection initialOutwardDepartures, WeekTimeCollection initialInwardDepartures, Duration waitingTime)
+        public void AddSubwayLine(Dictionary<Position2d, string> route, string name, WeekTimeCollection initialOutwardDepartures, WeekTimeCollection initialInwardDepartures, Duration waitingTime)
         {
             var numStations = route.Count;
             var ((outwardRun, outwardPath), (inwardRun, inwardPath)) = CreateSubwayRoutes(route, _transferStationDictionary);
@@ -60,7 +60,7 @@ namespace Transit.Data
                 inwardStationInfos.Add(inwardStationInfo);
             }
 
-            var line = new Line<Position2f>(name, outwardRun, inwardRun);
+            var line = new Line(name, outwardRun, inwardRun);
             var routeInfoOutward = new RouteInfo(outwardRun, outwardPath, outwardStationInfos, outwardTripList);
             var routeInfoInward = new RouteInfo(inwardRun, inwardPath, inwardStationInfos, inwardTripList);
 
@@ -78,7 +78,7 @@ namespace Transit.Data
             }
         }
 
-        public TransferStation<Position2f> GetTransferStation(Station<Position2f> station)
+        public TransferStation GetTransferStation(Station station)
         {
             if (station == null || !_stationToTransferStationDictionary.ContainsKey(station))
             {
@@ -88,7 +88,7 @@ namespace Transit.Data
             return _stationToTransferStationDictionary[station];
         }
 
-        public (LineInfo lineInfo, RouteInfo routeInfo, StationInfo stationInfo) GetInfos(Station<Position2f> station)
+        public (LineInfo lineInfo, RouteInfo routeInfo, StationInfo stationInfo) GetInfos(Station station)
         {
             if (station == null || !_stationToRouteInfoDictionary.ContainsKey(station))
             {
@@ -98,20 +98,20 @@ namespace Transit.Data
             return _stationToRouteInfoDictionary[station];
         }
 
-        private ((Route<Position2f>, Path), (Route<Position2f>, Path)) CreateSubwayRoutes(Dictionary<Position2f, string> dic, IDictionary<string, TransferStation<Position2f>> tsd)
+        private ((Route, Path), (Route, Path)) CreateSubwayRoutes(Dictionary<Position2d, string> dic, IDictionary<string, TransferStation> tsd)
         {
             var positions = dic.Keys.ToList();
             var ccrSpline = new CentripetalCatmullRomSpline(positions);
             var spline = ccrSpline.CalculateSegments(10);
 
-            var routeAList = new List<Station<Position2f>>();
-            var routeBList = new List<Station<Position2f>>();
+            var routeAList = new List<Station>();
+            var routeBList = new List<Station>();
             foreach (var b in positions)
             {
                 var idx = spline.FindIndex(p => p == b);
                 var a = idx == 0 ? b : spline[idx - 1];
                 var c = idx == spline.Count - 1 ? b : spline[idx + 1];
-                var (p1, p2) = b.GetOffsetPoints(c - a, 4f);
+                var (p1, p2) = b.GetOffsetPoints(c - a, 4.0);
 
                 var stationA = CreateStation(p1, dic[b], tsd);
                 var stationB = CreateStation(p2, dic[b], tsd);
@@ -119,21 +119,21 @@ namespace Transit.Data
                 routeBList.Add(stationB);
             }
 
-            var routeA = new Route<Position2f>(routeAList);
+            var routeA = new Route(routeAList);
             routeBList.Reverse();
-            var routeB = new Route<Position2f>(routeBList);
+            var routeB = new Route(routeBList);
 
-            var offsetSplines = spline.OffsetPaths(4f);
+            var offsetSplines = spline.OffsetPaths(4.0);
 
             return ((routeA, offsetSplines.Item1), (routeB, offsetSplines.Item2));
         }
 
-        private Station<Position2f> CreateStation(Position2f pos, string name, IDictionary<string, TransferStation<Position2f>> tsd)
+        private Station CreateStation(Position2d pos, string name, IDictionary<string, TransferStation> tsd)
         {
-            var station = new Station<Position2f>(pos);
+            var station = new Station(pos);
             if (!tsd.ContainsKey(name))
             {
-                tsd[name] = new TransferStation<Position2f>(name);
+                tsd[name] = new TransferStation(name);
             }
 
             tsd[name].AddStation(station);
@@ -141,7 +141,7 @@ namespace Transit.Data
             return station;
         }
 
-        private static (List<WeekTimeCollection>, List<WeekTimeCollection>, List<Trip<Position2f>>) CreateRouteArrivalsAndDepartures(Route<Position2f> route, Path path, WeekTimeCollection initialDepartures, IReadOnlyList<Duration> waitingTimes, Func<Distance, Duration> travelFunc)
+        private static (List<WeekTimeCollection>, List<WeekTimeCollection>, List<Trip>) CreateRouteArrivalsAndDepartures(Route route, Path path, WeekTimeCollection initialDepartures, IReadOnlyList<Duration> waitingTimes, Func<Distance, Duration> travelFunc)
         {
             if (waitingTimes.Count != route.Stations.Count() - 2)
             {
@@ -195,17 +195,17 @@ namespace Transit.Data
                 }
             }
 
-            var tripList = new List<Trip<Position2f>>();
+            var tripList = new List<Trip>();
             foreach (var c in tripPrepareList)
             {
-                var trip = new Trip<Position2f>(c.Select((t, idx) => (route.Stations.ElementAt(idx), t)).ToList());
+                var trip = new Trip(c.Select((t, idx) => (route.Stations.ElementAt(idx), t)).ToList());
                 tripList.Add(trip);
             }
 
             return (arrivals, departures, tripList);
         }
 
-        private static (List<WeekTimeCollection>, List<WeekTimeCollection>, List<Trip<Position2f>>) CreateRouteArrivalsAndDepartures(Route<Position2f> route, Path path, WeekTimeCollection initialDepartures, Duration waitingTime, Func<Distance, Duration> travelFunc)
+        private static (List<WeekTimeCollection>, List<WeekTimeCollection>, List<Trip>) CreateRouteArrivalsAndDepartures(Route route, Path path, WeekTimeCollection initialDepartures, Duration waitingTime, Func<Distance, Duration> travelFunc)
         {
             var numTrips = initialDepartures.Count;
             var tripPrepareList = new List<List<(WeekTimePoint, WeekTimePoint)>>(numTrips);
@@ -254,10 +254,10 @@ namespace Transit.Data
                 }
             }
 
-            var tripList = new List<Trip<Position2f>>();
+            var tripList = new List<Trip>();
             foreach (var c in tripPrepareList)
             {
-                var trip = new Trip<Position2f>(c.Select((t, idx) => (route.Stations.ElementAt(idx), t)).ToList());
+                var trip = new Trip(c.Select((t, idx) => (route.Stations.ElementAt(idx), t)).ToList());
                 tripList.Add(trip);
             }
 
@@ -266,8 +266,8 @@ namespace Transit.Data
 
         private static Duration SubwayTravelTimeFunc(Distance distance)
         {
-            var meanAcceleration = Acceleration.FromMetersPerSecondSquared(0.6f);
-            var maximalSpeed = Speed.FromKilometersPerHour(70f);
+            var meanAcceleration = Acceleration.FromMetersPerSecondSquared(0.6);
+            var maximalSpeed = Speed.FromKilometersPerHour(70.0);
             var timeToReachMaximalSpeed = maximalSpeed / meanAcceleration;
             var neededDistanceToReachMaximalSpeed = meanAcceleration / 2 * timeToReachMaximalSpeed * timeToReachMaximalSpeed;
             if (distance < 2 * neededDistanceToReachMaximalSpeed) // distance is too small to reach maximalSpeed

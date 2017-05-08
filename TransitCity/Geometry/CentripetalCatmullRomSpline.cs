@@ -6,9 +6,9 @@ namespace Geometry
 {
     public class CentripetalCatmullRomSpline
     {
-        private readonly List<Position2f> _controlPoints;
+        private readonly List<Position2d> _controlPoints;
 
-        public CentripetalCatmullRomSpline(List<Position2f> controlPoints)
+        public CentripetalCatmullRomSpline(List<Position2d> controlPoints)
         {
             if (controlPoints == null || controlPoints.Count < 2)
             {
@@ -30,11 +30,11 @@ namespace Geometry
                 return new Path(_controlPoints);
             }
 
-            var pts = new List<Position2f>
+            var pts = new List<Position2d>
             {
                 _controlPoints[0]
             };
-            var dt = 1f / subsegments;
+            var dt = 1.0 / subsegments;
 
             if (_controlPoints.Count == 2)
             {
@@ -72,25 +72,25 @@ namespace Geometry
             return new Path(pts);
         }
 
-        private static Position2f PointOnCurve(Position2f p0, Position2f p1, Position2f p2, Position2f p3, float t)
+        private static Position2d PointOnCurve(Position2d p0, Position2d p1, Position2d p2, Position2d p3, double t)
         {
             var t2 = t * t;
             var t3 = t2 * t;
 
-            var x = 0.5f * (2.0f * p1.X +
+            var x = 0.5 * (2.0 * p1.X +
                            (-p0.X + p2.X) * t +
-                           (2.0f * p0.X - 5.0f * p1.X + 4 * p2.X - p3.X) * t2 +
-                           (-p0.X + 3.0f * p1.X - 3.0f * p2.X + p3.X) * t3);
+                           (2.0 * p0.X - 5.0 * p1.X + 4 * p2.X - p3.X) * t2 +
+                           (-p0.X + 3.0 * p1.X - 3.0 * p2.X + p3.X) * t3);
 
-            var y = 0.5f * (2.0f * p1.Y +
+            var y = 0.5 * (2.0 * p1.Y +
                            (-p0.Y + p2.Y) * t +
-                           (2.0f * p0.Y - 5.0f * p1.Y + 4 * p2.Y - p3.Y) * t2 +
-                           (-p0.Y + 3.0f * p1.Y - 3.0f * p2.Y + p3.Y) * t3);
+                           (2.0 * p0.Y - 5.0 * p1.Y + 4 * p2.Y - p3.Y) * t2 +
+                           (-p0.Y + 3.0 * p1.Y - 3.0 * p2.Y + p3.Y) * t3);
 
-            return new Position2f(x, y);
+            return new Position2d(x, y);
         }
 
-        private static Position2f PointOnCurve(Position2f p0, Position2f p1, float t)
+        private static Position2d PointOnCurve(Position2d p0, Position2d p1, double t)
         {
             return p0 + (p1 - p0) * t;
         }

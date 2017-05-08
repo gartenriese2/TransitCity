@@ -8,8 +8,8 @@ namespace WpfDrawing.Panel
     /// </summary>
     public partial class PanelControl
     {
-        public static readonly DependencyProperty DataPointsProperty = DependencyProperty.Register(
-            "DataPoints",
+        public static readonly DependencyProperty ObjectsProperty = DependencyProperty.Register(
+            "Objects",
             typeof(ObservableNotifiableCollection<PanelObject>),
             typeof(PanelControl),
             new PropertyMetadata(new ObservableNotifiableCollection<PanelObject>()));
@@ -19,10 +19,10 @@ namespace WpfDrawing.Panel
             InitializeComponent();
         }
 
-        public ObservableNotifiableCollection<PanelObject> DataPoints
+        public ObservableNotifiableCollection<PanelObject> Objects
         {
-            get => (ObservableNotifiableCollection<PanelObject>)GetValue(DataPointsProperty);
-            set => SetValue(DataPointsProperty, value);
+            get => (ObservableNotifiableCollection<PanelObject>)GetValue(ObjectsProperty);
+            set => SetValue(ObjectsProperty, value);
         }
     }
 }

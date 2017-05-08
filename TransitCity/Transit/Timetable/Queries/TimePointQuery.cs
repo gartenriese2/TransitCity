@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Geometry;
 using Table;
 using Time;
 
 namespace Transit.Timetable.Queries
 {
-    public class TimePointQuery<TPos> : IQuery<Entry<TPos>> where TPos : IPosition
+    public class TimePointQuery : IQuery<Entry>
     {
         private readonly WeekTimePoint _startTimePoint;
         private readonly WeekTimePoint _endTimePoint;
@@ -18,7 +17,7 @@ namespace Transit.Timetable.Queries
             _endTimePoint = endTimePoint;
         }
 
-        public IEnumerable<Entry<TPos>> Execute(IEnumerable<Entry<TPos>> table)
+        public IEnumerable<Entry> Execute(IEnumerable<Entry> table)
         {
             return
                 from entry in table

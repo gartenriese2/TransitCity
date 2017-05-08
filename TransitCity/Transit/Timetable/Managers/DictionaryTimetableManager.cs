@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Geometry;
 using PathFinding.Network;
 using Time;
 
 namespace Transit.Timetable.Managers
 {
-    public class DictionaryTimetableManager<TPos> : ITimetableManager<TPos, LinkedEntry<TPos>> where TPos : IPosition
+    public class DictionaryTimetableManager : ITimetableManager<LinkedEntry>
     {
-        private readonly Dictionary<long, LinkedEntry<TPos>> _timetable = new Dictionary<long, LinkedEntry<TPos>>();
+        private readonly Dictionary<long, LinkedEntry> _timetable = new Dictionary<long, LinkedEntry>();
 
         private long _id = 0;
 
-        public void AddRoute(Line<TPos> line, Route<TPos> route, WeekTimeCollection timeCollection, List<TransferStation<TPos>> transferStations, Func<Station<TPos>, Station<TPos>, TimeEdgeCost> transitCostFunc)
+        public void AddRoute(Line line, Route route, WeekTimeCollection timeCollection, List<TransferStation> transferStations, Func<Station, Station, TimeEdgeCost> transitCostFunc)
         {
             var stations = route.Stations.ToList();
             foreach (var weekTime in timeCollection.SortedWeekTimePoints)
@@ -32,18 +31,18 @@ namespace Transit.Timetable.Managers
                     var cost = transitCostFunc(stationA, stationB);
                     var currentId = idQueue.Dequeue();
                     var nextEntries = idQueue.ToList();
-                    var entry = new LinkedEntry<TPos>(currentId, currentTime, line, route, GetTransferStation(stationA, transferStations), stationA, nextEntries);
+                    var entry = new LinkedEntry(currentId, currentTime, line, route, GetTransferStation(stationA, transferStations), stationA, nextEntries);
                     _timetable.Add(currentId, entry);
                     currentTime += cost.TimeSpan;
                 }
 
                 var lastId = idQueue.Dequeue();
-                var lastEntry = new LinkedEntry<TPos>(lastId, currentTime, line, route, GetTransferStation(route.Stations.Last(), transferStations), route.Stations.Last());
+                var lastEntry = new LinkedEntry(lastId, currentTime, line, route, GetTransferStation(route.Stations.Last(), transferStations), route.Stations.Last());
                 _timetable.Add(lastId, lastEntry);
             }
         }
 
-        public IEnumerable<LinkedEntry<TPos>> GetDepartures(Station<TPos> station, WeekTimePoint from, WeekTimePoint to)
+        public IEnumerable<LinkedEntry> GetDepartures(Station station, WeekTimePoint from, WeekTimePoint to)
         {
             if (from == to)
             {
@@ -58,7 +57,7 @@ namespace Transit.Timetable.Managers
             return _timetable.Values.Where(entry => entry.Station == station && (entry.WeekTimePoint >= from || entry.WeekTimePoint <= to));
         }
 
-        public IEnumerable<LinkedEntry<TPos>> GetDepartures(TransferStation<TPos> station, WeekTimePoint from, WeekTimePoint to)
+        public IEnumerable<LinkedEntry> GetDepartures(TransferStation station, WeekTimePoint from, WeekTimePoint to)
         {
             if (from == to)
             {
@@ -73,12 +72,12 @@ namespace Transit.Timetable.Managers
             return _timetable.Values.Where(entry => entry.TransferStation == station && (entry.WeekTimePoint >= from || entry.WeekTimePoint <= to));
         }
 
-        public IEnumerable<LinkedEntry<TPos>> GetNextEntries(LinkedEntry<TPos> entry)
+        public IEnumerable<LinkedEntry> GetNextEntries(LinkedEntry entry)
         {
             return entry.NextEntries.Select(id => _timetable[id]);
         }
 
-        private TransferStation<TPos> GetTransferStation(Station<TPos> station, IEnumerable<TransferStation<TPos>> transferStations)
+        private TransferStation GetTransferStation(Station station, IEnumerable<TransferStation> transferStations)
         {
             var collection = transferStations.Where(ts => ts.Stations.Any(s => s == station)).ToList();
             if (collection.Count != 1)

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Geometry;
 using Time;
 
 namespace Transit.Data
@@ -10,15 +9,13 @@ namespace Transit.Data
     {
         private readonly WeekTimePoint[] _arrivalsArray;
         private readonly WeekTimePoint[] _departuresArray;
-        private readonly List<Trip<Position2f>> _trips;
-        private readonly List<Trip<Position2f>> _tripsSortedByArrival;
-        private readonly List<Trip<Position2f>> _tripsSortedByDeparture;
+        private readonly List<Trip> _trips;
+        private readonly List<Trip> _tripsSortedByArrival;
+        private readonly List<Trip> _tripsSortedByDeparture;
 
-        public StationInfo(Station<Position2f> station, WeekTimeCollection arrivals, WeekTimeCollection departures, List<Trip<Position2f>> trips)
+        public StationInfo(Station station, WeekTimeCollection arrivals, WeekTimeCollection departures, List<Trip> trips)
         {
             Station = station ?? throw new ArgumentNullException(nameof(station));
-            Arrivals = arrivals ?? throw new ArgumentNullException(nameof(arrivals));
-            Departures = departures ?? throw new ArgumentNullException(nameof(departures));
 
             _arrivalsArray = arrivals.SortedWeekTimePoints.ToArray();
             _departuresArray = departures.SortedWeekTimePoints.ToArray();
@@ -48,86 +45,11 @@ namespace Transit.Data
                     throw new InvalidOperationException();
                 }
             }
-
-            if (Arrivals.Count == 0 && Departures.Count == 0)
-            {
-                throw new ArgumentException();
-            }
-
-            if (Arrivals.Count != 0 && Departures.Count != 0 && Arrivals.Count != Departures.Count)
-            {
-                throw new ArgumentException();
-            }
-
-            if (Math.Max(Arrivals.Count, Departures.Count) != trips.Count)
-            {
-                throw new ArgumentException();
-            }
         }
 
-        public Station<Position2f> Station { get; }
+        public Station Station { get; }
 
-        [Obsolete]
-        public WeekTimeCollection Arrivals { get; }
-
-        [Obsolete]
-        public WeekTimeCollection Departures { get; }
-
-        [Obsolete]
-        public WeekTimePoint FindCorrespondingDeparture(WeekTimePoint arrival)
-        {
-            if (arrival == null)
-            {
-                throw new ArgumentNullException(nameof(arrival));
-            }
-
-            if (Departures.Count == 0)
-            {
-                return null;
-            }
-
-            var idx = Arrivals.SortedWeekTimePoints.ToList().IndexOf(arrival);
-            if (idx == -1)
-            {
-                throw new ArgumentException();
-            }
-
-            return Departures.SortedWeekTimePoints.ElementAt(idx);
-        }
-
-        [Obsolete]
-        public WeekTimePoint GetNextDeparture(WeekTimePoint time)
-        {
-            return Departures.SortedWeekTimePoints.FirstOrDefault(wtp => time <= wtp) ?? Departures.SortedWeekTimePoints.FirstOrDefault();
-        }
-
-        public WeekTimePoint GetNextDepartureArrayBinarySearch(WeekTimePoint time)
-        {
-            if (_departuresArray.Length == 0)
-            {
-                return null;
-            }
-
-            var idx = Array.BinarySearch(_departuresArray, time);
-            if (idx < 0)
-            {
-                idx = ~idx;
-            }
-
-            if (idx == _departuresArray.Length)
-            {
-                return _departuresArray[0];
-            }
-
-            if (idx >= 0)
-            {
-                return _departuresArray[idx];
-            }
-
-            throw new InvalidOperationException();
-        }
-
-        public (WeekTimePoint, Trip<Position2f>) GetNextDepartureAndTripArrayBinarySearch(WeekTimePoint time)
+        public (WeekTimePoint, Trip) GetNextDepartureAndTripArrayBinarySearch(WeekTimePoint time)
         {
             if (_departuresArray.Length == 0)
             {
@@ -153,7 +75,7 @@ namespace Transit.Data
             throw new InvalidOperationException();
         }
 
-        public (WeekTimePoint, Trip<Position2f>) GetLastArrivalAndTripArrayBinarySearch(WeekTimePoint time)
+        public (WeekTimePoint, Trip) GetLastArrivalAndTripArrayBinarySearch(WeekTimePoint time)
         {
             if (_arrivalsArray.Length == 0)
             {

@@ -40,8 +40,8 @@ namespace CitySimulation
 
         public Area Area => Area.FromSqaureMeters(_shape.Area);
 
-        public float PopulationDensity => Residents.Count / Area.SquareKilometers;
+        public double PopulationDensity => Residents.Count / Area.SquareKilometers;
 
-        public float JobDensity => Jobs.Count / Area.SquareKilometers;
+        public double JobDensity => Jobs.Count / Area.SquareKilometers;
     }
 }

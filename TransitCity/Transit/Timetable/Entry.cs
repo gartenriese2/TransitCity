@@ -1,11 +1,10 @@
-﻿using Geometry;
-using Time;
+﻿using Time;
 
 namespace Transit.Timetable
 {
-    public class Entry<TPos> where TPos : IPosition
+    public class Entry
     {
-        internal Entry(WeekTimePoint weekTimePoint, WeekTimePoint weekTimePointNextStation, Line<TPos> line, Route<TPos> route, TransferStation<TPos> transferStation, Station<TPos> station)
+        internal Entry(WeekTimePoint weekTimePoint, WeekTimePoint weekTimePointNextStation, Line line, Route route, TransferStation transferStation, Station station)
         {
             WeekTimePoint = weekTimePoint;
             WeekTimePointNextStation = weekTimePointNextStation;
@@ -19,12 +18,12 @@ namespace Transit.Timetable
 
         internal WeekTimePoint WeekTimePointNextStation { get; }
 
-        internal Line<TPos> Line { get; }
+        internal Line Line { get; }
 
-        internal Route<TPos> Route { get; }
+        internal Route Route { get; }
 
-        internal TransferStation<TPos> TransferStation { get; }
+        internal TransferStation TransferStation { get; }
 
-        internal Station<TPos> Station { get; }
+        internal Station Station { get; }
     }
 }

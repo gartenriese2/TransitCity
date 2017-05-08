@@ -79,8 +79,8 @@ namespace TestApp
                         };
                         foreach (var pos in path)
                         {
-                            polyline.Points.Add(pos.X);
-                            polyline.Points.Add(pos.Y);
+                            polyline.Points.Add((SvgUnit) pos.X);
+                            polyline.Points.Add((SvgUnit) pos.Y);
                         }
                         document.Add(polyline);
                     }
@@ -90,8 +90,8 @@ namespace TestApp
                 {
                     var c = new SvgCircle
                     {
-                        CenterX = station.Position.X,
-                        CenterY = station.Position.Y,
+                        CenterX = (SvgUnit) station.Position.X,
+                        CenterY = (SvgUnit) station.Position.Y,
                         Radius = 8f,
                         Fill = new SvgColourServer(Color.White),
                         Stroke = new SvgColourServer(Color.Black),
@@ -107,7 +107,7 @@ namespace TestApp
                     var left = pos - vec.Normalize() * 32f + vec.RotateLeft().Normalize() * 16f;
                     var t = new SvgPolygon
                     {
-                        Points = new SvgPointCollection { tip.X, tip.Y, right.X, right.Y, left.X, left.Y },
+                        Points = new SvgPointCollection { (SvgUnit) tip.X, (SvgUnit) tip.Y, (SvgUnit) right.X, (SvgUnit) right.Y, (SvgUnit) left.X, (SvgUnit) left.Y },
                         Fill = new SvgColourServer(Color.Gray),
                         Stroke = new SvgColourServer(Color.Black),
                         StrokeWidth = 4f
@@ -126,12 +126,12 @@ namespace TestApp
             var rnd = new Random();
             var workerScheduleTuples = city.Residents.Where(r => r.HasJob).Select(r => (r, JobSchedule.CreateRandom(rnd))).ToList();
             var dataManager = new TestTransitData().DataManager;
-            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(5).MetersPerSecond, TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
+            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(5), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
 
-            var workerConnectionsDictionary = new Dictionary<Resident, List<List<Connection<Position2f>>>>();
+            var workerConnectionsDictionary = new Dictionary<Resident, List<List<Connection>>>();
             foreach (var (worker, schedule) in workerScheduleTuples)
             {
-                var workerTaskList = new List<Task<List<Connection<Position2f>>>>();
+                var workerTaskList = new List<Task<List<Connection>>>();
                 foreach (var scheduleWts in schedule.WeekTimeSpans)
                 {
                     workerTaskList.Add(Task.Factory.StartNew(() => raptor.ComputeReverse(worker.Position, scheduleWts.Begin, worker.Job.Position)));
@@ -364,13 +364,13 @@ namespace TestApp
         private static void DrawBusiestStations()
         {
             var dataManager = new TestTransitData().DataManager;
-            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(8).MetersPerSecond, TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
+            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(8), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
 
             const int count = 1000000;
             var random = new Random();
 
-            var sourceList = new List<Position2f>();
-            var targetList = new List<Position2f>();
+            var sourceList = new List<Position2d>();
+            var targetList = new List<Position2d>();
             for (var i = 0; i < count; ++i)
             {
                 sourceList.Add(CreateRandomPosition());
@@ -379,7 +379,7 @@ namespace TestApp
 
             var time = new WeekTimePoint(DayOfWeek.Wednesday, 7, 30);
 
-            var taskList = new List<Task<List<Connection<Position2f>>>>();
+            var taskList = new List<Task<List<Connection>>>();
             for (var i = 0; i < count; ++i)
             {
                 var source = sourceList[i];
@@ -392,7 +392,7 @@ namespace TestApp
             var results = taskList.Select(t => t.Result).ToList();
 
             var busiestStations = GetBusiestStations(results).OrderByDescending(x => x.Value);
-            var transferStationDic = new Dictionary<TransferStation<Position2f>, uint>();
+            var transferStationDic = new Dictionary<TransferStation, uint>();
             foreach (var station in busiestStations)
             {
                 var ts = dataManager.GetTransferStation(station.Key);
@@ -412,8 +412,8 @@ namespace TestApp
             {
                 var c = new SvgCircle
                 {
-                    CenterX = station.Position.X,
-                    CenterY = station.Position.Y,
+                    CenterX = (SvgUnit) station.Position.X,
+                    CenterY = (SvgUnit) station.Position.Y,
                     Radius = 8f,
                     Fill = new SvgColourServer(Color.White),
                     Stroke = new SvgColourServer(Color.Black),
@@ -453,8 +453,8 @@ namespace TestApp
                     };
                     foreach (var pos in path)
                     {
-                        polyline.Points.Add(pos.X);
-                        polyline.Points.Add(pos.Y);
+                        polyline.Points.Add((SvgUnit) pos.X);
+                        polyline.Points.Add((SvgUnit) pos.Y);
                     }
                     document.Add(polyline);
                 }
@@ -471,7 +471,7 @@ namespace TestApp
                 {
                     midpoint += stations[i].Position;
                 }
-                midpoint = new Position2f(midpoint.X / stations.Count, midpoint.Y / stations.Count);
+                midpoint = new Position2d(midpoint.X / stations.Count, midpoint.Y / stations.Count);
 
                 var radius = minRadius;
                 var people = 0u;
@@ -484,8 +484,8 @@ namespace TestApp
 
                 var c = new SvgCircle
                 {
-                    CenterX = midpoint.X,
-                    CenterY = midpoint.Y,
+                    CenterX = (SvgUnit) midpoint.X,
+                    CenterY = (SvgUnit) midpoint.Y,
                     Radius = radius,
                     Fill = new SvgColourServer(Color.White),
                     Stroke = new SvgColourServer(Color.Black),
@@ -496,42 +496,42 @@ namespace TestApp
                 var stationText = new SvgText(transferStation.Name)
                 {
                     FontSize = new SvgUnit(64),
-                    X = new SvgUnitCollection { midpoint.X },
-                    Y = new SvgUnitCollection { midpoint.Y + radius + 64 }
+                    X = new SvgUnitCollection { (SvgUnit) midpoint.X },
+                    Y = new SvgUnitCollection { (SvgUnit) (midpoint.Y + radius + 64) }
                 };
                 document.Add(stationText);
 
                 var peopleText = new SvgText(people.ToString())
                 {
                     FontSize = new SvgUnit(64),
-                    X = new SvgUnitCollection {midpoint.X},
-                    Y = new SvgUnitCollection {midpoint.Y + radius + 128}
+                    X = new SvgUnitCollection {(SvgUnit) midpoint.X},
+                    Y = new SvgUnitCollection {(SvgUnit) (midpoint.Y + radius + 128) }
                 };
                 document.Add(peopleText);
             }
 
             document.Save("busiestStations.svg");
 
-            Position2f CreateRandomPosition()
+            Position2d CreateRandomPosition()
             {
                 var x = random.NextDouble() * 10000;
                 var y = random.NextDouble() * 10000;
-                return new Position2f((float)x, (float)y);
+                return new Position2d(x, y);
             }
 
-            Dictionary<Station<Position2f>, uint> GetBusiestStations(IEnumerable<List<Connection<Position2f>>> connectionsLists)
+            Dictionary<Station, uint> GetBusiestStations(IEnumerable<List<Connection>> connectionsLists)
             {
-                var dic = new Dictionary<Station<Position2f>, uint>();
+                var dic = new Dictionary<Station, uint>();
                 foreach (var connectionsList in connectionsLists)
                 {
                     foreach (var connection in connectionsList)
                     {
-                        if (connection.Type == Connection<Position2f>.TypeEnum.Ride || connection.Type == Connection<Position2f>.TypeEnum.Undefined || connection.Type == Connection<Position2f>.TypeEnum.Walk)
+                        if (connection.Type == Connection.TypeEnum.Ride || connection.Type == Connection.TypeEnum.Undefined || connection.Type == Connection.TypeEnum.Walk)
                         {
                             continue;
                         }
 
-                        if (connection.Type == Connection<Position2f>.TypeEnum.WalkToStation)
+                        if (connection.Type == Connection.TypeEnum.WalkToStation)
                         {
                             var station = connection.TargetStation;
                             if (!dic.ContainsKey(station))
@@ -543,7 +543,7 @@ namespace TestApp
                                 dic[station]++;
                             }
                         }
-                        else if (connection.Type == Connection<Position2f>.TypeEnum.WalkFromStation)
+                        else if (connection.Type == Connection.TypeEnum.WalkFromStation)
                         {
                             var station = connection.SourceStation;
                             if (!dic.ContainsKey(station))
@@ -582,69 +582,6 @@ namespace TestApp
 
                 return dic;
             }
-        }
-
-        private static void RaptorPerformanceTest2()
-        {
-            var walkingSpeed = 2.2f;
-            var maxWalkingTime = TimeSpan.FromMinutes(10);
-            var maxWaitingTime = TimeSpan.FromMinutes(15);
-            var dataManager = new TestTransitData().DataManager;
-            var raptorWithDataManager = new RaptorWithDataManager(walkingSpeed, maxWalkingTime, maxWaitingTime, dataManager);
-            var raptorWithDataManagerBinarySearch = new RaptorWithDataManagerBinarySearch(walkingSpeed, maxWalkingTime, maxWaitingTime, dataManager);
-            var parallelRaptorWithDataManager = new ParallelRaptorWithDataManager(walkingSpeed, maxWalkingTime, maxWaitingTime, dataManager);
-            var raptorWithDataManagerBinarySearchTripLookup = new RaptorWithDataManagerBinarySearchTripLookup(walkingSpeed, maxWalkingTime, maxWaitingTime, dataManager);
-
-            var source = new Position2f(500, 500);
-            var target = new Position2f(7800, 1200);
-            var time = new WeekTimePoint(DayOfWeek.Tuesday, 11, 30);
-
-            const int tasks = 200000;
-
-            var taskList1 = new List<Task>();
-            var taskList2 = new List<Task>();
-            var taskList3 = new List<Task>();
-            var taskList4 = new List<Task>();
-
-            for (var i = 0; i < tasks; ++i)
-            {
-                taskList1.Add(Task.Factory.StartNew(() => raptorWithDataManager.Compute(source, time, target)));
-            }
-
-            var sw1 = Stopwatch.StartNew();
-            Task.WaitAll(taskList1.ToArray());
-            sw1.Stop();
-            Console.WriteLine($"RaptorWithDataManager: {sw1.ElapsedMilliseconds}ms ({sw1.ElapsedTicks / tasks} ticks per task)");
-
-            for (var i = 0; i < tasks; ++i)
-            {
-                taskList2.Add(Task.Factory.StartNew(() => raptorWithDataManagerBinarySearch.Compute(source, time, target)));
-            }
-
-            var sw2 = Stopwatch.StartNew();
-            Task.WaitAll(taskList2.ToArray());
-            sw2.Stop();
-            Console.WriteLine($"RaptorWithDataManagerBinarySearch: {sw2.ElapsedMilliseconds}ms ({sw2.ElapsedTicks / tasks} ticks per task)");
-
-            for (var i = 0; i < tasks; ++i)
-            {
-                taskList3.Add(Task.Factory.StartNew(() => parallelRaptorWithDataManager.Compute(source, time, target)));
-            }
-
-            var sw3 = Stopwatch.StartNew();
-            Task.WaitAll(taskList3.ToArray());
-            sw3.Stop();
-            Console.WriteLine($"ParallelRaptorWithDataManager: {sw3.ElapsedMilliseconds}ms ({sw3.ElapsedTicks / tasks} ticks per task)");
-
-            for (var i = 0; i < tasks; ++i)
-            {
-                taskList4.Add(Task.Factory.StartNew(() => raptorWithDataManagerBinarySearchTripLookup.Compute(source, time, target)));
-            }
-
-            var sw4 = Stopwatch.StartNew();
-            Task.WaitAll(taskList4.ToArray());
-            sw4.Stop();
-            Console.WriteLine($"RaptorWithDataManagerBinarySearchTripLookup: {sw4.ElapsedMilliseconds}ms ({sw4.ElapsedTicks / tasks} ticks per task)");
         }
     }
 }

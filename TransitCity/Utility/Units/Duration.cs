@@ -4,18 +4,18 @@ namespace Utility.Units
 {
     public class Duration
     {
-        private readonly float _seconds;
+        private readonly double _seconds;
 
-        internal Duration(float seconds)
+        internal Duration(double seconds)
         {
             _seconds = seconds;
         }
 
-        public float Seconds => _seconds;
+        public double Seconds => _seconds;
 
-        public float Minutes => _seconds / 60f;
+        public double Minutes => _seconds / 60.0;
 
-        public float Hours => _seconds / 3600f;
+        public double Hours => _seconds / 3600.0;
 
         public override string ToString()
         {
@@ -28,11 +28,11 @@ namespace Utility.Units
 
         public static Duration operator -(Duration t1, Duration t2) => new Duration(t1.Seconds - t2.Seconds);
 
-        public static Duration operator *(Duration t, float f) => new Duration(t.Seconds * f);
+        public static Duration operator *(Duration t, double f) => new Duration(t.Seconds * f);
 
-        public static Duration operator *(float f, Duration t) => t * f;
+        public static Duration operator *(double f, Duration t) => t * f;
 
-        public static Duration operator /(Duration t, float f) => new Duration(t.Seconds / f);
+        public static Duration operator /(Duration t, double f) => new Duration(t.Seconds / f);
 
         public static TimeSquared operator *(Duration t1, Duration t2) => new TimeSquared(t1.Seconds * t2.Seconds);
 
@@ -48,35 +48,35 @@ namespace Utility.Units
 
         public static bool operator >=(Duration t1, Duration t2) => t1.Seconds >= t2.Seconds;
 
-        public static Duration FromSeconds(float seconds) => new Duration(seconds);
+        public static Duration FromSeconds(double seconds) => new Duration(seconds);
 
-        public static Duration FromMinutes(float minutes) => new Duration(minutes * 60f);
+        public static Duration FromMinutes(double minutes) => new Duration(minutes * 60.0);
 
-        public static Duration FromHours(float hours) => new Duration(hours * 3600f);
+        public static Duration FromHours(double hours) => new Duration(hours * 3600.0);
     }
 
     public class TimeSquared
     {
-        private readonly float _secondsSquared;
+        private readonly double _secondsSquared;
 
-        internal TimeSquared(float secondsSquared)
+        internal TimeSquared(double secondsSquared)
         {
             _secondsSquared = secondsSquared;
         }
 
-        public float SecondsSquared => _secondsSquared;
+        public double SecondsSquared => _secondsSquared;
 
-        public Duration SquareRoot => Duration.FromSeconds((float) Math.Sqrt(SecondsSquared));
+        public Duration SquareRoot => Duration.FromSeconds(Math.Sqrt(SecondsSquared));
 
         public static TimeSquared operator +(TimeSquared tt1, TimeSquared tt2) => new TimeSquared(tt1.SecondsSquared + tt2.SecondsSquared);
 
         public static TimeSquared operator -(TimeSquared tt1, TimeSquared tt2) => new TimeSquared(tt1.SecondsSquared - tt2.SecondsSquared);
 
-        public static TimeSquared operator *(TimeSquared tt, float f) => new TimeSquared(tt.SecondsSquared * f);
+        public static TimeSquared operator *(TimeSquared tt, double f) => new TimeSquared(tt.SecondsSquared * f);
 
-        public static TimeSquared operator *(float f, TimeSquared tt) => tt * f;
+        public static TimeSquared operator *(double f, TimeSquared tt) => tt * f;
 
-        public static TimeSquared operator /(TimeSquared tt, float f) => new TimeSquared(tt.SecondsSquared / f);
+        public static TimeSquared operator /(TimeSquared tt, double f) => new TimeSquared(tt.SecondsSquared / f);
 
         public static bool operator <(TimeSquared tt1, TimeSquared tt2) => tt1.SecondsSquared < tt2.SecondsSquared;
 
@@ -86,6 +86,6 @@ namespace Utility.Units
 
         public static bool operator >=(TimeSquared tt1, TimeSquared tt2) => tt1.SecondsSquared >= tt2.SecondsSquared;
 
-        public static TimeSquared FromSecondsSquared(float secondsSquared) => new TimeSquared(secondsSquared);
+        public static TimeSquared FromSecondsSquared(double secondsSquared) => new TimeSquared(secondsSquared);
     }
 }
