@@ -49,6 +49,7 @@
     <Compile Include="Threading\Atomic.cs" />
     <Compile Include="Threading\IAtomic.cs" />
     <Compile Include="Timing\Timing.cs" />
+    <Compile Include="Movement.cs" />
     <Compile Include="Units\Acceleration.cs" />
     <Compile Include="Units\Area.cs" />
     <Compile Include="Units\Distance.cs" />

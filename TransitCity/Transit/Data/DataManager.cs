@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Geometry;
 using Time;
+using Utility;
 using Utility.Units;
 
 namespace Transit.Data
@@ -266,17 +267,7 @@ namespace Transit.Data
 
         private static Duration SubwayTravelTimeFunc(Distance distance)
         {
-            var meanAcceleration = Acceleration.FromMetersPerSecondSquared(0.6);
-            var maximalSpeed = Speed.FromKilometersPerHour(70.0);
-            var timeToReachMaximalSpeed = maximalSpeed / meanAcceleration;
-            var neededDistanceToReachMaximalSpeed = meanAcceleration / 2 * timeToReachMaximalSpeed * timeToReachMaximalSpeed;
-            if (distance < 2 * neededDistanceToReachMaximalSpeed) // distance is too small to reach maximalSpeed
-            {
-                return 2 * (distance / meanAcceleration).SquareRoot;
-            }
-
-            var remainingDistance = distance - 2 * neededDistanceToReachMaximalSpeed;
-            return 2 * timeToReachMaximalSpeed + remainingDistance / maximalSpeed;
+            return Movement.GetDurationFromDistance(distance, Acceleration.FromMetersPerSecondSquared(0.6), Speed.FromKilometersPerHour(70.0));
         }
     }
 }

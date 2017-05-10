@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Geometry;
 using Time;
+using Utility;
 using Utility.Units;
 
 namespace Transit.Data
@@ -194,7 +195,7 @@ namespace Transit.Data
                 throw new ArgumentOutOfRangeException();
             }
 
-            var traveledDistance = SubwayTravelDistanceFunc(Duration.FromSeconds((float)(wtp - departureFromLastStation).TotalSeconds), Duration.FromSeconds((float)(arrivalAtNextStation - departureFromLastStation).TotalSeconds));
+            var traveledDistance = SubwayTravelDistanceFunc(Duration.FromSeconds((wtp - departureFromLastStation).TotalSeconds), Duration.FromSeconds((arrivalAtNextStation - departureFromLastStation).TotalSeconds));
             var departureStationIndex = Path.FindIndex(f => f.EqualPosition(departurePosition));
             var arrivalStationIndex = Path.FindIndex(f => f.EqualPosition(arrivalPosition));
             var pathBetweenStations = Path.Subpath(departureStationIndex, arrivalStationIndex - departureStationIndex + 1);
@@ -208,7 +209,13 @@ namespace Transit.Data
                 throw new InvalidOperationException();
             }
 
-            var relativeDistance = traveledDistance.Meters / pathBetweenStations.Length();
+            var pathBetweenStationsLength = pathBetweenStations.Length();
+            if (traveledDistance.Meters - pathBetweenStationsLength > 1)
+            {
+                throw new InvalidOperationException("More than 1m difference");
+            }
+
+            var relativeDistance = Math.Min(1.0, traveledDistance.Meters / pathBetweenStationsLength);
             var pos = pathBetweenStations.Lerp(relativeDistance);
             var vec = pathBetweenStations.DirectionLerp(relativeDistance);
             return (pos, vec);
@@ -216,31 +223,7 @@ namespace Transit.Data
 
         private static Distance SubwayTravelDistanceFunc(Duration duration, Duration partDuration)
         {
-            if (duration > partDuration)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-
-            var meanAcceleration = Acceleration.FromMetersPerSecondSquared(0.6f);
-            var maximalSpeed = Speed.FromKilometersPerHour(70f);
-            var timeToReachMaximalSpeed = maximalSpeed / meanAcceleration;
-
-            if (duration <= timeToReachMaximalSpeed)
-            {
-                return meanAcceleration / 2 * duration * duration;
-            }
-
-            var neededDistanceToReachMaximalSpeed = meanAcceleration / 2 * timeToReachMaximalSpeed * timeToReachMaximalSpeed;
-
-            if (duration <= partDuration - timeToReachMaximalSpeed)
-            {
-                var remainingDuration = duration - timeToReachMaximalSpeed;
-                return neededDistanceToReachMaximalSpeed + maximalSpeed * remainingDuration;
-            }
-
-            var durationAtMaxSpeed = partDuration - 2 * timeToReachMaximalSpeed;
-            var remainingDuration2 = duration - timeToReachMaximalSpeed - durationAtMaxSpeed;
-            return neededDistanceToReachMaximalSpeed + maximalSpeed * durationAtMaxSpeed + meanAcceleration / 2 * remainingDuration2 * remainingDuration2;
+            return Movement.GetDistanceFromDuration(duration, partDuration, Acceleration.FromMetersPerSecondSquared(0.6), Speed.FromKilometersPerHour(70));
         }
     }
 }

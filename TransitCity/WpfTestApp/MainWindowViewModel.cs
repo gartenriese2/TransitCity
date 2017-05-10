@@ -1,18 +1,24 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows.Threading;
+using Geometry;
 using Time;
 using Transit.Data;
+using WpfDrawing.Annotations;
 using WpfDrawing.Objects;
 using WpfDrawing.Panel;
 using WpfDrawing.Utility;
 
 namespace WpfTestApp
 {
-    public class MainWindowViewModel
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
         private readonly Random _rand = new Random();
         private readonly DataManager _dataManager;
         private TimeSpan _time = TimeSpan.Zero;
+        private string _weektime = string.Empty;
 
         public MainWindowViewModel()
         {
@@ -39,39 +45,41 @@ namespace WpfTestApp
                 PanelObjects.Add(v);
             }
 
-            //var tmr = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(10) };
-            //tmr.Tick += OnTimerTick;
-            //tmr.Start();
-
-            var tmr2 = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
-            tmr2.Tick += OnTimerTick2;
-            tmr2.Start();
+            var tmr = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(10) };
+            tmr.Tick += OnTimerTick2;
+            tmr.Start();
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public ObservableNotifiableCollection<PanelObject> PanelObjects { get; } = new ObservableNotifiableCollection<PanelObject>();
 
-        private void OnTimerTick(object sender, EventArgs args)
+        public string WeekTime
         {
-            foreach (var panelObject in PanelObjects)
+            get => _weektime;
+            set
             {
-                var change = 0.01 * (_rand.NextDouble() - 0.5);
-
-                if (_rand.Next(2) == 0)
+                if (value != _weektime)
                 {
-                    panelObject.VariableX = Math.Max(0, Math.Min(1, panelObject.VariableX + change));
-                }
-                else
-                {
-                    panelObject.VariableY = Math.Max(0, Math.Min(1, panelObject.VariableY + change));
+                    _weektime = value;
+                    OnPropertyChanged();
                 }
             }
         }
 
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         private void OnTimerTick2(object sender, EventArgs args)
         {
-            _time += TimeSpan.FromSeconds(2);
-            var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(new WeekTimePoint(DayOfWeek.Monday) + _time);
-
+            _time += TimeSpan.FromSeconds(5);
+            var wtp = new WeekTimePoint(DayOfWeek.Monday) + _time;
+            WeekTime = wtp.ToString();
+            
+            var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(wtp).ToList();
             for (var i = PanelObjects.Count - 1; i >= 0; --i)
             {
                 if (PanelObjects[i] is Vehicle)
@@ -89,6 +97,8 @@ namespace WpfTestApp
                 };
                 PanelObjects.Add(v);
             }
+
+            
         }
     }
 }
