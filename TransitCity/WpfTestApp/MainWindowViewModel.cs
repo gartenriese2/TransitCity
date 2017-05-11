@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using Time;
 using Transit.Data;
+using Utility.MVVM;
 using WpfDrawing.Annotations;
 using WpfDrawing.Objects;
 using WpfDrawing.Panel;
@@ -12,23 +13,25 @@ using WpfDrawing.Utility;
 
 namespace WpfTestApp
 {
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : PropertyChangedBase
     {
-        private readonly Random _rand = new Random();
         private readonly DataManager _dataManager;
         private TimeSpan _time = TimeSpan.Zero;
         private string _weektime = string.Empty;
+        private double _timeDelta = 5.0;
 
         public MainWindowViewModel()
         {
             _dataManager = new TestTransitData().DataManager;
+            PlusCommand = new RelayCommand(o => _timeDelta *= 2.0, o => _timeDelta < 20.0);
+            MinusCommand = new RelayCommand(o => _timeDelta /= 2.0, o => _timeDelta > 0.001);
 
             foreach (var station in _dataManager.AllStations)
             {
                 var s = new Station
                 {
-                    VariableX = station.Position.X / 10000,
-                    VariableY = station.Position.Y / 10000
+                    X = station.Position.X / 10000,
+                    Y = station.Position.Y / 10000
                 };
                 PanelObjects.Add(s);
             }
@@ -45,9 +48,11 @@ namespace WpfTestApp
             tmr.Start();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public ObservableNotifiableCollection<PanelObject> PanelObjects { get; } = new ObservableNotifiableCollection<PanelObject>();
+
+        public RelayCommand PlusCommand { get; }
+
+        public RelayCommand MinusCommand { get; }
 
         public string WeekTime
         {
@@ -62,15 +67,9 @@ namespace WpfTestApp
             }
         }
 
-        [NotifyPropertyChangedInvocator]
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
         private void OnTimerTick2(object sender, EventArgs args)
         {
-            _time += TimeSpan.FromSeconds(5);
+            _time += TimeSpan.FromSeconds(_timeDelta);
             var wtp = new WeekTimePoint(DayOfWeek.Monday) + _time;
             WeekTime = wtp.ToString();
             

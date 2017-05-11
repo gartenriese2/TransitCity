@@ -44,12 +44,12 @@ namespace WpfDrawing.Panel
 
                 if (sizeInfo.WidthChanged)
                 {
-                    xform.X = sizeInfo.NewSize.Width * drawingVisual.PanelObject.VariableX;
+                    xform.X = sizeInfo.NewSize.Width * drawingVisual.PanelObject.X;
                 }
 
                 if (sizeInfo.HeightChanged)
                 {
-                    xform.Y = sizeInfo.NewSize.Height * drawingVisual.PanelObject.VariableY;
+                    xform.Y = sizeInfo.NewSize.Height * drawingVisual.PanelObject.Y;
                 }
             }
 
@@ -145,13 +145,13 @@ namespace WpfDrawing.Panel
                     continue;
                 }
 
-                if (args.PropertyName == nameof(panelObject.VariableX))
+                if (args.PropertyName == nameof(panelObject.X))
                 {
-                    transform.X = RenderSize.Width * panelObject.VariableX;
+                    transform.X = RenderSize.Width * panelObject.X;
                 }
-                else if (args.PropertyName == nameof(panelObject.VariableY))
+                else if (args.PropertyName == nameof(panelObject.Y))
                 {
-                    transform.Y = RenderSize.Height * panelObject.VariableY;
+                    transform.Y = RenderSize.Height * panelObject.Y;
                 }
             }
         }
@@ -170,8 +170,8 @@ namespace WpfDrawing.Panel
                 var dc = drawingVisual.RenderOpen();
                 dc.DrawDrawing(panelObject.GetDrawing());
                 var transformGroup = new TransformGroup();
-                var x = RenderSize.Width * panelObject.VariableX;
-                var y = RenderSize.Height * panelObject.VariableY;
+                var x = RenderSize.Width * panelObject.X;
+                var y = RenderSize.Height * panelObject.Y;
                 transformGroup.Children.Add(new TranslateTransform(x, y));
                 transformGroup.Children.Add(new RotateTransform(panelObject.Angle, x, y));
                 drawingVisual.Transform = transformGroup;

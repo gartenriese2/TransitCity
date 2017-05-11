@@ -6,34 +6,34 @@ namespace WpfDrawing.Panel
 {
     public abstract class PanelObject : INotifyPropertyChanged
     {
-        private double _variableX;
-        private double _variableY;
+        private double _x;
+        private double _y;
         private double _angle;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public double VariableX
+        public double X
         {
-            get => _variableX;
+            get => _x;
             set
             {
-                if (Math.Abs(_variableX - value) > double.Epsilon)
+                if (Math.Abs(_x - value) > double.Epsilon)
                 {
-                    _variableX = value;
-                    OnPropertyChanged(nameof(VariableX));
+                    _x = value;
+                    OnPropertyChanged(nameof(X));
                 }
             }
         }
 
-        public double VariableY
+        public double Y
         {
-            get => _variableY;
+            get => _y;
             set
             {
-                if (Math.Abs(_variableY - value) > double.Epsilon)
+                if (Math.Abs(_y - value) > double.Epsilon)
                 {
-                    _variableY = value;
-                    OnPropertyChanged(nameof(VariableY));
+                    _y = value;
+                    OnPropertyChanged(nameof(Y));
                 }
             }
         }

@@ -29,8 +29,8 @@ namespace WpfDrawing.Objects
 
         public Vehicle(Position2d position, Vector2d direction)
         {
-            VariableX = position.X;
-            VariableY = position.Y;
+            X = position.X;
+            Y = position.Y;
             Angle = Math.Atan2(direction.Y, direction.X) * 180.0 / Math.PI - 90.0;
         }
 

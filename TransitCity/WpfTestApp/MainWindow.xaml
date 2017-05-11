@@ -17,11 +17,25 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
-                   Margin="0,16"
-                   HorizontalAlignment="Center"
-                   Text="{Binding WeekTime}"
-                   FontSize="32"/>
+        <StackPanel Grid.Row="0"
+                    Margin="0,16"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+            <TextBlock Text="{Binding WeekTime}"
+                       FontSize="32"/>
+            <Button Margin="16,0"
+                    Width="32"
+                    FontSize="32"
+                    Command="{Binding PlusCommand}">
+                <TextBlock Text="+"/>
+            </Button>
+            <Button Width="32"
+                    FontSize="32"
+                    Command="{Binding MinusCommand}">
+                <TextBlock Text="-"/>
+            </Button>
+        </StackPanel>
+        
         <panel:PanelControl Grid.Row="1"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"

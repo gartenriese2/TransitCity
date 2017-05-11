@@ -110,6 +110,10 @@
       <Project>{0E4A9D5D-3EB2-4C41-B4C6-1987B2398F8C}</Project>
       <Name>Transit</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Utility\Utility.csproj">
+      <Project>{D1E7778B-2C3C-4058-9CCF-757E12D3BEB1}</Project>
+      <Name>Utility</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WpfDrawing\WpfDrawing.csproj">
       <Project>{31DF70BB-F397-4EC2-AF6E-B34270C6245C}</Project>
       <Name>WpfDrawing</Name>
