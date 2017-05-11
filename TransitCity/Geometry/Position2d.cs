@@ -45,6 +45,11 @@
 
         public static Position2d operator *(double s, Position2d p) => p * s;
 
+        public static Position2d operator /(Position2d p, double s)
+        {
+            return new Position2d(p.X / s, p.Y / s);
+        }
+
         public static Position2d Lerp(double t, Position2d p1, Position2d p2)
         {
             return p1 * (1 - t) + p2 * t;

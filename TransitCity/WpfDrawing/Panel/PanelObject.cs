@@ -8,6 +8,7 @@ namespace WpfDrawing.Panel
     {
         private double _variableX;
         private double _variableY;
+        private double _angle;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -19,7 +20,7 @@ namespace WpfDrawing.Panel
                 if (Math.Abs(_variableX - value) > double.Epsilon)
                 {
                     _variableX = value;
-                    OnPropertyChanged("VariableX");
+                    OnPropertyChanged(nameof(VariableX));
                 }
             }
         }
@@ -32,7 +33,20 @@ namespace WpfDrawing.Panel
                 if (Math.Abs(_variableY - value) > double.Epsilon)
                 {
                     _variableY = value;
-                    OnPropertyChanged("VariableY");
+                    OnPropertyChanged(nameof(VariableY));
+                }
+            }
+        }
+
+        public double Angle
+        {
+            get => _angle;
+            set
+            {
+                if (!Equals(value, _angle))
+                {
+                    _angle = value;
+                    OnPropertyChanged(nameof(Angle));
                 }
             }
         }

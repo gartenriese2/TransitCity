@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Media;
+using Geometry;
 using WpfDrawing.Panel;
 
 namespace WpfDrawing.Objects
@@ -23,6 +25,13 @@ namespace WpfDrawing.Objects
                 true)
             });
             Drawing = new GeometryDrawing(brush, pen, geo);
+        }
+
+        public Vehicle(Position2d position, Vector2d direction)
+        {
+            VariableX = position.X;
+            VariableY = position.Y;
+            Angle = Math.Atan2(direction.Y, direction.X) * 180.0 / Math.PI - 90.0;
         }
 
         public override Drawing GetDrawing()

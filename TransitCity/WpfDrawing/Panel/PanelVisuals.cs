@@ -169,7 +169,12 @@ namespace WpfDrawing.Panel
                 var drawingVisual = new PanelDrawingVisual { PanelObject = panelObject };
                 var dc = drawingVisual.RenderOpen();
                 dc.DrawDrawing(panelObject.GetDrawing());
-                drawingVisual.Transform = new TranslateTransform(RenderSize.Width * panelObject.VariableX, RenderSize.Height * panelObject.VariableY);
+                var transformGroup = new TransformGroup();
+                var x = RenderSize.Width * panelObject.VariableX;
+                var y = RenderSize.Height * panelObject.VariableY;
+                transformGroup.Children.Add(new TranslateTransform(x, y));
+                transformGroup.Children.Add(new RotateTransform(panelObject.Angle, x, y));
+                drawingVisual.Transform = transformGroup;
                 dc.Close();
                 _visualChildren.Add(drawingVisual);
             }

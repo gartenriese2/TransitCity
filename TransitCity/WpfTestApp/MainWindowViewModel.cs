@@ -36,11 +36,7 @@ namespace WpfTestApp
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(new WeekTimePoint(DayOfWeek.Monday) + _time);
             foreach (var activeVehicle in activeVehicles)
             {
-                var v = new Vehicle
-                {
-                    VariableX = activeVehicle.Item1.X / 10000,
-                    VariableY = activeVehicle.Item1.Y / 10000
-                };
+                var v = new Vehicle(activeVehicle.Item1 / 10000, activeVehicle.Item2.Normalize());
                 PanelObjects.Add(v);
             }
 
@@ -89,11 +85,7 @@ namespace WpfTestApp
 
             foreach (var activeVehicle in activeVehicles)
             {
-                var v = new Vehicle
-                {
-                    VariableX = activeVehicle.Item1.X / 10000,
-                    VariableY = activeVehicle.Item1.Y / 10000
-                };
+                var v = new Vehicle(activeVehicle.Item1 / 10000, activeVehicle.Item2.Normalize());
                 PanelObjects.Add(v);
             }
 
