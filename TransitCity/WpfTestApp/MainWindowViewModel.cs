@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Time;
 using Transit.Data;
@@ -25,13 +26,37 @@ namespace WpfTestApp
             PlusCommand = new RelayCommand(o => _timeDelta *= 2.0, o => _timeDelta < 20.0);
             MinusCommand = new RelayCommand(o => _timeDelta /= 2.0, o => _timeDelta > 0.001);
 
+            foreach (var lineInfo in _dataManager.AllLineInfos)
+            {
+                Color color;
+                switch (lineInfo.Line.Name)
+                {
+                    case "1":
+                        color = Colors.Red;
+                        break;
+                    case "2":
+                        color = Colors.DarkGreen;
+                        break;
+                    case "3":
+                        color = Colors.DarkBlue;
+                        break;
+                    case "4":
+                        color = Colors.Orange;
+                        break;
+                    default:
+                        throw new InvalidOperationException();
+                }
+
+                foreach (var path in lineInfo.RouteInfos.Select(ri => ri.Path))
+                {
+                    var r = new Route(path, color);
+                    PanelObjects.Add(r);
+                }
+            }
+
             foreach (var station in _dataManager.AllStations)
             {
-                var s = new Station
-                {
-                    X = station.Position.X / 10000,
-                    Y = station.Position.Y / 10000
-                };
+                var s = new Station(station.Position / 10000);
                 PanelObjects.Add(s);
             }
 

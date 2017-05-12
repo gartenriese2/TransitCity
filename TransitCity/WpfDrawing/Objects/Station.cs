@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Media;
+using Geometry;
 using WpfDrawing.Panel;
 
 namespace WpfDrawing.Objects
@@ -16,9 +17,13 @@ namespace WpfDrawing.Objects
             Drawing = new GeometryDrawing(brush, pen, geo);
         }
 
-        public override Drawing GetDrawing()
+        public Station(Position2d position)
         {
-            return Drawing;
+            X = position.X;
+            Y = position.Y;
+            Scale = 0.5;
         }
+
+        public override Drawing GetDrawing() => Drawing;
     }
 }

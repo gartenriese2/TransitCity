@@ -172,6 +172,7 @@ namespace WpfDrawing.Panel
                 var transformGroup = new TransformGroup();
                 var x = RenderSize.Width * panelObject.X;
                 var y = RenderSize.Height * panelObject.Y;
+                transformGroup.Children.Add(new ScaleTransform(panelObject.Scale, panelObject.Scale));
                 transformGroup.Children.Add(new TranslateTransform(x, y));
                 transformGroup.Children.Add(new RotateTransform(panelObject.Angle, x, y));
                 drawingVisual.Transform = transformGroup;

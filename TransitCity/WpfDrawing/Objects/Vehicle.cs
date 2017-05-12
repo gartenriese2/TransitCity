@@ -12,7 +12,7 @@ namespace WpfDrawing.Objects
 
         static Vehicle()
         {
-            var brush = new SolidColorBrush(Colors.Red);
+            var brush = new SolidColorBrush(Colors.Gray);
             var pen = new Pen(new SolidColorBrush(Colors.Black), 1);
             var geo = new PathGeometry(new []
             {
@@ -32,11 +32,9 @@ namespace WpfDrawing.Objects
             X = position.X;
             Y = position.Y;
             Angle = Math.Atan2(direction.Y, direction.X) * 180.0 / Math.PI - 90.0;
+            Scale = 0.5;
         }
 
-        public override Drawing GetDrawing()
-        {
-            return Drawing;
-        }
+        public override Drawing GetDrawing() => Drawing;
     }
 }
