@@ -1,12 +1,10 @@
 ﻿using System;
-using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using Time;
 using Transit.Data;
 using Utility.MVVM;
-using WpfDrawing.Annotations;
 using WpfDrawing.Objects;
 using WpfDrawing.Panel;
 using WpfDrawing.Utility;
@@ -19,6 +17,7 @@ namespace WpfTestApp
         private TimeSpan _time = TimeSpan.Zero;
         private string _weektime = string.Empty;
         private double _timeDelta = 5.0;
+        private double _simulationTime;
 
         public MainWindowViewModel()
         {
@@ -43,7 +42,7 @@ namespace WpfTestApp
                 PanelObjects.Add(v);
             }
 
-            var tmr = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(10) };
+            var tmr = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16.67) };
             tmr.Tick += OnTimerTick2;
             tmr.Start();
         }
@@ -67,8 +66,23 @@ namespace WpfTestApp
             }
         }
 
+        public double SimulationTime
+        {
+            get => _simulationTime;
+            set
+            {
+                if (Math.Abs(value - _simulationTime) > double.Epsilon)
+                {
+                    _simulationTime = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private void OnTimerTick2(object sender, EventArgs args)
         {
+            var sw = new Stopwatch();
+            sw.Start();
             _time += TimeSpan.FromSeconds(_timeDelta);
             var wtp = new WeekTimePoint(DayOfWeek.Monday) + _time;
             WeekTime = wtp.ToString();
@@ -87,8 +101,8 @@ namespace WpfTestApp
                 var v = new Vehicle(activeVehicle.Item1 / 10000, activeVehicle.Item2.Normalize());
                 PanelObjects.Add(v);
             }
-
-            
+            sw.Stop();
+            SimulationTime = sw.ElapsedMilliseconds;
         }
     }
 }
