@@ -27,17 +27,28 @@
                     HorizontalAlignment="Center">
             <TextBlock Text="{Binding WeekTime}"
                        FontSize="32"/>
-            <Button Margin="16,0"
+            <Button Margin="8,0"
                     Width="32"
                     FontSize="32"
                     Command="{Binding PlusCommand}">
                 <TextBlock Text="+"/>
             </Button>
-            <Button Width="32"
+            <Button Margin="8,0"
+                    Width="32"
                     FontSize="32"
                     Command="{Binding MinusCommand}">
                 <TextBlock Text="-"/>
             </Button>
+            <Button Margin="8,0"
+                    Width="100"
+                    FontSize="20"
+                    Command="{Binding ZoomInCommand}"
+                    Content="Zoom in"/>
+            <Button Margin="8,0"
+                    Width="100"
+                    FontSize="20"
+                    Command="{Binding ZoomOutCommand}"
+                    Content="Zoom out"/>
         </StackPanel>
         
         <TextBlock Grid.Row="0" Grid.Column="1"
@@ -50,7 +61,10 @@
         <panel:PanelControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Objects="{Binding PanelObjects}"/>
+                            Objects="{Binding PanelObjects}"
+                            Zoom="{Binding Zoom}"
+                            MinZoom="{Binding MinZoom, Mode=OneWayToSource}"
+                            MaxZoom="{Binding MaxZoom, Mode=OneWayToSource}"/>
     </Grid>
     
 </Window>
