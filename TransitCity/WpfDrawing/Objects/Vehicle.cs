@@ -32,7 +32,7 @@ namespace WpfDrawing.Objects
             X = position.X;
             Y = position.Y;
             Angle = Math.Atan2(direction.Y, direction.X) * 180.0 / Math.PI - 90.0;
-            Scale = 0.5;
+            Scale = 5;
         }
 
         public override Drawing GetDrawing() => Drawing;

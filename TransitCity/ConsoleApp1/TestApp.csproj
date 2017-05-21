@@ -87,6 +87,10 @@
       <Project>{D1E7778B-2C3C-4058-9CCF-757E12D3BEB1}</Project>
       <Name>Utility</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WpfDrawing\WpfDrawing.csproj">
+      <Project>{31DF70BB-F397-4EC2-AF6E-B34270C6245C}</Project>
+      <Name>WpfDrawing</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

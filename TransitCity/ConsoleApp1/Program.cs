@@ -28,7 +28,108 @@ namespace TestApp
             //DrawBusiestStations();
             //LineChartTest();
             //TransitWithSchedules();
-            DrawActiveVehicles();
+            //DrawActiveVehicles();
+            TestCoordinateSystems();
+        }
+
+        private static void TestCoordinateSystems()
+        {
+            var worldSize = new Size(10000, 10000);
+            var renderSize = new Size(800, 600);
+            var centerPoint = new Point(5000, 5000);
+            var zoom = 1.0;
+            //TestCases(worldSize, renderSize, zoom, centerPoint, new List<(Point, Point)>
+            //    {
+            //        (new Point(0, 0), new Point(100, 0)),
+            //        (new Point(5000, 5000), new Point(400, 300)),
+            //        (new Point(10000, 10000), new Point(700, 600)),
+            //        (new Point(0, 10000), new Point(100, 600)),
+            //        (new Point(10000, 0), new Point(700, 0))
+            //    }
+            //);
+            centerPoint = new Point(0, 0);
+            //TestCases(worldSize, renderSize, zoom, centerPoint, new List<(Point, Point)>
+            //    {
+            //        (new Point(0, 0), new Point(400, 300)),
+            //        (new Point(5000, 5000), new Point(700, 600)),
+            //        (new Point(10000, 10000), new Point(1000, 900)),
+            //        (new Point(0, 10000), new Point(400, 900)),
+            //        (new Point(10000, 0), new Point(1000, 300))
+            //    }
+            //);
+            //zoom = 2.0;
+            //TestCases(worldSize, renderSize, zoom, centerPoint, new List<(Point, Point)>
+            //    {
+            //        (new Point(0, 0), new Point(400, 300)),
+            //        (new Point(5000, 5000), new Point(1000, 900)),
+            //        (new Point(10000, 10000), new Point(1600, 1500)),
+            //        (new Point(0, 10000), new Point(400, 1500)),
+            //        (new Point(10000, 0), new Point(1600, 300))
+            //    }
+            //);
+            zoom = 0.5;
+            //TestCases(worldSize, renderSize, zoom, centerPoint, new List<(Point, Point)>
+            //    {
+            //        (new Point(0, 0), new Point(400, 300)),
+            //        (new Point(5000, 5000), new Point(550, 450)),
+            //        (new Point(10000, 10000), new Point(700, 600)),
+            //        (new Point(0, 10000), new Point(400, 600)),
+            //        (new Point(10000, 0), new Point(700, 300))
+            //    }
+            //);
+            centerPoint = new Point(5000, 5000);
+            TestCases(worldSize, renderSize, zoom, centerPoint, new List<(Point, Point)>
+                {
+                    (new Point(0, 0), new Point(250, 150)),
+                    (new Point(5000, 5000), new Point(400, 300)),
+                    (new Point(10000, 10000), new Point(550, 450)),
+                    (new Point(0, 10000), new Point(250, 450)),
+                    (new Point(10000, 0), new Point(550, 150))
+                }
+            );
+            zoom = 2.0;
+            TestCases(worldSize, renderSize, zoom, centerPoint, new List<(Point, Point)>
+                {
+                    (new Point(0, 0), new Point(-200, -300)),
+                    (new Point(5000, 5000), new Point(400, 300)),
+                    (new Point(10000, 10000), new Point(1000, 900)),
+                    (new Point(0, 10000), new Point(-200, 900)),
+                    (new Point(10000, 0), new Point(1000, -300))
+                }
+            );
+        }
+
+        private static void TestCases(Size worldSize, Size renderSize, double zoom, Point centerPoint, IEnumerable<(Point, Point)> pointsList)
+        {
+            Console.WriteLine("------------------------------------------------------------------------");
+            Console.WriteLine($"WorldSize: ({worldSize.Width}|{worldSize.Height})\tRenderSize: ({renderSize.Width}|{renderSize.Height})\tZoom: {zoom:F}\tCenterpoint: ({centerPoint.X}|{centerPoint.Y})");
+            foreach (var (worldPoint, expectedRenderPoint) in pointsList)
+            {
+                var renderPoint = ModelToView(worldSize, renderSize, zoom, centerPoint, worldPoint);
+                Console.WriteLine($"WorldPoint: ({worldPoint.X}|{worldPoint.Y})\tExpectedRenderPoint: ({expectedRenderPoint.X}|{expectedRenderPoint.Y})\tActualRenderPoint: ({renderPoint.X}|{renderPoint.Y})");
+            }
+            Console.WriteLine("------------------------------------------------------------------------");
+        }
+
+        private static Point ModelToView(Size worldSize, Size renderSize, double zoom, Point centerPoint, Point worldPoint)
+        {
+            var worldWidth = (double) worldSize.Width;
+            var worldHeight = (double) worldSize.Height;
+            var renderWidth = (double) renderSize.Width * zoom;
+            var renderHeight = (double) renderSize.Height * zoom;
+            var worldRatio = worldWidth / worldHeight;
+            var renderRatio = renderWidth / renderHeight;
+            var fitWidth = worldRatio >= renderRatio;
+            var worldToRenderConversion = fitWidth ? renderWidth / worldWidth : renderHeight / worldHeight;
+            var translateX = fitWidth ? 0 : (renderWidth - worldWidth * worldToRenderConversion) / 2;
+            var translateY = fitWidth ? (renderHeight - worldHeight * worldToRenderConversion) / 2 : 0;
+
+            var centerTranslateX = (worldWidth / 2 - centerPoint.X) * worldToRenderConversion;
+            var centerTranslateY = (worldHeight / 2 - centerPoint.Y) * worldToRenderConversion;
+
+            var x = (int) (worldPoint.X * worldToRenderConversion + translateX + centerTranslateX);
+            var y = (int) (worldPoint.Y * worldToRenderConversion + translateY + centerTranslateY);
+            return new Point(x, y);
         }
 
         private static void DrawActiveVehicles()

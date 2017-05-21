@@ -25,15 +25,22 @@ namespace WpfDrawing.Panel
             "MinZoom",
             typeof(double),
             typeof(PanelControl),
-            new PropertyMetadata(0.1),
+            new PropertyMetadata(0.001),
             value => (double)value > 0.0);
 
         public static readonly DependencyProperty MaxZoomProperty = DependencyProperty.Register(
             "MaxZoom",
             typeof(double),
             typeof(PanelControl),
-            new PropertyMetadata(100.0),
+            new PropertyMetadata(1000.0),
             value => (double)value > 0.0);
+
+        public static readonly DependencyProperty WorldSizeProperty = DependencyProperty.Register(
+            "WorldSize",
+            typeof(Size),
+            typeof(PanelControl),
+            new PropertyMetadata(new Size(0, 0)),
+            value => ((Size)value).Width >= 0 && ((Size)value).Height >= 0);
 
         public PanelControl()
         {
@@ -62,6 +69,12 @@ namespace WpfDrawing.Panel
         {
             get => (double)GetValue(MaxZoomProperty);
             set => SetValue(MaxZoomProperty, value);
+        }
+
+        public Size WorldSize
+        {
+            get => (Size)GetValue(WorldSizeProperty);
+            set => SetValue(WorldSizeProperty, value);
         }
     }
 }

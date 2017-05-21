@@ -37,6 +37,20 @@ namespace WpfDrawing.Panel
             new PropertyMetadata(100.0),
             value => (double)value > 0.0);
 
+        public static readonly DependencyProperty CenterProperty = DependencyProperty.Register(
+            "Center",
+            typeof(Point),
+            typeof(PanelVisuals),
+            new PropertyMetadata(new Point(0.5, 0.5)),
+            value => ((Point)value).X >= 0.0 && ((Point)value).X <= 1.0 && ((Point)value).Y >= 0.0 && ((Point)value).Y <= 1.0);
+
+        public static readonly DependencyProperty WorldSizeProperty = DependencyProperty.Register(
+            "WorldSize",
+            typeof(Size),
+            typeof(PanelVisuals),
+            new PropertyMetadata(new Size(0, 0), (o, args) => ((PanelVisuals) o).Refresh()),
+            value => ((Size)value).Width >= 0 && ((Size)value).Height >= 0);
+
         private readonly VisualCollection _visualChildren;
         private Size _viewSize;
 
@@ -69,6 +83,18 @@ namespace WpfDrawing.Panel
         {
             get => (double)GetValue(MaxZoomProperty);
             set => SetValue(MaxZoomProperty, value);
+        }
+
+        public Point Center
+        {
+            get => (Point) GetValue(CenterProperty);
+            set => SetValue(CenterProperty, value);
+        }
+
+        public Size WorldSize
+        {
+            get => (Size) GetValue(WorldSizeProperty);
+            set => SetValue(WorldSizeProperty, value);
         }
 
         protected override int VisualChildrenCount => _visualChildren.Count;
@@ -217,7 +243,7 @@ namespace WpfDrawing.Panel
 
         private void CreateVisualChildren(IEnumerable coll)
         {
-            if (coll == null)
+            if (coll == null || WorldSize.Width <= 0 || WorldSize.Height <= 0 || RenderSize.Width <= 0 || RenderSize.Height <= 0)
             {
                 return;
             }
@@ -234,15 +260,31 @@ namespace WpfDrawing.Panel
                 var dc = drawingVisual.RenderOpen();
                 dc.DrawDrawing(panelObject.GetDrawing());
                 var transformGroup = new TransformGroup();
-                var x = _viewSize.Width * panelObject.X;
-                var y = _viewSize.Height * panelObject.Y;
-                transformGroup.Children.Add(new ScaleTransform(panelObject.Scale * Zoom, panelObject.Scale * Zoom));
-                transformGroup.Children.Add(new TranslateTransform(x, y));
-                transformGroup.Children.Add(new RotateTransform(panelObject.Angle, x, y));
+                transformGroup.Children.Add(new ScaleTransform(panelObject.Scale, panelObject.Scale));
+                transformGroup.Children.Add(new TranslateTransform(panelObject.X, panelObject.Y));
+                transformGroup.Children.Add(new RotateTransform(panelObject.Angle, panelObject.X, panelObject.Y));
                 drawingVisual.Transform = transformGroup;
                 dc.Close();
                 _visualChildren.Add(drawingVisual);
             }
+
+            var worldWidth = WorldSize.Width;
+            var worldHeight = WorldSize.Height;
+            var renderWidth = RenderSize.Width;
+            var renderHeight = RenderSize.Height;
+            var worldRatio = worldWidth / worldHeight;
+            var renderRatio = renderWidth / renderHeight;
+            var fitWidth = worldRatio >= renderRatio;
+            var worldToRenderConversion = fitWidth ? renderWidth / worldWidth : renderHeight / worldHeight;
+            var translateX = fitWidth ? 0 : (renderWidth - worldWidth * worldToRenderConversion) * 0.5;
+            var translateY = fitWidth ? (renderHeight - worldHeight * worldToRenderConversion) * 0.5 : 0;
+            var group = new TransformGroup();
+            var scale = new ScaleTransform(Zoom * worldToRenderConversion, Zoom * worldToRenderConversion);
+            var zoomOffset = (Zoom - 1) * (fitWidth ? renderWidth : renderHeight) * 0.5;
+            var translate = new TranslateTransform(translateX - zoomOffset, translateY - zoomOffset);
+            group.Children.Add(scale);
+            group.Children.Add(translate);
+            RenderTransform = group;
         }
 
         private void RemoveVisualChildren(IEnumerable coll)

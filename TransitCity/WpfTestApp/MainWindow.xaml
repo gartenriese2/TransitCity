@@ -20,7 +20,7 @@
             <ColumnDefinition/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        
+
         <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                     Margin="0,16"
                     Orientation="Horizontal"
@@ -39,18 +39,16 @@
                     Command="{Binding MinusCommand}">
                 <TextBlock Text="-"/>
             </Button>
-            <Button Margin="8,0"
-                    Width="100"
-                    FontSize="20"
-                    Command="{Binding ZoomInCommand}"
-                    Content="Zoom in"/>
-            <Button Margin="8,0"
-                    Width="100"
-                    FontSize="20"
-                    Command="{Binding ZoomOutCommand}"
-                    Content="Zoom out"/>
+            <Slider x:Name="ZoomSlider"
+                    Minimum="{Binding MinZoom, Mode=OneTime}"
+                    Maximum="{Binding MaxZoom, Mode=OneTime}"
+                    Value="1"
+                    Width="256"
+                    VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding Value, ElementName=ZoomSlider, StringFormat=N2}"
+                       VerticalAlignment="Center"/>
         </StackPanel>
-        
+
         <TextBlock Grid.Row="0" Grid.Column="1"
                    Width="32"
                    TextAlignment="Right">
@@ -59,12 +57,13 @@
         </TextBlock>
 
         <panel:PanelControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
                             Objects="{Binding PanelObjects}"
-                            Zoom="{Binding Zoom}"
-                            MinZoom="{Binding MinZoom, Mode=OneWayToSource}"
-                            MaxZoom="{Binding MaxZoom, Mode=OneWayToSource}"/>
+                            Zoom="{Binding Value, ElementName=ZoomSlider}"
+                            MinZoom="{Binding MinZoom, Mode=OneTime}"
+                            MaxZoom="{Binding MaxZoom, Mode=OneTime}"
+                            WorldSize="{Binding WorldSize, Mode=OneTime}"/>
     </Grid>
-    
 </Window>
+    

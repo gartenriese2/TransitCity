@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Geometry;
 using Time;
 using Transit.Data;
 using Utility.MVVM;
@@ -20,15 +20,12 @@ namespace WpfTestApp
         private string _weektime = string.Empty;
         private double _timeDelta = 5.0;
         private double _simulationTime;
-        private double _zoom = 1.0;
 
         public MainWindowViewModel()
         {
             _dataManager = new TestTransitData().DataManager;
             PlusCommand = new RelayCommand(o => _timeDelta *= 2.0, o => _timeDelta < 20.0);
             MinusCommand = new RelayCommand(o => _timeDelta /= 2.0, o => _timeDelta > 0.001);
-            ZoomInCommand = new RelayCommand(o => ZoomIn());
-            ZoomOutCommand = new RelayCommand(o => ZoomOut());
 
             foreach (var lineInfo in _dataManager.AllLineInfos)
             {
@@ -60,14 +57,14 @@ namespace WpfTestApp
 
             foreach (var station in _dataManager.AllStations)
             {
-                var s = new Station(station.Position / 10000);
+                var s = new Station(station.Position);
                 PanelObjects.Add(s);
             }
 
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(new WeekTimePoint(DayOfWeek.Monday) + _time);
             foreach (var activeVehicle in activeVehicles)
             {
-                var v = new Vehicle(activeVehicle.Item1 / 10000, activeVehicle.Item2.Normalize());
+                var v = new Vehicle(activeVehicle.Item1, activeVehicle.Item2.Normalize());
                 PanelObjects.Add(v);
             }
 
@@ -81,10 +78,6 @@ namespace WpfTestApp
         public RelayCommand PlusCommand { get; }
 
         public RelayCommand MinusCommand { get; }
-
-        public RelayCommand ZoomInCommand { get; }
-
-        public RelayCommand ZoomOutCommand { get; }
 
         public string WeekTime
         {
@@ -112,22 +105,11 @@ namespace WpfTestApp
             }
         }
 
-        public double Zoom
-        {
-            get => _zoom;
-            set
-            {
-                if (Math.Abs(value - _zoom) > double.Epsilon)
-                {
-                    _zoom = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        public double MinZoom { get; } = 0.1;
 
-        public double MinZoom { private get; set; }
+        public double MaxZoom { get; } = 10.0;
 
-        public double MaxZoom { private get; set; }
+        public Size WorldSize { get; } = new Size(10000, 10000);
 
         private void OnTimerTick2(object sender, EventArgs args)
         {
@@ -148,27 +130,11 @@ namespace WpfTestApp
 
             foreach (var activeVehicle in activeVehicles)
             {
-                var v = new Vehicle(activeVehicle.Item1 / 10000, activeVehicle.Item2.Normalize());
+                var v = new Vehicle(activeVehicle.Item1, activeVehicle.Item2.Normalize());
                 PanelObjects.Add(v);
             }
             sw.Stop();
             SimulationTime = sw.ElapsedMilliseconds;
-        }
-
-        private void ZoomIn()
-        {
-            if (Zoom * 2 <= MaxZoom)
-            {
-                Zoom *= 2;
-            }
-        }
-
-        private void ZoomOut()
-        {
-            if (Zoom / 2 >= MinZoom)
-            {
-                Zoom /= 2;
-            }
         }
     }
 }

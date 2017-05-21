@@ -8,7 +8,7 @@ namespace WpfDrawing.Objects
 {
     public class Route : PanelObject
     {
-        private readonly Drawing _drawing;
+        private readonly GeometryDrawing _drawing;
 
         public Route(Path path, Color color)
         {
@@ -25,7 +25,13 @@ namespace WpfDrawing.Objects
             var geo = new PathGeometry(new []{pathFigure});
             _drawing = new GeometryDrawing(brush, pen, geo);
 
-            Scale = 0.08;
+            Scale = 1;
+        }
+
+        public double Thickness
+        {
+            get => _drawing.Pen.Thickness;
+            set => _drawing.Pen.Thickness = value;
         }
 
         public override Drawing GetDrawing() => _drawing;
