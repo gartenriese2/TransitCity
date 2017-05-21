@@ -7,5 +7,6 @@
                         Zoom="{Binding Zoom, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         MinZoom="{Binding MinZoom, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         MaxZoom="{Binding MaxZoom, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        Center="{Binding Center, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         WorldSize="{Binding WorldSize, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
 </UserControl>

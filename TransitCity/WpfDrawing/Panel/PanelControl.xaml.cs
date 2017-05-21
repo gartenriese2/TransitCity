@@ -35,6 +35,13 @@ namespace WpfDrawing.Panel
             new PropertyMetadata(1000.0),
             value => (double)value > 0.0);
 
+        public static readonly DependencyProperty CenterProperty = DependencyProperty.Register(
+            "Center",
+            typeof(Point),
+            typeof(PanelControl),
+            new PropertyMetadata(new Point(0.5, 0.5)),
+            value => ((Point)value).X >= 0.0 && ((Point)value).X <= 1.0 && ((Point)value).Y >= 0.0 && ((Point)value).Y <= 1.0);
+
         public static readonly DependencyProperty WorldSizeProperty = DependencyProperty.Register(
             "WorldSize",
             typeof(Size),
@@ -69,6 +76,12 @@ namespace WpfDrawing.Panel
         {
             get => (double)GetValue(MaxZoomProperty);
             set => SetValue(MaxZoomProperty, value);
+        }
+
+        public Point Center
+        {
+            get => (Point)GetValue(CenterProperty);
+            set => SetValue(CenterProperty, value);
         }
 
         public Size WorldSize

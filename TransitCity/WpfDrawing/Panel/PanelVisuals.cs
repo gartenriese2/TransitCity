@@ -282,8 +282,10 @@ namespace WpfDrawing.Panel
             var scale = new ScaleTransform(Zoom * worldToRenderConversion, Zoom * worldToRenderConversion);
             var zoomOffset = (Zoom - 1) * (fitWidth ? renderWidth : renderHeight) * 0.5;
             var translate = new TranslateTransform(translateX - zoomOffset, translateY - zoomOffset);
+            var pan = new TranslateTransform((0.5 - Center.X) * renderWidth * Zoom, -(0.5 - Center.Y) * renderHeight * Zoom);
             group.Children.Add(scale);
             group.Children.Add(translate);
+            group.Children.Add(pan);
             RenderTransform = group;
         }
 

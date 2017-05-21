@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Time;
@@ -20,12 +21,19 @@ namespace WpfTestApp
         private string _weektime = string.Empty;
         private double _timeDelta = 5.0;
         private double _simulationTime;
+        private Point _center;
+        private double _centerX;
+        private double _centerY;
+        private double _zoom;
 
         public MainWindowViewModel()
         {
             _dataManager = new TestTransitData().DataManager;
             PlusCommand = new RelayCommand(o => _timeDelta *= 2.0, o => _timeDelta < 20.0);
             MinusCommand = new RelayCommand(o => _timeDelta /= 2.0, o => _timeDelta > 0.001);
+            CenterX = 0.5;
+            CenterY = 0.5;
+            Zoom = 1.0;
 
             foreach (var lineInfo in _dataManager.AllLineInfos)
             {
@@ -105,11 +113,92 @@ namespace WpfTestApp
             }
         }
 
+        public Point Center
+        {
+            get => _center;
+            private set
+            {
+                if (_center != value)
+                {
+                    _center = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public double CenterX
+        {
+            get => _centerX;
+            set
+            {
+                if (Math.Abs(value - _centerX) > double.Epsilon)
+                {
+                    _centerX = value;
+                    OnPropertyChanged();
+                    Center = new Point(CenterX, CenterY);
+                }
+            }
+        }
+
+        public double CenterY
+        {
+            get => _centerY;
+            set
+            {
+                if (Math.Abs(value - _centerY) > double.Epsilon)
+                {
+                    _centerY = value;
+                    OnPropertyChanged();
+                    Center = new Point(CenterX, CenterY);
+                }
+            }
+        }
+
+        public double Zoom
+        {
+            get => _zoom;
+            set
+            {
+                if (Math.Abs(value - _zoom) > double.Epsilon)
+                {
+                    _zoom = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public double MinZoom { get; } = 0.1;
 
         public double MaxZoom { get; } = 10.0;
 
         public Size WorldSize { get; } = new Size(10000, 10000);
+
+        public void OnMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var diff = e.Delta / 1000.0 * Zoom;
+            Zoom = Math.Max(MinZoom, Math.Min(MaxZoom, Zoom + diff));
+        }
+
+        public void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            var delta = 0.1;
+            if (e.Key == Key.Left)
+            {
+                CenterX = Math.Max(0.0, CenterX - delta);
+            }
+            if (e.Key == Key.Right)
+            {
+                CenterX = Math.Min(1.0, CenterX + delta);
+            }
+            if (e.Key == Key.Up)
+            {
+                CenterY = Math.Min(1.0, CenterY + delta);
+            }
+            if (e.Key == Key.Down)
+            {
+                CenterY = Math.Max(0.0, CenterY - delta);
+            }
+        }
 
         private void OnTimerTick2(object sender, EventArgs args)
         {
