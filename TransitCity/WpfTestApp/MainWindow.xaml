@@ -92,6 +92,10 @@
                            Text="{Binding CenterY, StringFormat=N2}"
                            TextAlignment="Right"/>
             </Grid>
+            <TextBlock>
+                <Run Text="Active Connections:"/>
+                <Run Text="{Binding ActiveConnectionsCount}"/>
+            </TextBlock>
         </StackPanel>
 
         <TextBlock Grid.Row="0" Grid.Column="1"

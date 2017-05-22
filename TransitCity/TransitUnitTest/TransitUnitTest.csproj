@@ -66,11 +66,16 @@
     <Compile Include="TimetableUnitTests.cs" />
     <Compile Include="DataManagerUnitTests.cs" />
     <Compile Include="RaptorUnitTests.cs" />
+    <Compile Include="TransitConnectionInfoUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CitySimulation\CitySimulation.csproj">
+      <Project>{1247B810-D259-44B0-A520-64F5225DF770}</Project>
+      <Name>CitySimulation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Geometry\Geometry.csproj">
       <Project>{75EB7F70-EC1D-45AD-82AC-CB953003D1A3}</Project>
       <Name>Geometry</Name>
