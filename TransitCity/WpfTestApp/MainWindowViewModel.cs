@@ -169,7 +169,7 @@ namespace WpfTestApp
 
         public double MinZoom { get; } = 0.1;
 
-        public double MaxZoom { get; } = 10.0;
+        public double MaxZoom { get; } = 50.0;
 
         public Size WorldSize { get; } = new Size(10000, 10000);
 
@@ -181,7 +181,7 @@ namespace WpfTestApp
 
         public void OnKeyDown(object sender, KeyEventArgs e)
         {
-            var delta = 0.1;
+            var delta = 0.1 / Zoom;
             if (e.Key == Key.Left)
             {
                 CenterX = Math.Max(0.0, CenterX - delta);
