@@ -226,7 +226,7 @@ namespace TestApp
             var rnd = new Random();
             var workerScheduleTuples = city.Residents.Where(r => r.HasJob).Select(r => (r, JobSchedule.CreateRandom(rnd))).ToList();
             var dataManager = new TestTransitData().DataManager;
-            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(5), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
+            var raptor = new Raptor(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
 
             var workerConnectionsDictionary = new Dictionary<Resident, List<List<Connection>>>();
             foreach (var (worker, schedule) in workerScheduleTuples)
@@ -234,8 +234,8 @@ namespace TestApp
                 var workerTaskList = new List<Task<List<Connection>>>();
                 foreach (var scheduleWts in schedule.WeekTimeSpans)
                 {
-                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.ComputeReverse(worker.Position, scheduleWts.Begin, worker.Job.Position)));
-                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.Compute(worker.Job.Position, scheduleWts.End, worker.Position)));
+                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.ComputeReverse(worker.Position, scheduleWts.Begin, worker.Job.Position, Speed.FromKilometersPerHour(8))));
+                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.Compute(worker.Job.Position, scheduleWts.End, worker.Position, Speed.FromKilometersPerHour(8))));
                 }
 
                 Task.WaitAll(workerTaskList.ToArray());
@@ -464,7 +464,7 @@ namespace TestApp
         private static void DrawBusiestStations()
         {
             var dataManager = new TestTransitData().DataManager;
-            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(8), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
+            var raptor = new Raptor(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
 
             const int count = 1000000;
             var random = new Random();
@@ -484,7 +484,7 @@ namespace TestApp
             {
                 var source = sourceList[i];
                 var target = targetList[i];
-                taskList.Add(Task.Factory.StartNew(() => raptor.Compute(source, time, target)));
+                taskList.Add(Task.Factory.StartNew(() => raptor.Compute(source, time, target, Speed.FromKilometersPerHour(8))));
             }
 
             Task.WaitAll(taskList.ToArray());

@@ -53,8 +53,8 @@
     <Compile Include="Data\StationInfo.cs" />
     <Compile Include="Data\TestTransitData.cs" />
     <Compile Include="Data\TransitConnectionInfo.cs" />
-    <Compile Include="Timetable\Algorithm\RaptorWithDataManagerBase.cs" />
-    <Compile Include="Timetable\Algorithm\RaptorWithDataManagerBinarySearchTripLookup.cs" />
+    <Compile Include="Timetable\Algorithm\RaptorBase.cs" />
+    <Compile Include="Timetable\Algorithm\Raptor.cs" />
     <Compile Include="Timetable\Connection.cs" />
     <Compile Include="Timetable\Managers\DictionaryTimetableManager.cs" />
     <Compile Include="Timetable\Managers\ITimetableManager.cs" />

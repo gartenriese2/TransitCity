@@ -9,58 +9,58 @@ using Utility.Units;
 
 namespace Transit.Timetable.Algorithm
 {
-    public class RaptorWithDataManagerBinarySearchTripLookup : RaptorWithDataManagerBase
+    public class Raptor : RaptorBase
     {
-        public RaptorWithDataManagerBinarySearchTripLookup(Speed walkingSpeed, TimeSpan maxWalkingTime, TimeSpan maxWaitingTime, DataManager dataManager)
-            : base(walkingSpeed, maxWalkingTime, maxWaitingTime, dataManager)
+        public Raptor(TimeSpan maxWalkingTime, TimeSpan maxWaitingTime, DataManager dataManager)
+            : base(maxWalkingTime, maxWaitingTime, dataManager)
         {
         }
 
-        public override List<Connection> Compute(Position2d sourcePos, WeekTimePoint startTime, Position2d targetPos)
+        public override List<Connection> Compute(Position2d sourcePos, WeekTimePoint startTime, Position2d targetPos, Speed walkingSpeed)
         {
-            var earliestKnownTargetArrivalTime = startTime + TimeSpan.FromSeconds(sourcePos.DistanceTo(targetPos) / _walkingSpeed.MetersPerSecond);
+            var earliestKnownTargetArrivalTime = startTime + TimeSpan.FromSeconds(sourcePos.DistanceTo(targetPos) / walkingSpeed.MetersPerSecond);
             var earliestConnections = new List<Connection>
             {
                 Connection.CreateWalk(sourcePos, startTime, targetPos, earliestKnownTargetArrivalTime)
             };
 
-            var (markedStations, connections) = GetInitialMarkedStations(sourcePos, startTime);
+            var (markedStations, connections) = GetInitialMarkedStations(sourcePos, startTime, walkingSpeed);
             earliestConnections.AddRange(connections);
 
             for (var k = 1; markedStations.Count > 0 && k <= NumRounds; ++k)
             {
-                ComputeRound(targetPos, earliestConnections, markedStations, ref earliestKnownTargetArrivalTime);
+                ComputeRound(targetPos, earliestConnections, markedStations, ref earliestKnownTargetArrivalTime, walkingSpeed);
             }
 
             return GetTravelPath(earliestConnections, targetPos);
         }
 
-        public override List<Connection> ComputeReverse(Position2d sourcePos, WeekTimePoint latestArrivalTime, Position2d targetPos)
+        public override List<Connection> ComputeReverse(Position2d sourcePos, WeekTimePoint latestArrivalTime, Position2d targetPos, Speed walkingSpeed)
         {
-            var latestKnownSourceDepartureTime = latestArrivalTime - TimeSpan.FromSeconds(sourcePos.DistanceTo(targetPos) / _walkingSpeed.MetersPerSecond);
+            var latestKnownSourceDepartureTime = latestArrivalTime - TimeSpan.FromSeconds(sourcePos.DistanceTo(targetPos) / walkingSpeed.MetersPerSecond);
             var latestConnections = new List<Connection>
             {
                 Connection.CreateWalk(sourcePos, latestKnownSourceDepartureTime, targetPos, latestArrivalTime)
             };
 
-            var (markedStations, connections) = GetInitialMarkedStationsReverse(targetPos, latestArrivalTime);
+            var (markedStations, connections) = GetInitialMarkedStationsReverse(targetPos, latestArrivalTime, walkingSpeed);
             latestConnections.AddRange(connections);
 
             for (var k = 1; markedStations.Count > 0 && k <= NumRounds; ++k)
             {
-                ComputeRoundReverse(sourcePos, latestConnections, markedStations, ref latestKnownSourceDepartureTime);
+                ComputeRoundReverse(sourcePos, latestConnections, markedStations, ref latestKnownSourceDepartureTime, walkingSpeed);
             }
 
             return GetTravelPathReverse(latestConnections, sourcePos);
         }
 
-        private void ComputeRound(Position2d targetPos, List<Connection> earliestKnownConnections, IDictionary<StationInfo, WeekTimePoint> markedStations, ref WeekTimePoint earliestKnownTargetArrivalTime)
+        private void ComputeRound(Position2d targetPos, List<Connection> earliestKnownConnections, IDictionary<StationInfo, WeekTimePoint> markedStations, ref WeekTimePoint earliestKnownTargetArrivalTime, Speed walkingSpeed)
         {
             var newlyMarkedStations = new Dictionary<StationInfo, WeekTimePoint>();
 
             foreach (var (station, startTime) in markedStations)
             {
-                ComputeRoundForStation(station, startTime, ref earliestKnownTargetArrivalTime, earliestKnownConnections, targetPos, newlyMarkedStations);
+                ComputeRoundForStation(station, startTime, ref earliestKnownTargetArrivalTime, earliestKnownConnections, targetPos, newlyMarkedStations, walkingSpeed);
             }
 
             markedStations.Clear();
@@ -70,14 +70,13 @@ namespace Transit.Timetable.Algorithm
             }
         }
 
-        private void ComputeRoundReverse(Position2d sourcePos, List<Connection> latestKnownConnections,
-            IDictionary<StationInfo, WeekTimePoint> markedStations, ref WeekTimePoint latestKnownSourceDepartureTime)
+        private void ComputeRoundReverse(Position2d sourcePos, List<Connection> latestKnownConnections, IDictionary<StationInfo, WeekTimePoint> markedStations, ref WeekTimePoint latestKnownSourceDepartureTime, Speed walkingSpeed)
         {
             var newlyMarkedStations = new Dictionary<StationInfo, WeekTimePoint>();
 
             foreach (var (station, departureTime) in markedStations)
             {
-                ComputeRoundForStationReverse(station, departureTime, ref latestKnownSourceDepartureTime, latestKnownConnections, sourcePos, newlyMarkedStations);
+                ComputeRoundForStationReverse(station, departureTime, ref latestKnownSourceDepartureTime, latestKnownConnections, sourcePos, newlyMarkedStations, walkingSpeed);
             }
 
             markedStations.Clear();
@@ -87,8 +86,7 @@ namespace Transit.Timetable.Algorithm
             }
         }
 
-        private void ComputeRoundForStation(StationInfo station, WeekTimePoint startTime, ref WeekTimePoint earliestKnownTargetArrivalTime,
-            List<Connection> earliestKnownConnections, Position2d targetPos, IDictionary<StationInfo, WeekTimePoint> newlyMarkedStations)
+        private void ComputeRoundForStation(StationInfo station, WeekTimePoint startTime, ref WeekTimePoint earliestKnownTargetArrivalTime, List<Connection> earliestKnownConnections, Position2d targetPos, IDictionary<StationInfo, WeekTimePoint> newlyMarkedStations, Speed walkingSpeed)
         {
             var (nextDeparture, trip) = station.GetNextDepartureAndTripArrayBinarySearch(startTime);
             if (nextDeparture == null)
@@ -101,7 +99,7 @@ namespace Transit.Timetable.Algorithm
                 return;
             }
 
-            var newStations = CheckRoute(station, nextDeparture, trip, ref earliestKnownTargetArrivalTime, earliestKnownConnections, targetPos);
+            var newStations = CheckRoute(station, nextDeparture, trip, ref earliestKnownTargetArrivalTime, earliestKnownConnections, targetPos, walkingSpeed);
             foreach (var pair in newStations)
             {
                 if (!newlyMarkedStations.ContainsKey(pair.Key) || newlyMarkedStations[pair.Key] > pair.Value)
@@ -111,8 +109,7 @@ namespace Transit.Timetable.Algorithm
             }
         }
 
-        private void ComputeRoundForStationReverse(StationInfo station, WeekTimePoint departureTime, ref WeekTimePoint latestKnownSourceDepartureTime,
-            List<Connection> latestKnownConnections, Position2d sourcePos, IDictionary<StationInfo, WeekTimePoint> newlyMarkedStations)
+        private void ComputeRoundForStationReverse(StationInfo station, WeekTimePoint departureTime, ref WeekTimePoint latestKnownSourceDepartureTime, List<Connection> latestKnownConnections, Position2d sourcePos, IDictionary<StationInfo, WeekTimePoint> newlyMarkedStations, Speed walkingSpeed)
         {
             var (lastArrival, trip) = station.GetLastArrivalAndTripArrayBinarySearch(departureTime);
             if (lastArrival == null)
@@ -125,7 +122,7 @@ namespace Transit.Timetable.Algorithm
                 return;
             }
 
-            var newStations = CheckRouteReverse(station, lastArrival, trip, ref latestKnownSourceDepartureTime, latestKnownConnections, sourcePos);
+            var newStations = CheckRouteReverse(station, lastArrival, trip, ref latestKnownSourceDepartureTime, latestKnownConnections, sourcePos, walkingSpeed);
             foreach (var pair in newStations)
             {
                 if (!newlyMarkedStations.ContainsKey(pair.Key) || newlyMarkedStations[pair.Key] < pair.Value)
@@ -135,7 +132,7 @@ namespace Transit.Timetable.Algorithm
             }
         }
 
-        private Dictionary<StationInfo, WeekTimePoint> CheckRoute(StationInfo currentStationInfo, WeekTimePoint currentDeparture, Trip trip, ref WeekTimePoint earliestKnownTargetArrivalTime, List<Connection> earliestKnownConnections, Position2d targetPos)
+        private Dictionary<StationInfo, WeekTimePoint> CheckRoute(StationInfo currentStationInfo, WeekTimePoint currentDeparture, Trip trip, ref WeekTimePoint earliestKnownTargetArrivalTime, List<Connection> earliestKnownConnections, Position2d targetPos, Speed walkingSpeed)
         {
             var newlyMarkedStations = new Dictionary<StationInfo, WeekTimePoint>();
             var (lineInfo, routeInfo, stationInfo) = _dataManager.GetInfos(currentStationInfo.Station);
@@ -156,7 +153,7 @@ namespace Transit.Timetable.Algorithm
                     break;
                 }
 
-                var exitWalkingTime = TimeSpan.FromSeconds(nextStation.ExitPosition.DistanceTo(targetPos) / _walkingSpeed.MetersPerSecond);
+                var exitWalkingTime = TimeSpan.FromSeconds(nextStation.ExitPosition.DistanceTo(targetPos) / walkingSpeed.MetersPerSecond);
                 if (exitWalkingTime < TimeSpan.FromMinutes(10))
                 {
                     var arrivalAtTargetPos = nextTime + exitWalkingTime;
@@ -192,7 +189,7 @@ namespace Transit.Timetable.Algorithm
                 foreach (var otherStation in otherStations)
                 {
                     const float exitTime = 10f;
-                    var transferTime = nextStation.ExitPosition.DistanceTo(otherStation.EntryPosition) / _walkingSpeed.MetersPerSecond;
+                    var transferTime = nextStation.ExitPosition.DistanceTo(otherStation.EntryPosition) / walkingSpeed.MetersPerSecond;
                     var timespan = TimeSpan.FromSeconds(transferTime + exitTime);
                     var arrivalTime = nextTime + timespan;
                     if (arrivalTime >= earliestKnownTargetArrivalTime)
@@ -219,7 +216,7 @@ namespace Transit.Timetable.Algorithm
             return newlyMarkedStations;
         }
 
-        private Dictionary<StationInfo, WeekTimePoint> CheckRouteReverse(StationInfo currentStationInfo, WeekTimePoint currentArrival, Trip trip, ref WeekTimePoint latestKnownSourceDepartureTime, List<Connection> latestKnownConnections, Position2d sourcePos)
+        private Dictionary<StationInfo, WeekTimePoint> CheckRouteReverse(StationInfo currentStationInfo, WeekTimePoint currentArrival, Trip trip, ref WeekTimePoint latestKnownSourceDepartureTime, List<Connection> latestKnownConnections, Position2d sourcePos, Speed walkingSpeed)
         {
             var newlyMarkedStations = new Dictionary<StationInfo, WeekTimePoint>();
             var (lineInfo, routeInfo, stationInfo) = _dataManager.GetInfos(currentStationInfo.Station);
@@ -240,7 +237,7 @@ namespace Transit.Timetable.Algorithm
                     break;
                 }
 
-                var entryWalkingTime = TimeSpan.FromSeconds(lastStation.EntryPosition.DistanceTo(sourcePos) / _walkingSpeed.MetersPerSecond);
+                var entryWalkingTime = TimeSpan.FromSeconds(lastStation.EntryPosition.DistanceTo(sourcePos) / walkingSpeed.MetersPerSecond);
                 if (entryWalkingTime < TimeSpan.FromMinutes(10))
                 {
                     var departureAtSorucePos = lastTime - entryWalkingTime;
@@ -276,7 +273,7 @@ namespace Transit.Timetable.Algorithm
                 foreach (var otherStation in otherStations)
                 {
                     const float exitTime = 10f;
-                    var transferTime = lastStation.EntryPosition.DistanceTo(otherStation.ExitPosition) / _walkingSpeed.MetersPerSecond;
+                    var transferTime = lastStation.EntryPosition.DistanceTo(otherStation.ExitPosition) / walkingSpeed.MetersPerSecond;
                     var timespan = TimeSpan.FromSeconds(transferTime + exitTime);
                     var departureTime = lastTime - timespan;
                     if (departureTime <= latestKnownSourceDepartureTime)

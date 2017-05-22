@@ -67,12 +67,12 @@ namespace CitySimulationUnitTest
         {
             var city = CreateCity();
             var dataManager = new TestTransitData().DataManager;
-            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(5), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
+            var raptor = new Raptor(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
             var time = new WeekTimePoint(DayOfWeek.Wednesday, 7, 30);
             var taskList = new List<Task<List<Connection>>>();
             foreach (var resident in city.Residents.Where(r => r.HasJob))
             {
-                taskList.Add(Task.Factory.StartNew(() => raptor.Compute(resident.Position, time, resident.Job.Position)));
+                taskList.Add(Task.Factory.StartNew(() => raptor.Compute(resident.Position, time, resident.Job.Position, Speed.FromKilometersPerHour(8))));
             }
             Task.WaitAll(taskList.ToArray());
             var results = taskList.Select(t => t.Result).ToList();

@@ -30,7 +30,7 @@ namespace TransitUnitTest
         public void TestRandomPaths()
         {
             var dataManager = new TestTransitData().DataManager;
-            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(8), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
+            var raptor = new Raptor(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
 
             const int count = 50000;
 
@@ -49,7 +49,7 @@ namespace TransitUnitTest
             {
                 var source = sourceList[i];
                 var target = targetList[i];
-                taskList.Add(Task.Factory.StartNew(() => raptor.Compute(source, time, target)));
+                taskList.Add(Task.Factory.StartNew(() => raptor.Compute(source, time, target, Speed.FromKilometersPerHour(8))));
             }
 
             var sw = Stopwatch.StartNew();
@@ -63,7 +63,7 @@ namespace TransitUnitTest
         public void DataAnalyzing()
         {
             var dataManager = new TestTransitData().DataManager;
-            var raptor = new RaptorWithDataManagerBinarySearchTripLookup(Speed.FromKilometersPerHour(8), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
+            var raptor = new Raptor(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), dataManager);
 
             const int count = 50000;
 
@@ -82,7 +82,7 @@ namespace TransitUnitTest
             {
                 var source = sourceList[i];
                 var target = targetList[i];
-                taskList.Add(Task.Factory.StartNew(() => raptor.Compute(source, time, target)));
+                taskList.Add(Task.Factory.StartNew(() => raptor.Compute(source, time, target, Speed.FromKilometersPerHour(8))));
             }
 
             Task.WaitAll(taskList.ToArray());

@@ -8,28 +8,26 @@ using Utility.Units;
 
 namespace Transit.Timetable.Algorithm
 {
-    public class RaptorWithDataManagerBase : IRaptor
+    public class RaptorBase : IRaptor
     {
         protected const int NumRounds = 5;
-        protected readonly Speed _walkingSpeed;
         protected readonly TimeSpan _maxWalkingTime;
         protected readonly TimeSpan _maxWaitingTime;
         protected readonly DataManager _dataManager;
 
-        protected RaptorWithDataManagerBase(Speed walkingSpeed, TimeSpan maxWalkingTime, TimeSpan maxWaitingTime, DataManager dataManager)
+        protected RaptorBase(TimeSpan maxWalkingTime, TimeSpan maxWaitingTime, DataManager dataManager)
         {
-            _walkingSpeed = walkingSpeed;
             _maxWalkingTime = maxWalkingTime;
             _maxWaitingTime = maxWaitingTime;
             _dataManager = dataManager;
         }
 
-        public virtual List<Connection> Compute(Position2d sourcePos, WeekTimePoint startTime, Position2d targetPos)
+        public virtual List<Connection> Compute(Position2d sourcePos, WeekTimePoint startTime, Position2d targetPos, Speed walkingSpeed)
         {
             throw new NotImplementedException();
         }
 
-        public virtual List<Connection> ComputeReverse(Position2d sourcePos, WeekTimePoint latestArrivalTime, Position2d targetPos)
+        public virtual List<Connection> ComputeReverse(Position2d sourcePos, WeekTimePoint latestArrivalTime, Position2d targetPos, Speed walkingSpeed)
         {
             throw new NotImplementedException();
         }
@@ -87,13 +85,13 @@ namespace Transit.Timetable.Algorithm
             return connectionList;
         }
 
-        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection>) GetInitialMarkedStations(Position2d position, WeekTimePoint time)
+        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection>) GetInitialMarkedStations(Position2d position, WeekTimePoint time, Speed walkingSpeed)
         {
             var markedStations = new Dictionary<StationInfo, WeekTimePoint>();
             var connections = new List<Connection>();
             foreach (var stationInfo in _dataManager.AllStationInfos)
             {
-                var walkingTime = TimeSpan.FromSeconds(position.DistanceTo(stationInfo.Station.Position) / _walkingSpeed.MetersPerSecond);
+                var walkingTime = TimeSpan.FromSeconds(position.DistanceTo(stationInfo.Station.Position) / walkingSpeed.MetersPerSecond);
                 if (walkingTime > _maxWalkingTime)
                 {
                     continue;
@@ -107,13 +105,13 @@ namespace Transit.Timetable.Algorithm
             return (markedStations, connections);
         }
 
-        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection>) GetInitialMarkedStationsReverse(Position2d position, WeekTimePoint time)
+        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection>) GetInitialMarkedStationsReverse(Position2d position, WeekTimePoint time, Speed walkingSpeed)
         {
             var markedStations = new Dictionary<StationInfo, WeekTimePoint>();
             var connections = new List<Connection>();
             foreach (var stationInfo in _dataManager.AllStationInfos)
             {
-                var walkingTime = TimeSpan.FromSeconds(position.DistanceTo(stationInfo.Station.Position) / _walkingSpeed.MetersPerSecond);
+                var walkingTime = TimeSpan.FromSeconds(position.DistanceTo(stationInfo.Station.Position) / walkingSpeed.MetersPerSecond);
                 if (walkingTime > _maxWalkingTime)
                 {
                     continue;
