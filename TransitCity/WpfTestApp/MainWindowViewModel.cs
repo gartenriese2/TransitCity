@@ -458,7 +458,7 @@ namespace WpfTestApp
                 PanelObjects.Add(v);
             }
 
-            var activeConnections = _transitConnectionInfo.GetActiveConnections(wtp);
+            var activeConnections = _transitConnectionInfo.GetActiveConnectionsDictionary(wtp);
             ActiveConnectionsCount = activeConnections.Count();
 
             sw.Stop();

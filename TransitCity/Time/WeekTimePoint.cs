@@ -94,6 +94,8 @@ namespace Time
             return TimeSpan.FromDays(7) - (wtp1 - wtp2);
         }
 
+        public static WeekTimePoint CreateLastPossibleWeekTimePoint() => new WeekTimePoint(TimeSpan.FromTicks(TimeSpan.FromDays(7).Ticks - 1));
+
         public override int GetHashCode()
         {
             return TimePoint.GetHashCode();

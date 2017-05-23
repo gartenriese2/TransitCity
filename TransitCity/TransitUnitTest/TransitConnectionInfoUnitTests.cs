@@ -34,7 +34,13 @@ namespace TransitUnitTest
             sw.Stop();
             Console.WriteLine($"GetActiveConnectionsThreaded took {sw.ElapsedMilliseconds}ms");
 
+            sw.Restart();
+            var connections3 = info.GetActiveConnectionsDictionary(wtp).ToList();
+            sw.Stop();
+            Console.WriteLine($"GetActiveConnectionsDictionary took {sw.ElapsedMilliseconds}ms");
+
             Assert.AreEqual(connections.Count, connections2.Count);
+            Assert.AreEqual(connections.Count, connections3.Count);
         }
 
         private TransitConnectionInfo CreateTransitConnectionInfo()
@@ -260,7 +266,7 @@ namespace TransitUnitTest
                 0, 0,
                 10000, 0,
                 10000, 10000,
-                0, 100000
+                0, 10000
             ), 20000, 20000);
 
             return new City("SmallCity", new List<IDistrict> { district });

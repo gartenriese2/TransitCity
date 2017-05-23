@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CitySimulation;
 using Time;
 using Transit.Timetable;
+using Utility.Extensions;
 
 namespace Transit.Data
 {
@@ -13,6 +14,7 @@ namespace Transit.Data
     public class TransitConnectionInfo
     {
         private readonly Dictionary<Resident, List<ConnectionList>> _connectionsDictionary;
+        private readonly Dictionary<WeekTimeSpan, List<Connection>> _hourlyConnectionsDictionary = new Dictionary<WeekTimeSpan, ConnectionList>(24 * 7);
 
         public TransitConnectionInfo(Dictionary<Resident, List<ConnectionList>> connectionsDictionary)
         {
@@ -60,9 +62,32 @@ namespace Transit.Data
             return taskList.Select(t => t.Result).SelectMany(r => r);
         }
 
+        public IEnumerable<Connection> GetActiveConnectionsDictionary(WeekTimePoint wtp)
+        {
+            return _hourlyConnectionsDictionary.First(pair => pair.Key.IsInside(wtp)).Value.Where(c => new WeekTimeSpan(c.SourceTime, c.TargetTime).IsInside(wtp));
+        }
+
         private void Initialize()
         {
-            var connectionsLists = _connectionsDictionary.SelectMany(p => p.Value);
+            for (var i = 0; i < 24 * 7; ++i)
+            {
+                var begin = new WeekTimePoint(TimeSpan.FromHours(i));
+                var end = new WeekTimePoint(TimeSpan.FromHours((i + 1) % 168));
+                _hourlyConnectionsDictionary.Add(new WeekTimeSpan(begin, end), new ConnectionList());
+            }
+
+            var connections = _connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl);
+            foreach (var connection in connections)
+            {
+                var cwts = new WeekTimeSpan(connection.SourceTime, connection.TargetTime);
+                foreach (var (wts, list) in _hourlyConnectionsDictionary)
+                {
+                    if (wts.Overlaps(cwts))
+                    {
+                        list.Add(connection);
+                    }
+                }
+            }
         }
     }
 }
