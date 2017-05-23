@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using CitySimulation;
+using Geometry;
 using Geometry.Shapes;
 using Time;
 using Transit.Data;
@@ -37,7 +38,8 @@ namespace WpfTestApp
 
         public MainWindowViewModel()
         {
-            var city = CreateCity();
+            //var city = CreateCity();
+            var city = CreateSmallCity();
             var rnd = new Random();
             var workerScheduleTuples = city.Residents.Where(r => r.HasJob).Select(r => (r, JobSchedule.CreateRandom(rnd))).ToList();
             _dataManager = new TestTransitData().DataManager;
@@ -435,6 +437,18 @@ namespace WpfTestApp
             return new City("London", new List<IDistrict> { balham, buckhurst, epping, morden, neasden, clapham, stockwell, debden, amersham, chesham, stanmore, tooting, hampstead, watfrord, chigwell });
         }
 
+        private static City CreateSmallCity()
+        {
+            var district = new RandomDistrict("City", new Polygon(
+                0, 0,
+                10000, 0,
+                10000, 10000,
+                0, 10000
+            ), 2000, 2000);
+
+            return new City("SmallCity", new List<IDistrict> { district });
+        }
+
         private void OnTimerTick2(object sender, EventArgs args)
         {
             var sw = new Stopwatch();
@@ -446,7 +460,7 @@ namespace WpfTestApp
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(wtp).ToList();
             for (var i = PanelObjects.Count - 1; i >= 0; --i)
             {
-                if (PanelObjects[i] is Vehicle)
+                if (PanelObjects[i] is Vehicle || PanelObjects[i] is ResidentObject)
                 {
                     PanelObjects.RemoveAt(i);
                 }
@@ -458,8 +472,21 @@ namespace WpfTestApp
                 PanelObjects.Add(v);
             }
 
-            var activeConnections = _transitConnectionInfo.GetActiveConnectionsDictionary(wtp);
-            ActiveConnectionsCount = activeConnections.Count();
+            var activeConnections = _transitConnectionInfo.GetActiveConnectionsDictionary(wtp).ToList();
+            ActiveConnectionsCount = activeConnections.Count;
+            var walkingConnections = activeConnections.Where(c => c.Type == Connection.TypeEnum.WalkToStation || c.Type == Connection.TypeEnum.WalkFromStation);
+            foreach (var wc in walkingConnections)
+            {
+                var vec = wc.Type == Connection.TypeEnum.WalkToStation
+                    ? wc.TargetStation.EntryPosition - wc.SourcePos
+                    : wc.TargetPos - wc.SourceStation.ExitPosition;
+                var from = wc.Type == Connection.TypeEnum.WalkToStation ? wc.SourcePos : wc.SourceStation.ExitPosition;
+                var to = wc.Type == Connection.TypeEnum.WalkToStation ? wc.TargetStation.EntryPosition : wc.TargetPos;
+                var t = (wtp - wc.SourceTime).TotalMilliseconds / (wc.TargetTime - wc.SourceTime).TotalMilliseconds;
+                var pos = Position2d.Lerp(t, from, to);
+                var v = new ResidentObject(pos, vec);
+                PanelObjects.Add(v);
+            }
 
             sw.Stop();
             SimulationTime = sw.ElapsedMilliseconds;

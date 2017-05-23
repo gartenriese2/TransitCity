@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converter\ElementToXConverter.cs" />
+    <Compile Include="Objects\Resident.cs" />
     <Compile Include="Objects\Route.cs" />
     <Compile Include="Objects\Station.cs" />
     <Compile Include="Objects\Vehicle.cs" />

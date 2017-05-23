@@ -64,6 +64,7 @@
                 <TextBlock Grid.Row="0" Grid.Column="0"
                             Text="Zoom"/>
                 <Slider Grid.Row="0" Grid.Column="1"
+                        Focusable="False"
                         x:Name="ZoomSlider"
                         Minimum="{Binding MinZoom, Mode=OneTime}"
                         Maximum="{Binding MaxZoom, Mode=OneTime}"
@@ -75,6 +76,7 @@
                 <TextBlock Grid.Row="1" Grid.Column="0"
                            Text="CenterX"/>
                 <Slider Grid.Row="1" Grid.Column="1"
+                        Focusable="False"
                         Minimum="0.0"
                         Maximum="1.0"
                         Value="{Binding CenterX, Mode=TwoWay}"/>
@@ -85,6 +87,7 @@
                 <TextBlock Grid.Row="2" Grid.Column="0"
                            Text="CenterY"/>
                 <Slider Grid.Row="2" Grid.Column="1"
+                        Focusable="False"
                         Minimum="0.0"
                         Maximum="1.0"
                         Value="{Binding CenterY}"/>
