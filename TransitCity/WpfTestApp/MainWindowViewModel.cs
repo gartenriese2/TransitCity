@@ -24,6 +24,8 @@ namespace WpfTestApp
 {
     public class MainWindowViewModel : PropertyChangedBase
     {
+        #region Fields
+
         private readonly DataManager _dataManager;
         private readonly TransitConnectionInfo _transitConnectionInfo;
         private TimeSpan _time = TimeSpan.Zero;
@@ -35,30 +37,38 @@ namespace WpfTestApp
         private double _centerY;
         private double _zoom;
         private int _activeConnectionsCount;
+        private double _percentageLoaded;
+        private Visibility _percentageLoadedVisibility = Visibility.Hidden;
+
+        #endregion
 
         public MainWindowViewModel()
         {
-            //var city = CreateCity();
-            var city = CreateSmallCity();
-            var rnd = new Random();
-            var workerScheduleTuples = city.Residents.Where(r => r.HasJob).Select(r => (r, JobSchedule.CreateRandom(rnd))).ToList();
             _dataManager = new TestTransitData().DataManager;
-            var raptor = new Raptor(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), _dataManager);
-            var workerConnectionsDictionary = new Dictionary<Resident, List<List<Connection>>>();
-            foreach (var (worker, schedule) in workerScheduleTuples)
-            {
-                var workerTaskList = new List<Task<List<Connection>>>();
-                foreach (var scheduleWts in schedule.WeekTimeSpans)
-                {
-                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.ComputeReverse(worker.Position, scheduleWts.Begin, worker.Job.Position, Speed.FromKilometersPerHour(8))));
-                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.Compute(worker.Job.Position, scheduleWts.End, worker.Position, Speed.FromKilometersPerHour(8))));
-                }
+            _transitConnectionInfo = new TransitConnectionInfo(new Dictionary<Resident, List<List<Connection>>>());
+            Initialize();
 
-                Task.WaitAll(workerTaskList.ToArray());
-                workerConnectionsDictionary.Add(worker, workerTaskList.Select(t => t.Result).ToList());
-            }
+            ////var city = CreateCity();
+            //var city = CreateSmallCity();
+            //var rnd = new Random();
+            //var workerScheduleTuples = city.Residents.Where(r => r.HasJob).Select(r => (r, JobSchedule.CreateRandom(rnd))).ToList();
 
-            _transitConnectionInfo = new TransitConnectionInfo(workerConnectionsDictionary);
+            //var raptor = new Raptor(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), _dataManager);
+            //var workerConnectionsDictionary = new Dictionary<Resident, List<List<Connection>>>();
+            //foreach (var (worker, schedule) in workerScheduleTuples)
+            //{
+            //    var workerTaskList = new List<Task<List<Connection>>>();
+            //    foreach (var scheduleWts in schedule.WeekTimeSpans)
+            //    {
+            //        workerTaskList.Add(Task.Factory.StartNew(() => raptor.ComputeReverse(worker.Position, scheduleWts.Begin, worker.Job.Position, Speed.FromKilometersPerHour(8))));
+            //        workerTaskList.Add(Task.Factory.StartNew(() => raptor.Compute(worker.Job.Position, scheduleWts.End, worker.Position, Speed.FromKilometersPerHour(8))));
+            //    }
+
+            //    Task.WaitAll(workerTaskList.ToArray());
+            //    workerConnectionsDictionary.Add(worker, workerTaskList.Select(t => t.Result).ToList());
+            //}
+
+            //_transitConnectionInfo = new TransitConnectionInfo(workerConnectionsDictionary);
 
             PlusCommand = new RelayCommand(o => _timeDelta *= 2.0, o => _timeDelta < 20.0);
             MinusCommand = new RelayCommand(o => _timeDelta /= 2.0, o => _timeDelta > 0.001);
@@ -111,6 +121,8 @@ namespace WpfTestApp
             tmr.Tick += OnTimerTick2;
             tmr.Start();
         }
+
+        #region Properties
 
         public ObservableNotifiableCollection<PanelObject> PanelObjects { get; } = new ObservableNotifiableCollection<PanelObject>();
 
@@ -211,11 +223,39 @@ namespace WpfTestApp
             }
         }
 
+        public double PercentageLoaded
+        {
+            get => _percentageLoaded;
+            set
+            {
+                if (Math.Abs(value - _percentageLoaded) > double.Epsilon)
+                {
+                    _percentageLoaded = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public Visibility PercentageLoadedVisibility
+        {
+            get => _percentageLoadedVisibility;
+            set
+            {
+                if (value != _percentageLoadedVisibility)
+                {
+                    _percentageLoadedVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public double MinZoom { get; } = 0.1;
 
         public double MaxZoom { get; } = 50.0;
 
         public Size WorldSize { get; } = new Size(10000, 10000);
+
+        #endregion
 
         public void OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -472,9 +512,10 @@ namespace WpfTestApp
                 PanelObjects.Add(v);
             }
 
-            var activeConnections = _transitConnectionInfo.GetActiveConnectionsDictionary(wtp).ToList();
+            var activeConnections = _transitConnectionInfo.GetActiveConnections(wtp).ToList();
             ActiveConnectionsCount = activeConnections.Count;
             var walkingConnections = activeConnections.Where(c => c.Type == Connection.TypeEnum.WalkToStation || c.Type == Connection.TypeEnum.WalkFromStation);
+            var residents = new List<ResidentObject>();
             foreach (var wc in walkingConnections)
             {
                 var vec = wc.Type == Connection.TypeEnum.WalkToStation
@@ -484,12 +525,47 @@ namespace WpfTestApp
                 var to = wc.Type == Connection.TypeEnum.WalkToStation ? wc.TargetStation.EntryPosition : wc.TargetPos;
                 var t = (wtp - wc.SourceTime).TotalMilliseconds / (wc.TargetTime - wc.SourceTime).TotalMilliseconds;
                 var pos = Position2d.Lerp(t, from, to);
-                var v = new ResidentObject(pos, vec);
-                PanelObjects.Add(v);
+                var r = new ResidentObject(pos, vec);
+                residents.Add(r);
             }
+
+            residents.ForEach(r => PanelObjects.Add(r));
 
             sw.Stop();
             SimulationTime = sw.ElapsedMilliseconds;
+        }
+
+        private async void Initialize()
+        {
+            PercentageLoadedVisibility = Visibility.Visible;
+
+            var city = CreateCity();
+            var rnd = new Random();
+            var workerScheduleTuples = city.Residents.Where(r => r.HasJob).Select(r => (r, JobSchedule.CreateRandom(rnd))).ToList();
+            var raptor = new Raptor(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), _dataManager);
+            var count = 0;
+            foreach (var (worker, schedule) in workerScheduleTuples)
+            {
+                var workerTaskList = new List<Task<List<Connection>>>();
+                foreach (var scheduleWts in schedule.WeekTimeSpans)
+                {
+                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.ComputeReverse(worker.Position, scheduleWts.Begin, worker.Job.Position, Speed.FromKilometersPerHour(8))));
+                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.Compute(worker.Job.Position, scheduleWts.End, worker.Position, Speed.FromKilometersPerHour(8))));
+                }
+
+                await Task.WhenAll(workerTaskList.ToArray());
+                var connections = workerTaskList.Select(t => t.Result).ToList();
+                var dic = new Dictionary<Resident, List<List<Connection>>>
+                {
+                    [worker] = connections
+                };
+                _transitConnectionInfo.AddConnections(dic);
+
+                ++count;
+                PercentageLoaded = 100.0 * count / workerScheduleTuples.Count;
+            }
+
+            PercentageLoadedVisibility = Visibility.Collapsed;
         }
     }
 }

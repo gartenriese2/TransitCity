@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using CitySimulation;
 using Time;
 using Transit.Timetable;
@@ -22,6 +21,16 @@ namespace Transit.Data
             Initialize();
         }
 
+        public void AddConnections(Dictionary<Resident, List<ConnectionList>> connectionsDictionary)
+        {
+            foreach (var (key, value) in connectionsDictionary)
+            {
+                _connectionsDictionary.Add(key, value);
+            }
+            
+            AddToHourlyConnectionsDictionary(connectionsDictionary);
+        }
+
         public float GetPercentagOfConnectionsWithTransit()
         {
             var connectionsLists = _connectionsDictionary.SelectMany(p => p.Value).ToList();
@@ -40,30 +49,6 @@ namespace Transit.Data
 
         public IEnumerable<Connection> GetActiveConnections(WeekTimePoint wtp)
         {
-            return _connectionsDictionary.Values.SelectMany(cll => cll)
-                                                .SelectMany(cl => cl)
-                                                .Where(c => new WeekTimeSpan(c.SourceTime, c.TargetTime).IsInside(wtp));
-        }
-
-        public IEnumerable<Connection> GetActiveConnectionsThreaded(WeekTimePoint wtp)
-        {
-            var numThreads = Environment.ProcessorCount;
-            if (numThreads <= 1)
-            {
-                return GetActiveConnections(wtp);
-            }
-
-            var taskList = new List<Task<List<Connection>>>(numThreads);
-            var connections = _connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl);
-            var i = 0;
-            var groups = connections.GroupBy(x => i++ % numThreads).ToList();
-            taskList.AddRange(groups.Select(g => Task.Factory.StartNew(() => g.Where(c => new WeekTimeSpan(c.SourceTime, c.TargetTime).IsInside(wtp)).ToList())));
-            Task.WaitAll(taskList.ToArray());
-            return taskList.Select(t => t.Result).SelectMany(r => r);
-        }
-
-        public IEnumerable<Connection> GetActiveConnectionsDictionary(WeekTimePoint wtp)
-        {
             return _hourlyConnectionsDictionary.First(pair => pair.Key.IsInside(wtp)).Value.Where(c => new WeekTimeSpan(c.SourceTime, c.TargetTime).IsInside(wtp));
         }
 
@@ -76,7 +61,12 @@ namespace Transit.Data
                 _hourlyConnectionsDictionary.Add(new WeekTimeSpan(begin, end), new ConnectionList());
             }
 
-            var connections = _connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl);
+            AddToHourlyConnectionsDictionary(_connectionsDictionary);
+        }
+
+        private void AddToHourlyConnectionsDictionary(Dictionary<Resident, List<ConnectionList>> connectionsDictionary)
+        {
+            var connections = connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl);
             foreach (var connection in connections)
             {
                 var cwts = new WeekTimeSpan(connection.SourceTime, connection.TargetTime);

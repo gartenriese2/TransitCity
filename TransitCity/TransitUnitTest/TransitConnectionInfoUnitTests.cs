@@ -28,19 +28,6 @@ namespace TransitUnitTest
             var connections = info.GetActiveConnections(wtp).ToList();
             sw.Stop();
             Console.WriteLine($"GetActiveConnections took {sw.ElapsedMilliseconds}ms");
-
-            sw.Restart();
-            var connections2 = info.GetActiveConnectionsThreaded(wtp).ToList();
-            sw.Stop();
-            Console.WriteLine($"GetActiveConnectionsThreaded took {sw.ElapsedMilliseconds}ms");
-
-            sw.Restart();
-            var connections3 = info.GetActiveConnectionsDictionary(wtp).ToList();
-            sw.Stop();
-            Console.WriteLine($"GetActiveConnectionsDictionary took {sw.ElapsedMilliseconds}ms");
-
-            Assert.AreEqual(connections.Count, connections2.Count);
-            Assert.AreEqual(connections.Count, connections3.Count);
         }
 
         private TransitConnectionInfo CreateTransitConnectionInfo()
