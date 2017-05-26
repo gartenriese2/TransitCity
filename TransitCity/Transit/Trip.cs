@@ -11,6 +11,8 @@ namespace Transit
     public class Trip
     {
         private readonly List<(Station, (Arrival, Departure))> _stationTimes;
+        private readonly List<Departure> _departureTimes;
+        private readonly List<Arrival> _arrivalTimes;
         private readonly List<Station> _stations;
         private readonly Dictionary<Station, Arrival> _arrivals;
         private readonly Dictionary<Station, Departure> _departures;
@@ -18,6 +20,8 @@ namespace Transit
         public Trip(List<(Station, (Arrival, Departure))> stationTimes)
         {
             _stationTimes = stationTimes ?? throw new ArgumentNullException(nameof(stationTimes));
+            _departureTimes = _stationTimes.Select(tuple => tuple.Item2.Item2).ToList();
+            _arrivalTimes = _stationTimes.Select(tuple => tuple.Item2.Item1).ToList();
             _stations = new List<Station>(_stationTimes.Select(x => x.Item1));
             _arrivals = stationTimes.ToDictionary(t => t.Item1, t => t.Item2.Item1);
             _departures = stationTimes.ToDictionary(t => t.Item1, t => t.Item2.Item2);
@@ -55,7 +59,7 @@ namespace Transit
                 throw new ArgumentException();
             }
 
-            return _stationTimes.Skip(idx + 1).Select(vt => vt.Item2.Item1);
+            return _arrivalTimes.Skip(idx + 1);
         }
 
         public IEnumerable<Departure> GetLastDepartures(Station station)
@@ -66,7 +70,7 @@ namespace Transit
                 throw new ArgumentException();
             }
 
-            return _stationTimes.Take(idx).Reverse().Select(vt => vt.Item2.Item2);
+            return _departureTimes.Take(idx).Reverse();
         }
 
         public IEnumerable<Departure> GetNextDepartures(Station station)
@@ -77,7 +81,7 @@ namespace Transit
                 throw new ArgumentException();
             }
 
-            return _stationTimes.Skip(idx + 1).Select(vt => vt.Item2.Item2);
+            return _departureTimes.Skip(idx + 1);
         }
     }
 }
