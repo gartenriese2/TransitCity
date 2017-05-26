@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Geometry;
 using Time;
 
 namespace Transit
@@ -12,17 +11,19 @@ namespace Transit
     public class Trip
     {
         private readonly List<(Station, (Arrival, Departure))> _stationTimes;
+        private readonly List<Station> _stations;
         private readonly Dictionary<Station, Arrival> _arrivals;
         private readonly Dictionary<Station, Departure> _departures;
 
         public Trip(List<(Station, (Arrival, Departure))> stationTimes)
         {
             _stationTimes = stationTimes ?? throw new ArgumentNullException(nameof(stationTimes));
+            _stations = new List<Station>(_stationTimes.Select(x => x.Item1));
             _arrivals = stationTimes.ToDictionary(t => t.Item1, t => t.Item2.Item1);
             _departures = stationTimes.ToDictionary(t => t.Item1, t => t.Item2.Item2);
         }
 
-        public IEnumerable<Station> Stations => _stationTimes.Select(x => x.Item1);
+        public IEnumerable<Station> Stations => _stations;
 
         public Station GetNextStation(Station from)
         {

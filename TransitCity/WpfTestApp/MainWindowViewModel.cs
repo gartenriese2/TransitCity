@@ -484,7 +484,7 @@ namespace WpfTestApp
                 10000, 0,
                 10000, 10000,
                 0, 10000
-            ), 2000, 2000);
+            ), 10000, 10000);
 
             return new City("SmallCity", new List<IDistrict> { district });
         }
@@ -518,11 +518,10 @@ namespace WpfTestApp
             var residents = new List<ResidentObject>();
             foreach (var wc in walkingConnections)
             {
-                var vec = wc.Type == Connection.TypeEnum.WalkToStation
-                    ? wc.TargetStation.EntryPosition - wc.SourcePos
-                    : wc.TargetPos - wc.SourceStation.ExitPosition;
-                var from = wc.Type == Connection.TypeEnum.WalkToStation ? wc.SourcePos : wc.SourceStation.ExitPosition;
-                var to = wc.Type == Connection.TypeEnum.WalkToStation ? wc.TargetStation.EntryPosition : wc.TargetPos;
+                var toStation = wc.Type == Connection.TypeEnum.WalkToStation;
+                var vec = toStation ? wc.TargetStation.EntryPosition - wc.SourcePos : wc.TargetPos - wc.SourceStation.ExitPosition;
+                var from = toStation ? wc.SourcePos : wc.SourceStation.ExitPosition;
+                var to = toStation ? wc.TargetStation.EntryPosition : wc.TargetPos;
                 var t = (wtp - wc.SourceTime).TotalMilliseconds / (wc.TargetTime - wc.SourceTime).TotalMilliseconds;
                 var pos = Position2d.Lerp(t, from, to);
                 var r = new ResidentObject(pos, vec);
@@ -539,18 +538,19 @@ namespace WpfTestApp
         {
             PercentageLoadedVisibility = Visibility.Visible;
 
-            var city = CreateCity();
+            var city = CreateSmallCity();
             var rnd = new Random();
             var workerScheduleTuples = city.Residents.Where(r => r.HasJob).Select(r => (r, JobSchedule.CreateRandom(rnd))).ToList();
             var raptor = new Raptor(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), _dataManager);
             var count = 0;
             foreach (var (worker, schedule) in workerScheduleTuples)
             {
+                var walkingSpeed = Speed.FromKilometersPerHour(5 + rnd.NextDouble() * 5);
                 var workerTaskList = new List<Task<List<Connection>>>();
                 foreach (var scheduleWts in schedule.WeekTimeSpans)
                 {
-                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.ComputeReverse(worker.Position, scheduleWts.Begin, worker.Job.Position, Speed.FromKilometersPerHour(8))));
-                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.Compute(worker.Job.Position, scheduleWts.End, worker.Position, Speed.FromKilometersPerHour(8))));
+                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.ComputeReverse(worker.Position, scheduleWts.Begin, worker.Job.Position, walkingSpeed)));
+                    workerTaskList.Add(Task.Factory.StartNew(() => raptor.Compute(worker.Job.Position, scheduleWts.End, worker.Position, walkingSpeed)));
                 }
 
                 await Task.WhenAll(workerTaskList.ToArray());

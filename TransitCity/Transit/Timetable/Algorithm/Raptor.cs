@@ -154,7 +154,7 @@ namespace Transit.Timetable.Algorithm
                 }
 
                 var exitWalkingTime = TimeSpan.FromSeconds(nextStation.ExitPosition.DistanceTo(targetPos) / walkingSpeed.MetersPerSecond);
-                if (exitWalkingTime < TimeSpan.FromMinutes(10))
+                if (exitWalkingTime < _maxWalkingTime)
                 {
                     var arrivalAtTargetPos = nextTime + exitWalkingTime;
                     if (arrivalAtTargetPos < earliestKnownTargetArrivalTime)
@@ -165,7 +165,7 @@ namespace Transit.Timetable.Algorithm
                     }
                 }
 
-                if (earliestKnownConnections.Any(c => c.TargetStation == nextStation && c.TargetTime <= nextTime))
+                if (earliestKnownConnections.Exists(c => c.TargetStation == nextStation && c.TargetTime <= nextTime))
                 {
                     continue;
                 }
@@ -176,7 +176,7 @@ namespace Transit.Timetable.Algorithm
                     earliestKnownConnections.Add(connection);
                     newlyMarkedStations.Add(nextStationInfo, nextTime);
                 }
-                else if (earliestKnownConnections.Any(c => c.TargetStation == nextStation && c.TargetTime > nextTime))
+                else if (earliestKnownConnections.Exists(c => c.TargetStation == nextStation && c.TargetTime > nextTime))
                 {
                     var connection = Connection.CreateRide(stationInfo.Station, currentDeparture, nextStation, nextTime, lineInfo.Line);
                     var idx = earliestKnownConnections.FindIndex(c => c.TargetStation == nextStation && c.TargetTime > nextTime);
@@ -204,7 +204,7 @@ namespace Transit.Timetable.Algorithm
                         earliestKnownConnections.Add(connection);
                         newlyMarkedStations.Add(otherStationInfo, arrivalTime);
                     }
-                    else if (earliestKnownConnections.Any(c => c.TargetStation == otherStation && c.TargetTime > arrivalTime))
+                    else if (earliestKnownConnections.Exists(c => c.TargetStation == otherStation && c.TargetTime > arrivalTime))
                     {
                         var idx = earliestKnownConnections.FindIndex(c => c.TargetStation == otherStation && c.TargetTime > arrivalTime);
                         earliestKnownConnections[idx] = connection;
@@ -238,7 +238,7 @@ namespace Transit.Timetable.Algorithm
                 }
 
                 var entryWalkingTime = TimeSpan.FromSeconds(lastStation.EntryPosition.DistanceTo(sourcePos) / walkingSpeed.MetersPerSecond);
-                if (entryWalkingTime < TimeSpan.FromMinutes(10))
+                if (entryWalkingTime < _maxWalkingTime)
                 {
                     var departureAtSorucePos = lastTime - entryWalkingTime;
                     if (departureAtSorucePos > latestKnownSourceDepartureTime)
@@ -249,7 +249,7 @@ namespace Transit.Timetable.Algorithm
                     }
                 }
 
-                if (latestKnownConnections.Any(c => c.SourceStation == lastStation && c.SourceTime >= lastTime))
+                if (latestKnownConnections.Exists(c => c.SourceStation == lastStation && c.SourceTime >= lastTime))
                 {
                     continue;
                 }
@@ -260,7 +260,7 @@ namespace Transit.Timetable.Algorithm
                     latestKnownConnections.Add(connection);
                     newlyMarkedStations.Add(lastStationInfo, lastTime);
                 }
-                else if (latestKnownConnections.Any(c => c.SourceStation == lastStation && c.SourceTime < lastTime))
+                else if (latestKnownConnections.Exists(c => c.SourceStation == lastStation && c.SourceTime < lastTime))
                 {
                     var connection = Connection.CreateRide(lastStation, lastTime, stationInfo.Station, currentArrival, lineInfo.Line);
                     var idx = latestKnownConnections.FindIndex(c => c.SourceStation == lastStation && c.SourceTime < lastTime);
@@ -288,7 +288,7 @@ namespace Transit.Timetable.Algorithm
                         latestKnownConnections.Add(connection);
                         newlyMarkedStations.Add(otherStationInfo, departureTime);
                     }
-                    else if (latestKnownConnections.Any(c => c.SourceStation == otherStation && c.SourceTime < departureTime))
+                    else if (latestKnownConnections.Exists(c => c.SourceStation == otherStation && c.SourceTime < departureTime))
                     {
                         var idx = latestKnownConnections.FindIndex(c => c.SourceStation == otherStation && c.SourceTime < departureTime);
                         latestKnownConnections[idx] = connection;
