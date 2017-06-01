@@ -1,0 +1,70 @@
+﻿<UserControl x:Class="WpfDrawing.Timetable.NextStationsInfoControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:timetable="clr-namespace:WpfDrawing.Timetable"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="354"
+             d:DataContext="{d:DesignInstance timetable:NextStationsInfoViewModel}">
+    <d:DesignerProperties.DesignStyle>
+        <Style TargetType="UserControl">
+            <Style.Setters>
+                <Setter Property="Background" Value="White"/>
+            </Style.Setters>
+        </Style>
+    </d:DesignerProperties.DesignStyle>
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Grid.Row="0" Grid.Column="0"
+                       Text="{Binding CurrentStationName, Mode=OneTime}"/>
+            <Border Grid.Row="0" Grid.Column="1"
+                    Background="Black"
+                    CornerRadius="8"
+                    Width="16" Height="16">
+                <TextBlock Text="0"
+                           Foreground="White"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"/>
+            </Border>
+            
+            <ItemsControl Grid.Row="1" Grid.Column="0"
+                          Margin="0,2,0,0"
+                          ItemsSource="{Binding Names}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Margin="0,2"
+                                   Text="{Binding ., Mode=OneTime}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <ItemsControl Grid.Row="1" Grid.Column="1"
+                          Margin="0,2,0,0"
+                          ItemsSource="{Binding Minutes}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,2"
+                                Background="Black"
+                                CornerRadius="8"
+                                Width="16" Height="16">
+                            <TextBlock Text="{Binding }"
+                                       Foreground="White"
+                                       FontWeight="Bold"
+                                       HorizontalAlignment="Center"/>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

@@ -7,7 +7,7 @@ namespace Transit
     {
         private readonly List<Route> _routes = new List<Route>();
 
-        public Line(string name, params Route[] routes)
+        public Line(string name, TransitType type, params Route[] routes)
         {
             if (routes.Length == 0)
             {
@@ -16,11 +16,14 @@ namespace Transit
 
             _routes.AddRange(routes);
             Name = name;
+            Type = type;
         }
 
         public IEnumerable<Route> Routes => _routes;
 
         public string Name { get; }
+
+        public TransitType Type { get; }
 
         public override string ToString()
         {

@@ -55,13 +55,13 @@ namespace Transit.Data
                 var inwardArrivalCollection = i > 0 ? inwardArrivals[i - 1] : new WeekTimeCollection();
                 var outwardDepartureCollection = i < numStations - 1 ? outwardDepartures[i] : new WeekTimeCollection();
                 var inwardDepartureCollection = i < numStations - 1 ? inwardDepartures[i] : new WeekTimeCollection();
-                var outwardStationInfo = new StationInfo(outwardStation, outwardArrivalCollection, outwardDepartureCollection, outwardTripList);
-                var inwardStationInfo = new StationInfo(inwardStation, inwardArrivalCollection, inwardDepartureCollection, inwardTripList);
+                var outwardStationInfo = new StationInfo(outwardStation, GetTransferStation(outwardStation), outwardArrivalCollection, outwardDepartureCollection, outwardTripList);
+                var inwardStationInfo = new StationInfo(inwardStation, GetTransferStation(inwardStation), inwardArrivalCollection, inwardDepartureCollection, inwardTripList);
                 outwardStationInfos.Add(outwardStationInfo);
                 inwardStationInfos.Add(inwardStationInfo);
             }
 
-            var line = new Line(name, outwardRun, inwardRun);
+            var line = new Line(name, TransitType.Subway, outwardRun, inwardRun);
             var routeInfoOutward = new RouteInfo(outwardRun, outwardPath, outwardStationInfos, outwardTripList);
             var routeInfoInward = new RouteInfo(inwardRun, inwardPath, inwardStationInfos, inwardTripList);
 

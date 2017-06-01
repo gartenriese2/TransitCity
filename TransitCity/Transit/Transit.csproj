@@ -71,6 +71,7 @@
     <Compile Include="Station.cs" />
     <Compile Include="Timetable\Entry.cs" />
     <Compile Include="TransitNetwork.cs" />
+    <Compile Include="TransitType.cs" />
     <Compile Include="Trip.cs" />
   </ItemGroup>
   <ItemGroup>

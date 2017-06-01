@@ -113,7 +113,7 @@ namespace TransitUnitTest
                 [new Position2d(8000, 9000)] = "Swiss Cottage",
             }, tsd);
 
-            return new Line("1", rA, rB);
+            return new Line("1", TransitType.Subway, rA, rB);
         }
 
         private Line CreateLine2(IDictionary<string, TransferStation> tsd)
@@ -133,7 +133,7 @@ namespace TransitUnitTest
                 [new Position2d(9000, 1500)] = "Oval",
             }, tsd);
 
-            return new Line("2", rA, rB);
+            return new Line("2", TransitType.Subway, rA, rB);
         }
 
         private static Line CreateLine3(IDictionary<string, TransferStation> tsd)
@@ -150,7 +150,7 @@ namespace TransitUnitTest
                 [new Position2d(9900, 6300)] = "Croxley"
             }, tsd);
 
-            return new Line("3", rA, rB);
+            return new Line("3", TransitType.Subway, rA, rB);
         }
 
         private static Line CreateLine4(IDictionary<string, TransferStation> tsd)
@@ -169,7 +169,7 @@ namespace TransitUnitTest
                 [new Position2d(9600, 3600)] = "Chigwell"
             }, tsd);
 
-            return new Line("4", rA, rB);
+            return new Line("4", TransitType.Subway, rA, rB);
         }
 
         private static Tuple<Route, Route> CreateRoutes(IDictionary<Position2d, string> dic, IDictionary<string, TransferStation> tsd)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Time;
+using Transit.Data;
 
 namespace Transit
 {
@@ -23,6 +24,7 @@ namespace Transit
             _departureTimes = _stationTimes.Select(tuple => tuple.Item2.Item2).ToList();
             _arrivalTimes = _stationTimes.Select(tuple => tuple.Item2.Item1).ToList();
             _stations = new List<Station>(_stationTimes.Select(x => x.Item1));
+
             _arrivals = stationTimes.ToDictionary(t => t.Item1, t => t.Item2.Item1);
             _departures = stationTimes.ToDictionary(t => t.Item1, t => t.Item2.Item2);
         }

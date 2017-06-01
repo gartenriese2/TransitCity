@@ -13,9 +13,10 @@ namespace Transit.Data
         private readonly List<Trip> _tripsSortedByArrival;
         private readonly List<Trip> _tripsSortedByDeparture;
 
-        public StationInfo(Station station, WeekTimeCollection arrivals, WeekTimeCollection departures, List<Trip> trips)
+        public StationInfo(Station station, TransferStation transferStation, WeekTimeCollection arrivals, WeekTimeCollection departures, List<Trip> trips)
         {
             Station = station ?? throw new ArgumentNullException(nameof(station));
+            TransferStation = transferStation ?? throw new ArgumentNullException(nameof(transferStation));
 
             _arrivalsArray = arrivals.SortedWeekTimePoints.ToArray();
             _departuresArray = departures.SortedWeekTimePoints.ToArray();
@@ -48,6 +49,10 @@ namespace Transit.Data
         }
 
         public Station Station { get; }
+
+        public TransferStation TransferStation { get; }
+
+        public IEnumerable<Trip> Trips => _trips;
 
         public (WeekTimePoint, Trip) GetNextDepartureAndTripArrayBinarySearch(WeekTimePoint time)
         {

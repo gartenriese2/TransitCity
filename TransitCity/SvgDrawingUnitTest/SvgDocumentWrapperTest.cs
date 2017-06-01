@@ -202,7 +202,7 @@ namespace SvgDrawingUnitTest
                 [new Position2d(8000, 9000)] = "Swiss Cottage",
             }, 240f, tsd);
 
-            return new Tuple<Line, Tuple<List<Position2d>, List<Position2d>>>(new Line("1", t1.Item1, t2.Item1), new Tuple<List<Position2d>, List<Position2d>>(t1.Item2, t2.Item2));
+            return new Tuple<Line, Tuple<List<Position2d>, List<Position2d>>>(new Line("1", TransitType.Subway, t1.Item1, t2.Item1), new Tuple<List<Position2d>, List<Position2d>>(t1.Item2, t2.Item2));
         }
 
         private Tuple<Line, Tuple<List<Position2d>, List<Position2d>>> CreateLine2(Dictionary<string, TransferStation> tsd)
@@ -222,7 +222,7 @@ namespace SvgDrawingUnitTest
                 [new Position2d(9000, 1500)] = "Oval",
             }, 240f, tsd);
 
-            return new Tuple<Line, Tuple<List<Position2d>, List<Position2d>>>(new Line("2", t1.Item1, t2.Item1), new Tuple<List<Position2d>, List<Position2d>>(t1.Item2, t2.Item2));
+            return new Tuple<Line, Tuple<List<Position2d>, List<Position2d>>>(new Line("2", TransitType.Subway, t1.Item1, t2.Item1), new Tuple<List<Position2d>, List<Position2d>>(t1.Item2, t2.Item2));
         }
 
         private Tuple<Line, Tuple<List<Position2d>, List<Position2d>>> CreateLine3(Dictionary<string, TransferStation> tsd)
@@ -240,7 +240,7 @@ namespace SvgDrawingUnitTest
             }, 120f, tsd);
 
 
-            return new Tuple<Line, Tuple<List<Position2d>, List<Position2d>>>(new Line("3", t1.Item1, t2.Item1), new Tuple<List<Position2d>, List<Position2d>>(t1.Item2, t2.Item2));
+            return new Tuple<Line, Tuple<List<Position2d>, List<Position2d>>>(new Line("3", TransitType.Subway, t1.Item1, t2.Item1), new Tuple<List<Position2d>, List<Position2d>>(t1.Item2, t2.Item2));
         }
 
         private Tuple<Line, Tuple<List<Position2d>, List<Position2d>>> CreateLine4(Dictionary<string, TransferStation> tsd)
@@ -260,7 +260,7 @@ namespace SvgDrawingUnitTest
             }, 180f, tsd);
 
 
-            return new Tuple<Line, Tuple<List<Position2d>, List<Position2d>>>(new Line("3", t1.Item1, t2.Item1), new Tuple<List<Position2d>, List<Position2d>>(t1.Item2, t2.Item2));
+            return new Tuple<Line, Tuple<List<Position2d>, List<Position2d>>>(new Line("3", TransitType.Subway, t1.Item1, t2.Item1), new Tuple<List<Position2d>, List<Position2d>>(t1.Item2, t2.Item2));
         }
 
         private Tuple<Tuple<Route, List<Position2d>>, Tuple<Route, List<Position2d>>> CreateRoutes(Dictionary<Position2d, string> dic, float frequency, Dictionary<string, TransferStation> tsd)
