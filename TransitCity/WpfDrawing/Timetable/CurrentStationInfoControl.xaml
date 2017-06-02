@@ -16,23 +16,42 @@
     </d:DesignerProperties.DesignStyle>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="1.5*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition Height="0.5*"/>
         </Grid.RowDefinitions>
         
         <TextBlock Grid.Row="1"
                    HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
                    Text="{Binding LineName, Mode=OneTime}"
                    FontSize="72"/>
-        <TextBlock Grid.Row="2"
+        <TextBlock Grid.Row="3"
+                   Margin="16,0,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   Text="Departures from"
+                   FontSize="24"/>
+        <TextBlock Grid.Row="4"
                    HorizontalAlignment="Center"
                    Text="{Binding CurrentStationName, Mode=OneTime}"
+                   FontWeight="Bold"
                    FontSize="36"/>
-        <TextBlock Grid.Row="3"
+        <TextBlock Grid.Row="5"
+                   Margin="16,0,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   Text="Direction"
+                   FontSize="24"/>
+        <TextBlock Grid.Row="6"
                    HorizontalAlignment="Center"
                    Text="{Binding LastStationName, Mode=OneTime}"
+                   FontWeight="Bold"
                    FontSize="36"/>
     </Grid>
 </UserControl>
