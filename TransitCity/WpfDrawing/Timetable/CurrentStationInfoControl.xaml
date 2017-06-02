@@ -6,7 +6,7 @@
              xmlns:timetable="clr-namespace:WpfDrawing.Timetable"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="354"
-             d:DataContext="{d:DesignInstance timetable:CurrentStationInfoViewModel}">
+             d:DataContext="{d:DesignInstance timetable:CurrentStationInfoViewModel, d:IsDesignTimeCreatable=True}">
     <d:DesignerProperties.DesignStyle>
         <Style TargetType="UserControl">
             <Style.Setters>

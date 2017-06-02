@@ -6,7 +6,7 @@
              xmlns:timetable="clr-namespace:WpfDrawing.Timetable"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="354"
-             d:DataContext="{d:DesignInstance timetable:NextStationsInfoViewModel}">
+             d:DataContext="{d:DesignInstance timetable:NextStationsInfoViewModel, IsDesignTimeCreatable=True}">
     <d:DesignerProperties.DesignStyle>
         <Style TargetType="UserControl">
             <Style.Setters>
@@ -26,42 +26,58 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             
-            <TextBlock Grid.Row="0" Grid.Column="0"
+            <TextBlock Grid.Row="0" Grid.Column="1"
+                       Margin="0,8,0,8"
                        Text="{Binding CurrentStationName, Mode=OneTime}"/>
-            <Border Grid.Row="0" Grid.Column="1"
+            <Border Grid.Row="0" Grid.Column="0"
+                    HorizontalAlignment="Right"
+                    Margin="0,8,8,8"
                     Background="Black"
                     CornerRadius="8"
-                    Width="16" Height="16">
-                <TextBlock Text="0"
-                           Foreground="White"
-                           FontWeight="Bold"
-                           HorizontalAlignment="Center"/>
-            </Border>
+                    Width="16" Height="16"/>
+            <Border Grid.Row="0" Grid.Column="0"
+                    Background="Black"
+                    Width="2"
+                    HorizontalAlignment="Right"
+                    Margin="0,8,15,-2"/>
             
-            <ItemsControl Grid.Row="1" Grid.Column="0"
+            <ItemsControl Grid.Row="1" Grid.Column="1"
                           Margin="0,2,0,0"
                           ItemsSource="{Binding Names}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Margin="0,2"
+                        <TextBlock Margin="0,2,0,0"
+                                   Height="16"
                                    Text="{Binding ., Mode=OneTime}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <ItemsControl Grid.Row="1" Grid.Column="1"
+            <ItemsControl Grid.Row="1" Grid.Column="0"
                           Margin="0,2,0,0"
                           ItemsSource="{Binding Minutes}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Margin="0,2"
-                                Background="Black"
-                                CornerRadius="8"
-                                Width="16" Height="16">
-                            <TextBlock Text="{Binding }"
-                                       Foreground="White"
-                                       FontWeight="Bold"
-                                       HorizontalAlignment="Center"/>
-                        </Border>
+                        <Grid>
+                            <Border Width="2"
+                                    Background="Black"
+                                    HorizontalAlignment="Right"
+                                    Margin="0,0,15,0"/>
+                            <Border Margin="0,2,8,0"
+                                    HorizontalAlignment="Right"
+                                    Background="Black"
+                                    CornerRadius="8"
+                                    Width="16" Height="16">
+                                <TextBlock Text="{Binding }"
+                                           Margin="0,0,0,0.5"
+                                           Foreground="White"
+                                           FontWeight="Bold"
+                                           FontSize="10"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           TextAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                        
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

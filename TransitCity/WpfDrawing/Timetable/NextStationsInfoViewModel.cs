@@ -3,11 +3,51 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Time;
 using Transit.Data;
+using Utility.MVVM;
 
 namespace WpfDrawing.Timetable
 {
-    public class NextStationsInfoViewModel
+    public class NextStationsInfoViewModel : ViewModelBase
     {
+        public NextStationsInfoViewModel()
+        {
+            if (!IsInDesignMode)
+            {
+                throw new InvalidOperationException();
+            }
+
+            CurrentStationName = "Stratford";
+            Names.Add("Leyton");
+            Minutes.Add(2);
+
+            Names.Add("Leytonstone");
+            Minutes.Add(5);
+
+            Names.Add("Snaresbrook");
+            Minutes.Add(8);
+
+            Names.Add("South Woodford");
+            Minutes.Add(10);
+
+            Names.Add("Woodford");
+            Minutes.Add(12);
+
+            Names.Add("Buckhurst Hill");
+            Minutes.Add(14);
+
+            Names.Add("Loughton");
+            Minutes.Add(17);
+
+            Names.Add("Debden");
+            Minutes.Add(20);
+
+            Names.Add("Theydon Bois");
+            Minutes.Add(23);
+
+            Names.Add("Epping");
+            Minutes.Add(26);
+        }
+
         public NextStationsInfoViewModel(StationInfo stationInfo, RouteInfo routeInfo)
         {
             CurrentStationName = stationInfo.TransferStation.Name;

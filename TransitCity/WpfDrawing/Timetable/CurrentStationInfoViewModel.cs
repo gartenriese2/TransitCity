@@ -1,12 +1,26 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Transit;
 using Transit.Data;
 using Utility.MVVM;
 
 namespace WpfDrawing.Timetable
 {
-    public class CurrentStationInfoViewModel : PropertyChangedBase
+    public class CurrentStationInfoViewModel : ViewModelBase
     {
+        public CurrentStationInfoViewModel()
+        {
+            if (!IsInDesignMode)
+            {
+                throw new InvalidOperationException();
+            }
+
+            CurrentStationName = "Stratford";
+            LastStationName = "Epping";
+            LineName = "Central";
+            Type = TransitType.Subway;
+        }
+
         public CurrentStationInfoViewModel(StationInfo stationInfo, LineInfo lineInfo, RouteInfo routeInfo)
         {
             CurrentStationName = stationInfo.TransferStation.Name;

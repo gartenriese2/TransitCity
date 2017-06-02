@@ -6,7 +6,7 @@
              xmlns:timetable="clr-namespace:WpfDrawing.Timetable"
              mc:Ignorable="d" 
              d:DesignHeight="1000" d:DesignWidth="707"
-             d:DataContext="{d:DesignInstance timetable:TimetableViewModel}"
+             d:DataContext="{d:DesignInstance timetable:TimetableViewModel, d:IsDesignTimeCreatable=True}"
              Background="White">
     <Grid>
         <Grid.RowDefinitions>
@@ -21,16 +21,18 @@
             </Grid.ColumnDefinitions>
             
             <Border Grid.Column="0"
+                    Margin="4"
                     CornerRadius="8"
                     BorderBrush="Black"
                     BorderThickness="1">
-                <timetable:CurrentStationInfoControl/>
+                <timetable:CurrentStationInfoControl DataContext="{Binding CurrentStationInfoViewModel}"/>
             </Border>
             <Border Grid.Column="1"
+                    Margin="4"
                     CornerRadius="8"
                     BorderBrush="Black"
                     BorderThickness="1">
-                <timetable:NextStationsInfoControl/>
+                <timetable:NextStationsInfoControl DataContext="{Binding NextStationsInfoViewModel}"/>
             </Border>
         </Grid>
     </Grid>
