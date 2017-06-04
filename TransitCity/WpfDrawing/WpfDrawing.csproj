@@ -62,6 +62,11 @@
       <DependentUpon>CurrentStationInfoControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Timetable\CurrentStationInfoViewModel.cs" />
+    <Compile Include="Timetable\DepartureData.cs" />
+    <Compile Include="Timetable\DeparturesInfoControl.xaml.cs">
+      <DependentUpon>DeparturesInfoControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Timetable\DeparturesInfoViewModel.cs" />
     <Compile Include="Timetable\NextStationsInfoControl.xaml.cs">
       <DependentUpon>NextStationsInfoControl.xaml</DependentUpon>
     </Compile>
@@ -79,6 +84,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Timetable\CurrentStationInfoControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Timetable\DeparturesInfoControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,0 +1,163 @@
+﻿<UserControl x:Class="WpfDrawing.Timetable.DeparturesInfoControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:timetable="clr-namespace:WpfDrawing.Timetable"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="707"
+             d:DataContext="{d:DesignInstance timetable:DeparturesInfoViewModel, IsDesignTimeCreatable=True}">
+    <d:DesignerProperties.DesignStyle>
+        <Style TargetType="UserControl">
+            <Style.Setters>
+                <Setter Property="Background" Value="White"/>
+            </Style.Setters>
+        </Style>
+    </d:DesignerProperties.DesignStyle>
+    <DataGrid BorderBrush="Transparent"
+              Background="Transparent"
+              ItemsSource="{Binding DepartureInfoCollection}"
+              AutoGenerateColumns="False"
+              RowHeaderWidth="0"
+              CanUserAddRows="False"
+              GridLinesVisibility="None">
+        <DataGrid.Resources>
+            <Style TargetType="{x:Type DataGridColumnHeader}">
+                <Setter Property="Background" Value="Transparent" />
+            </Style>
+            <DataTemplate x:Key="HeaderTemplate">
+                <Border BorderThickness="1"
+                        BorderBrush="Black"
+                        CornerRadius="4"
+                        HorizontalAlignment="Stretch"
+                        Margin="1,0,1,0">
+                    <TextBlock Text="{Binding }"
+                               TextAlignment="Center"
+                               FontWeight="Bold"
+                               Margin="2"/>
+                </Border>
+            </DataTemplate>
+            <DataTemplate x:Key="ItemsTemplate">
+                <TextBlock Text="{Binding ., StringFormat=D2}"
+                           Margin="2,0,10,0"/>
+            </DataTemplate>
+            <ItemsPanelTemplate x:Key="ItemsPanelTemplate">
+                <StackPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+            <Style x:Key="HeaderStyle"
+                   TargetType="DataGridColumnHeader">
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+            </Style>
+            <Style x:Key="CellStyle"
+                   TargetType="DataGridCell">
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+            </Style>
+        </DataGrid.Resources>
+        <DataGrid.Columns>
+            <DataGridTemplateColumn Header="Hour"
+                                    HeaderTemplate="{StaticResource HeaderTemplate}"
+                                    HeaderStyle="{StaticResource HeaderStyle}"
+                                    CellStyle="{StaticResource CellStyle}"
+                                    IsReadOnly="True"
+                                    Width="*">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Black"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Margin="1">
+                            <TextBlock Text="{Binding Hour}"
+                                       TextAlignment="Center"
+                                       FontWeight="Bold"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Monday - Thursday"
+                                    HeaderTemplate="{StaticResource HeaderTemplate}"
+                                    HeaderStyle="{StaticResource HeaderStyle}"
+                                    CellStyle="{StaticResource CellStyle}"
+                                    IsReadOnly="True"
+                                    Width="4*">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Black"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Margin="1">
+                            <ItemsControl ItemsSource="{Binding MinutesWeekday}"
+                                          ItemTemplate="{StaticResource ItemsTemplate}"
+                                          ItemsPanel="{StaticResource ItemsPanelTemplate}"/>
+                        </Border>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Friday"
+                                    HeaderTemplate="{StaticResource HeaderTemplate}"
+                                    HeaderStyle="{StaticResource HeaderStyle}"
+                                    CellStyle="{StaticResource CellStyle}"
+                                    IsReadOnly="True"
+                                    Width="4*">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Black"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Margin="1">
+                            <ItemsControl ItemsSource="{Binding MinutesFriday}"
+                                          ItemTemplate="{StaticResource ItemsTemplate}"
+                                          ItemsPanel="{StaticResource ItemsPanelTemplate}"/>
+                        </Border>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Saturday"
+                                    HeaderTemplate="{StaticResource HeaderTemplate}"
+                                    HeaderStyle="{StaticResource HeaderStyle}"
+                                    CellStyle="{StaticResource CellStyle}"
+                                    IsReadOnly="True"
+                                    Width="4*">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Black"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Margin="1">
+                            <ItemsControl ItemsSource="{Binding MinutesSaturday}"
+                                          ItemTemplate="{StaticResource ItemsTemplate}"
+                                          ItemsPanel="{StaticResource ItemsPanelTemplate}"/>
+                        </Border>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Sunday"
+                                    HeaderTemplate="{StaticResource HeaderTemplate}"
+                                    HeaderStyle="{StaticResource HeaderStyle}"
+                                    CellStyle="{StaticResource CellStyle}"
+                                    IsReadOnly="True"
+                                    Width="4*">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Black"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Margin="1">
+                            <ItemsControl ItemsSource="{Binding MinutesSunday}"
+                                          ItemTemplate="{StaticResource ItemsTemplate}"
+                                          ItemsPanel="{StaticResource ItemsPanelTemplate}"/>
+                        </Border>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+        </DataGrid.Columns>
+    </DataGrid>
+</UserControl>
