@@ -48,28 +48,6 @@ namespace WpfTestApp
             _transitConnectionInfo = new TransitConnectionInfo(new Dictionary<Resident, List<List<Connection>>>());
             Initialize();
 
-            ////var city = CreateCity();
-            //var city = CreateSmallCity();
-            //var rnd = new Random();
-            //var workerScheduleTuples = city.Residents.Where(r => r.HasJob).Select(r => (r, JobSchedule.CreateRandom(rnd))).ToList();
-
-            //var raptor = new Raptor(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), _dataManager);
-            //var workerConnectionsDictionary = new Dictionary<Resident, List<List<Connection>>>();
-            //foreach (var (worker, schedule) in workerScheduleTuples)
-            //{
-            //    var workerTaskList = new List<Task<List<Connection>>>();
-            //    foreach (var scheduleWts in schedule.WeekTimeSpans)
-            //    {
-            //        workerTaskList.Add(Task.Factory.StartNew(() => raptor.ComputeReverse(worker.Position, scheduleWts.Begin, worker.Job.Position, Speed.FromKilometersPerHour(8))));
-            //        workerTaskList.Add(Task.Factory.StartNew(() => raptor.Compute(worker.Job.Position, scheduleWts.End, worker.Position, Speed.FromKilometersPerHour(8))));
-            //    }
-
-            //    Task.WaitAll(workerTaskList.ToArray());
-            //    workerConnectionsDictionary.Add(worker, workerTaskList.Select(t => t.Result).ToList());
-            //}
-
-            //_transitConnectionInfo = new TransitConnectionInfo(workerConnectionsDictionary);
-
             PlusCommand = new RelayCommand(o => _timeDelta *= 2.0, o => _timeDelta < 20.0);
             MinusCommand = new RelayCommand(o => _timeDelta /= 2.0, o => _timeDelta > 0.001);
             CenterX = 0.5;
@@ -484,7 +462,7 @@ namespace WpfTestApp
                 10000, 0,
                 10000, 10000,
                 0, 10000
-            ), 10000, 10000);
+            ), 20000, 20000);
 
             return new City("SmallCity", new List<IDistrict> { district });
         }
@@ -555,6 +533,10 @@ namespace WpfTestApp
 
                 await Task.WhenAll(workerTaskList.ToArray());
                 var connections = workerTaskList.Select(t => t.Result).ToList();
+                if (connections.Count == 1)
+                {
+                    
+                }
                 var dic = new Dictionary<Resident, List<List<Connection>>>
                 {
                     [worker] = connections

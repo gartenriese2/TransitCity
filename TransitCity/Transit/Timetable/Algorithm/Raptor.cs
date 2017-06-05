@@ -25,7 +25,7 @@ namespace Transit.Timetable.Algorithm
             };
             var earliestConnectionsToStationsDictionary = new Dictionary<Station, WeekTimePoint>();
 
-            var (markedStations, connections, exitTimeSpans) = GetInitialMarkedStations(sourcePos, startTime, walkingSpeed);
+            var (markedStations, connections, exitTimeSpans) = GetInitialMarkedStations(sourcePos, targetPos, startTime, walkingSpeed);
             earliestConnections.AddRange(connections);
             foreach (var c in connections)
             {
@@ -62,7 +62,7 @@ namespace Transit.Timetable.Algorithm
             };
             var latestConnectionsFromStationsDictionary = new Dictionary<Station, WeekTimePoint>();
 
-            var (markedStations, connections, enterTimeSpans) = GetInitialMarkedStationsReverse(targetPos, latestArrivalTime, walkingSpeed);
+            var (markedStations, connections, enterTimeSpans) = GetInitialMarkedStationsReverse(sourcePos, targetPos, latestArrivalTime, walkingSpeed);
             latestConnections.AddRange(connections);
             foreach (var c in connections)
             {

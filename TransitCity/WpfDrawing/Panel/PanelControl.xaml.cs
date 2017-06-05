@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 using WpfDrawing.Utility;
 
 namespace WpfDrawing.Panel
@@ -88,6 +89,11 @@ namespace WpfDrawing.Panel
         {
             get => (Size)GetValue(WorldSizeProperty);
             set => SetValue(WorldSizeProperty, value);
+        }
+
+        private void UIElement_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var pt = e.GetPosition((UIElement)sender);
         }
     }
 }

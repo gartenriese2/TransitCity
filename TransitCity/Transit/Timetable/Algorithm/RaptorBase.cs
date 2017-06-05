@@ -85,57 +85,57 @@ namespace Transit.Timetable.Algorithm
             return connectionList;
         }
 
-        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection>, Dictionary<Station, TimeSpan>) GetInitialMarkedStations(Position2d position, WeekTimePoint time, Speed walkingSpeed)
+        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection>, Dictionary<Station, TimeSpan>) GetInitialMarkedStations(Position2d sourcePos, Position2d targetPos, WeekTimePoint time, Speed walkingSpeed)
         {
             var markedStations = new Dictionary<StationInfo, WeekTimePoint>();
             var connections = new List<Connection>();
             var exitTimeSpans = new Dictionary<Station, TimeSpan>();
             foreach (var stationInfo in _dataManager.AllStationInfos)
             {
-                var walktingTimeFromExit = TimeSpan.FromSeconds(stationInfo.Station.ExitPosition.DistanceTo(position) / walkingSpeed.MetersPerSecond);
+                var walktingTimeFromExit = TimeSpan.FromSeconds(stationInfo.Station.ExitPosition.DistanceTo(targetPos) / walkingSpeed.MetersPerSecond);
                 exitTimeSpans.Add(stationInfo.Station, walktingTimeFromExit);
-                if (walktingTimeFromExit.TotalMilliseconds / 2 > _maxWalkingTime.TotalMilliseconds) // Approximation
+                //if (walktingTimeFromExit.TotalMilliseconds / 2 > _maxWalkingTime.TotalMilliseconds) // Approximation
+                //{
+                //    continue;
+                //}
+
+                var walkingTimeToEntry = TimeSpan.FromSeconds(sourcePos.DistanceTo(stationInfo.Station.EntryPosition) / walkingSpeed.MetersPerSecond);
+                if (walkingTimeToEntry > _maxWalkingTime)
                 {
                     continue;
                 }
 
-                var walkingTime = TimeSpan.FromSeconds(position.DistanceTo(stationInfo.Station.EntryPosition) / walkingSpeed.MetersPerSecond);
-                if (walkingTime > _maxWalkingTime)
-                {
-                    continue;
-                }
-
-                var timeAtStation = time + walkingTime;
+                var timeAtStation = time + walkingTimeToEntry;
                 markedStations.Add(stationInfo, timeAtStation);
-                connections.Add(Connection.CreateWalkToStation(position, time, stationInfo.Station, timeAtStation));
+                connections.Add(Connection.CreateWalkToStation(sourcePos, time, stationInfo.Station, timeAtStation));
             }
 
             return (markedStations, connections, exitTimeSpans);
         }
 
-        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection>, Dictionary<Station, TimeSpan>) GetInitialMarkedStationsReverse(Position2d position, WeekTimePoint time, Speed walkingSpeed)
+        protected (Dictionary<StationInfo, WeekTimePoint>, List<Connection>, Dictionary<Station, TimeSpan>) GetInitialMarkedStationsReverse(Position2d sourcePos, Position2d targetPos, WeekTimePoint time, Speed walkingSpeed)
         {
             var markedStations = new Dictionary<StationInfo, WeekTimePoint>();
             var connections = new List<Connection>();
             var enterTimeSpans = new Dictionary<Station, TimeSpan>();
             foreach (var stationInfo in _dataManager.AllStationInfos)
             {
-                var walktingTimeToEntry = TimeSpan.FromSeconds(stationInfo.Station.EntryPosition.DistanceTo(position) / walkingSpeed.MetersPerSecond);
-                enterTimeSpans.Add(stationInfo.Station, walktingTimeToEntry);
-                if (walktingTimeToEntry.TotalMilliseconds / 2 > _maxWalkingTime.TotalMilliseconds) // Approximation
+                var walkingTimeToEntry = TimeSpan.FromSeconds(sourcePos.DistanceTo(stationInfo.Station.EntryPosition) / walkingSpeed.MetersPerSecond);
+                enterTimeSpans.Add(stationInfo.Station, walkingTimeToEntry);
+                //if (walkingTimeToEntry.TotalMilliseconds / 2 > _maxWalkingTime.TotalMilliseconds) // Approximation
+                //{
+                //    continue;
+                //}
+
+                var walkingTimeFromExit = TimeSpan.FromSeconds(stationInfo.Station.ExitPosition.DistanceTo(targetPos) / walkingSpeed.MetersPerSecond);
+                if (walkingTimeFromExit > _maxWalkingTime)
                 {
                     continue;
                 }
 
-                var walkingTime = TimeSpan.FromSeconds(position.DistanceTo(stationInfo.Station.Position) / walkingSpeed.MetersPerSecond);
-                if (walkingTime > _maxWalkingTime)
-                {
-                    continue;
-                }
-
-                var timeAtStation = time - walkingTime;
+                var timeAtStation = time - walkingTimeFromExit;
                 markedStations.Add(stationInfo, timeAtStation);
-                connections.Add(Connection.CreateWalkFromStation(stationInfo.Station, timeAtStation, position, time));
+                connections.Add(Connection.CreateWalkFromStation(stationInfo.Station, timeAtStation, targetPos, time));
             }
 
             return (markedStations, connections, enterTimeSpans);

@@ -2,7 +2,9 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:panel="clr-namespace:WpfDrawing.Panel"
-             ClipToBounds="True">
+             ClipToBounds="True"
+             Background="White"
+             MouseLeftButtonUp="UIElement_OnMouseLeftButtonUp">
     <panel:PanelVisuals ItemsSource="{Binding Objects, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         Zoom="{Binding Zoom, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         MinZoom="{Binding MinZoom, RelativeSource={RelativeSource AncestorType=UserControl}}"
