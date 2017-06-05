@@ -30,7 +30,7 @@
                         BorderBrush="Black"
                         CornerRadius="4"
                         HorizontalAlignment="Stretch"
-                        Margin="1,0,1,0">
+                        Margin="1,0,1,8">
                     <TextBlock Text="{Binding }"
                                TextAlignment="Center"
                                FontWeight="Bold"
@@ -42,7 +42,7 @@
                            Margin="2,0,10,0"/>
             </DataTemplate>
             <ItemsPanelTemplate x:Key="ItemsPanelTemplate">
-                <StackPanel Orientation="Horizontal"/>
+                <WrapPanel Orientation="Horizontal"/>
             </ItemsPanelTemplate>
             <Style x:Key="HeaderStyle"
                    TargetType="DataGridColumnHeader">
@@ -73,7 +73,7 @@
                         <Border BorderBrush="Black"
                                 BorderThickness="1"
                                 CornerRadius="4"
-                                Margin="1">
+                                Margin="1, 0.5">
                             <TextBlock Text="{Binding Hour}"
                                        TextAlignment="Center"
                                        FontWeight="Bold"
@@ -93,7 +93,7 @@
                         <Border BorderBrush="Black"
                                 BorderThickness="1"
                                 CornerRadius="4"
-                                Margin="1">
+                                Margin="1, 0.5">
                             <ItemsControl ItemsSource="{Binding MinutesWeekday}"
                                           ItemTemplate="{StaticResource ItemsTemplate}"
                                           ItemsPanel="{StaticResource ItemsPanelTemplate}"/>
@@ -112,7 +112,7 @@
                         <Border BorderBrush="Black"
                                 BorderThickness="1"
                                 CornerRadius="4"
-                                Margin="1">
+                                Margin="1, 0.5">
                             <ItemsControl ItemsSource="{Binding MinutesFriday}"
                                           ItemTemplate="{StaticResource ItemsTemplate}"
                                           ItemsPanel="{StaticResource ItemsPanelTemplate}"/>
@@ -131,7 +131,7 @@
                         <Border BorderBrush="Black"
                                 BorderThickness="1"
                                 CornerRadius="4"
-                                Margin="1">
+                                Margin="1, 0.5">
                             <ItemsControl ItemsSource="{Binding MinutesSaturday}"
                                           ItemTemplate="{StaticResource ItemsTemplate}"
                                           ItemsPanel="{StaticResource ItemsPanelTemplate}"/>
