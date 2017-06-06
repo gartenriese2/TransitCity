@@ -4,9 +4,14 @@ using Time;
 
 namespace Transit.Timetable
 {
-    public class Connection
+    public class Connection : WeekTimeSpan
     {
-        private Connection() { }
+        private Connection(WeekTimePoint begin, WeekTimePoint end)
+            : base(begin, end)
+        {
+            SourceTime = begin;
+            TargetTime = end;
+        }
 
         public enum TypeEnum : byte
         {
@@ -36,62 +41,52 @@ namespace Transit.Timetable
 
         public static Connection CreateWalkToStation(Position2d sourcePos, WeekTimePoint sourceTime, Station targetStation, WeekTimePoint targetTime)
         {
-            return new Connection
+            return new Connection(sourceTime, targetTime)
             {
                 Type = TypeEnum.WalkToStation,
                 SourcePos = sourcePos,
-                SourceTime = sourceTime,
-                TargetStation = targetStation,
-                TargetTime = targetTime
+                TargetStation = targetStation
             };
         }
 
         public static Connection CreateWalkFromStation(Station sourceStation, WeekTimePoint sourceTime, Position2d targetPos, WeekTimePoint targetTime)
         {
-            return new Connection
+            return new Connection(sourceTime, targetTime)
             {
                 Type = TypeEnum.WalkFromStation,
                 SourceStation = sourceStation,
-                SourceTime = sourceTime,
-                TargetPos = targetPos,
-                TargetTime = targetTime
+                TargetPos = targetPos
             };
         }
 
         public static Connection CreateTransfer(Station sourceStation, WeekTimePoint sourceTime, Station targetStation, WeekTimePoint targetTime)
         {
-            return new Connection
+            return new Connection(sourceTime, targetTime)
             {
                 Type = TypeEnum.Transfer,
                 SourceStation = sourceStation,
-                SourceTime = sourceTime,
-                TargetStation = targetStation,
-                TargetTime = targetTime
+                TargetStation = targetStation
             };
         }
 
         public static Connection CreateRide(Station sourceStation, WeekTimePoint sourceTime, Station targetStation, WeekTimePoint targetTime, Line line)
         {
-            return new Connection
+            return new Connection(sourceTime, targetTime)
             {
                 Type = TypeEnum.Ride,
                 SourceStation = sourceStation,
-                SourceTime = sourceTime,
                 TargetStation = targetStation,
-                TargetTime = targetTime,
                 Line = line
             };
         }
 
         public static Connection CreateWalk(Position2d sourcePos, WeekTimePoint sourceTime, Position2d targetPos, WeekTimePoint targetTime)
         {
-            return new Connection
+            return new Connection(sourceTime, targetTime)
             {
                 Type = TypeEnum.Walk,
                 SourcePos = sourcePos,
-                SourceTime = sourceTime,
-                TargetPos = targetPos,
-                TargetTime = targetTime
+                TargetPos = targetPos
             };
         }
 

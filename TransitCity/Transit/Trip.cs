@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Time;
-using Transit.Data;
 
 namespace Transit
 {
     using Arrival = WeekTimePoint;
     using Departure = WeekTimePoint;
 
-    public class Trip
+    public class Trip : WeekTimeSpan
     {
         private readonly List<(Station, (Arrival, Departure))> _stationTimes;
         private readonly List<Departure> _departureTimes;
@@ -19,6 +18,7 @@ namespace Transit
         private readonly Dictionary<Station, Departure> _departures;
 
         public Trip(List<(Station, (Arrival, Departure))> stationTimes)
+            : base(stationTimes?[0].Item2.Item2, stationTimes?[stationTimes.Count - 1].Item2.Item1)
         {
             _stationTimes = stationTimes ?? throw new ArgumentNullException(nameof(stationTimes));
             _departureTimes = _stationTimes.Select(tuple => tuple.Item2.Item2).ToList();

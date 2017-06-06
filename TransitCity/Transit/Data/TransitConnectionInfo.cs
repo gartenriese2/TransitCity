@@ -13,12 +13,12 @@ namespace Transit.Data
     public class TransitConnectionInfo
     {
         private readonly Dictionary<Resident, List<ConnectionList>> _connectionsDictionary;
-        private readonly Dictionary<WeekTimeSpan, ConnectionList> _hourlyConnectionsDictionary = new Dictionary<WeekTimeSpan, ConnectionList>(24 * 7);
+        private readonly HourlyDictionary<Connection> _hourlyConnectionsDictionary;
 
         public TransitConnectionInfo(Dictionary<Resident, List<ConnectionList>> connectionsDictionary)
         {
             _connectionsDictionary = connectionsDictionary ?? throw new ArgumentNullException(nameof(connectionsDictionary));
-            Initialize();
+            _hourlyConnectionsDictionary = new HourlyDictionary<Connection>(HourlyDictionary<Connection>.Granularity.Hour, connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl));
         }
 
         public void AddConnections(Dictionary<Resident, List<ConnectionList>> connectionsDictionary)
@@ -28,7 +28,7 @@ namespace Transit.Data
                 _connectionsDictionary.Add(key, value);
             }
             
-            AddToHourlyConnectionsDictionary(connectionsDictionary);
+            _hourlyConnectionsDictionary.AddRange(connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl));
         }
 
         public float GetPercentagOfConnectionsWithTransit()
@@ -49,35 +49,7 @@ namespace Transit.Data
 
         public IEnumerable<Connection> GetActiveConnections(WeekTimePoint wtp)
         {
-            return _hourlyConnectionsDictionary.First(pair => pair.Key.IsInside(wtp)).Value.Where(c => new WeekTimeSpan(c.SourceTime, c.TargetTime).IsInside(wtp));
-        }
-
-        private void Initialize()
-        {
-            for (var i = 0; i < 24 * 7; ++i)
-            {
-                var begin = new WeekTimePoint(TimeSpan.FromHours(i));
-                var end = new WeekTimePoint(TimeSpan.FromHours((i + 1) % 168));
-                _hourlyConnectionsDictionary.Add(new WeekTimeSpan(begin, end), new ConnectionList());
-            }
-
-            AddToHourlyConnectionsDictionary(_connectionsDictionary);
-        }
-
-        private void AddToHourlyConnectionsDictionary(Dictionary<Resident, List<ConnectionList>> connectionsDictionary)
-        {
-            var connections = connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl);
-            foreach (var connection in connections)
-            {
-                var cwts = new WeekTimeSpan(connection.SourceTime, connection.TargetTime);
-                foreach (var (wts, list) in _hourlyConnectionsDictionary)
-                {
-                    if (wts.Overlaps(cwts))
-                    {
-                        list.Add(connection);
-                    }
-                }
-            }
+            return _hourlyConnectionsDictionary[wtp].Where(c => new WeekTimeSpan(c.SourceTime, c.TargetTime).IsInside(wtp));
         }
     }
 }

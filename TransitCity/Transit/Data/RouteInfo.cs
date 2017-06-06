@@ -4,14 +4,13 @@ using System.Linq;
 using Geometry;
 using Time;
 using Utility;
-using Utility.Extensions;
 using Utility.Units;
 
 namespace Transit.Data
 {
     public class RouteInfo
     {
-        private readonly Dictionary<WeekTimeSpan, List<Trip>> _hourlyTripsDictionary = new Dictionary<WeekTimeSpan, List<Trip>>(24 * 7);
+        private readonly HourlyDictionary<Trip> _hourlyTripsDictionary;
 
         public RouteInfo(Route route, Path path, List<StationInfo> stationInfos, List<Trip> trips)
         {
@@ -19,25 +18,7 @@ namespace Transit.Data
             Path = path ?? throw new ArgumentNullException(nameof(path));
             StationInfos = stationInfos ?? throw new ArgumentNullException(nameof(stationInfos));
             Trips = trips ?? throw new ArgumentNullException(nameof(trips));
-
-            for (var i = 0; i < 24 * 7; ++i)
-            {
-                var begin = new WeekTimePoint(TimeSpan.FromHours(i));
-                var end = new WeekTimePoint(TimeSpan.FromHours((i + 1) % 168));
-                _hourlyTripsDictionary.Add(new WeekTimeSpan(begin, end), new List<Trip>());
-            }
-
-            foreach (var trip in Trips)
-            {
-                var twts = new WeekTimeSpan(trip.DepartureAtStation(trip.Stations.First()), trip.ArrivalAtStation(trip.Stations.Last()));
-                foreach (var (wts, list) in _hourlyTripsDictionary)
-                {
-                    if (wts.Overlaps(twts))
-                    {
-                        list.Add(trip);
-                    }
-                }
-            }
+            _hourlyTripsDictionary = new HourlyDictionary<Trip>(HourlyDictionary<Trip>.Granularity.Hour, Trips);
         }
 
         public Route Route { get; }
@@ -102,7 +83,7 @@ namespace Transit.Data
 
         public IEnumerable<Trip> GetActiveTrips(WeekTimePoint wtp)
         {
-            var hourlyTrips = _hourlyTripsDictionary.First(pair => pair.Key.IsInside(wtp)).Value;
+            var hourlyTrips = _hourlyTripsDictionary[wtp];
             return hourlyTrips.Where(trip => new WeekTimeSpan(trip.DepartureAtStation(trip.Stations.First()), trip.ArrivalAtStation(trip.Stations.Last())).IsInside(wtp));
         }
 
