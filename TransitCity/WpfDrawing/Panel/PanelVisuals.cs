@@ -10,6 +10,8 @@ namespace WpfDrawing.Panel
 {
     public class PanelVisuals : FrameworkElement
     {
+        #region DependencyProperties
+
         public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
             "ItemsSource",
             typeof(ObservableNotifiableCollection<PanelObject>),
@@ -51,15 +53,17 @@ namespace WpfDrawing.Panel
             new PropertyMetadata(new Size(0, 0), (o, args) => ((PanelVisuals) o).Refresh()),
             value => ((Size)value).Width >= 0 && ((Size)value).Height >= 0);
 
+        #endregion
+
         private readonly VisualCollection _visualChildren;
-        private Size _viewSize;
 
         public PanelVisuals()
         {
             _visualChildren = new VisualCollection(this);
-            _viewSize = new Size(RenderSize.Width * Zoom, RenderSize.Height * Zoom);
             SizeChanged += (sender, args) => Refresh();
         }
+
+        #region Properties
 
         public ObservableNotifiableCollection<PanelObject> ItemsSource
         {
@@ -98,6 +102,8 @@ namespace WpfDrawing.Panel
         }
 
         protected override int VisualChildrenCount => _visualChildren.Count;
+
+        #endregion
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
@@ -233,7 +239,6 @@ namespace WpfDrawing.Panel
                 return;
             }
 
-            _viewSize = new Size(RenderSize.Width * Zoom, RenderSize.Height * Zoom);
             _visualChildren.Clear();
             CreateVisualChildren(ItemsSource);
         }
@@ -256,11 +261,7 @@ namespace WpfDrawing.Panel
                 var drawingVisual = new PanelDrawingVisual { PanelObject = panelObject };
                 var dc = drawingVisual.RenderOpen();
                 dc.DrawDrawing(panelObject.GetDrawing());
-                var transformGroup = new TransformGroup();
-                transformGroup.Children.Add(new ScaleTransform(panelObject.Scale, panelObject.Scale));
-                transformGroup.Children.Add(new TranslateTransform(panelObject.X, panelObject.Y));
-                transformGroup.Children.Add(new RotateTransform(panelObject.Angle, panelObject.X, panelObject.Y));
-                drawingVisual.Transform = transformGroup;
+                drawingVisual.Transform = panelObject.GetTransformGroup();
                 dc.Close();
                 _visualChildren.Add(drawingVisual);
             }

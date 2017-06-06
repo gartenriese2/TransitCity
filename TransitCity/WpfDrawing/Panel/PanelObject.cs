@@ -66,5 +66,14 @@ namespace WpfDrawing.Panel
         public bool IsSelected { get; set; }
 
         public abstract Drawing GetDrawing();
+
+        public TransformGroup GetTransformGroup()
+        {
+            var transformGroup = new TransformGroup();
+            transformGroup.Children.Add(new ScaleTransform(Scale, Scale));
+            transformGroup.Children.Add(new TranslateTransform(X, Y));
+            transformGroup.Children.Add(new RotateTransform(Angle, X, Y));
+            return transformGroup;
+        }
     }
 }
