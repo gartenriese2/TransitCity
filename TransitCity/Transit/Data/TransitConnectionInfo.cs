@@ -14,11 +14,19 @@ namespace Transit.Data
     {
         private readonly Dictionary<Resident, List<ConnectionList>> _connectionsDictionary;
         private readonly HourlyDictionary<Connection> _hourlyConnectionsDictionary;
+        private readonly Dictionary<Connection, Resident> _connectionToResidentDictionary = new Dictionary<Connection, Resident>();
 
         public TransitConnectionInfo(Dictionary<Resident, List<ConnectionList>> connectionsDictionary)
         {
             _connectionsDictionary = connectionsDictionary ?? throw new ArgumentNullException(nameof(connectionsDictionary));
             _hourlyConnectionsDictionary = new HourlyDictionary<Connection>(HourlyDictionary<Connection>.Granularity.Hour, connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl));
+            foreach (var (resident, connectionLists) in connectionsDictionary)
+            {
+                foreach (var connection in connectionLists.SelectMany(cl => cl))
+                {
+                    _connectionToResidentDictionary.Add(connection, resident);
+                }
+            }
         }
 
         public void AddConnections(Dictionary<Resident, List<ConnectionList>> connectionsDictionary)
@@ -29,6 +37,13 @@ namespace Transit.Data
             }
             
             _hourlyConnectionsDictionary.AddRange(connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl));
+            foreach (var (resident, connectionLists) in connectionsDictionary)
+            {
+                foreach (var connection in connectionLists.SelectMany(cl => cl))
+                {
+                    _connectionToResidentDictionary.Add(connection, resident);
+                }
+            }
         }
 
         public float GetPercentagOfConnectionsWithTransit()
@@ -47,9 +62,9 @@ namespace Transit.Data
             return _connectionsDictionary.Select(d => d.Value).Count(l => l.All(c => c.Count > 1)) * 100f / _connectionsDictionary.Count;
         }
 
-        public IEnumerable<Connection> GetActiveConnections(WeekTimePoint wtp)
+        public IEnumerable<(Resident, Connection)> GetActiveConnections(WeekTimePoint wtp)
         {
-            return _hourlyConnectionsDictionary[wtp].Where(c => new WeekTimeSpan(c.SourceTime, c.TargetTime).IsInside(wtp));
+            return _hourlyConnectionsDictionary[wtp].Where(c => new WeekTimeSpan(c.SourceTime, c.TargetTime).IsInside(wtp)).Select(c => (_connectionToResidentDictionary[c], c));
         }
     }
 }

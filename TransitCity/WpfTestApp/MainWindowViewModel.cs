@@ -28,6 +28,7 @@ namespace WpfTestApp
 
         private readonly DataManager _dataManager;
         private readonly TransitConnectionInfo _transitConnectionInfo;
+        private readonly List<ResidentObject> _residentObjects = new List<ResidentObject>();
         private TimeSpan _time = TimeSpan.Zero;
         private string _weektime = string.Empty;
         private double _timeDelta = 5.0;
@@ -671,7 +672,7 @@ namespace WpfTestApp
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(wtp).ToList();
             for (var i = PanelObjects.Count - 1; i >= 0; --i)
             {
-                if (PanelObjects[i] is Vehicle || PanelObjects[i] is ResidentObject)
+                if (PanelObjects[i] is Vehicle)
                 {
                     PanelObjects.RemoveAt(i);
                 }
@@ -685,9 +686,9 @@ namespace WpfTestApp
 
             var activeConnections = _transitConnectionInfo.GetActiveConnections(wtp).ToList();
             ActiveConnectionsCount = activeConnections.Count;
-            var walkingConnections = activeConnections.Where(c => c.Type == Connection.TypeEnum.WalkToStation || c.Type == Connection.TypeEnum.WalkFromStation || c.Type == Connection.TypeEnum.Transfer);
+            var walkingConnections = activeConnections.Where(c => c.Item2.Type == Connection.TypeEnum.WalkToStation || c.Item2.Type == Connection.TypeEnum.WalkFromStation || c.Item2.Type == Connection.TypeEnum.Transfer);
             var residents = new List<ResidentObject>();
-            foreach (var wc in walkingConnections)
+            foreach (var (r, wc) in walkingConnections)
             {
                 var isTransfer = wc.Type == Connection.TypeEnum.Transfer;
                 if (isTransfer)
@@ -697,8 +698,8 @@ namespace WpfTestApp
                     var to = wc.TargetStation.EntryPosition;
                     var t = (wtp - wc.SourceTime).TotalMilliseconds / (wc.TargetTime - wc.SourceTime).TotalMilliseconds;
                     var pos = Position2d.Lerp(t, from, to);
-                    var r = new ResidentObject(pos, vec);
-                    residents.Add(r);
+                    var ro = new ResidentObject(pos, vec, r);
+                    residents.Add(ro);
                 }
                 else
                 {
@@ -708,12 +709,38 @@ namespace WpfTestApp
                     var to = toStation ? wc.TargetStation.EntryPosition : wc.TargetPos;
                     var t = (wtp - wc.SourceTime).TotalMilliseconds / (wc.TargetTime - wc.SourceTime).TotalMilliseconds;
                     var pos = Position2d.Lerp(t, from, to);
-                    var r = new ResidentObject(pos, vec);
-                    residents.Add(r);
+                    var ro = new ResidentObject(pos, vec, r);
+                    residents.Add(ro);
                 }
             }
 
-            residents.ForEach(r => PanelObjects.Add(r));
+            var removed = _residentObjects.Where(x => !residents.Select(r => r.Resident).Contains(x.Resident)).ToList();
+            var added = residents.Where(x => !_residentObjects.Select(r => r.Resident).Contains(x.Resident)).ToList();
+            for (var i = PanelObjects.Count - 1; i >= 0; --i)
+            {
+                var po = PanelObjects[i];
+                if (!(po is ResidentObject))
+                {
+                    continue;
+                }
+
+                var ro = (ResidentObject) po;
+                if (removed.Exists(x => x.Resident == ro.Resident))
+                {
+                    PanelObjects.RemoveAt(i);
+                }
+                else
+                {
+                    var nr = residents.Find(x => x.Resident == ro.Resident);
+                    ro.Angle = nr.Angle;
+                    ro.X = nr.X;
+                    ro.Y = nr.Y;
+                }
+            }
+
+            added.ForEach(r => PanelObjects.Add(r));
+            _residentObjects.Clear();
+            _residentObjects.AddRange(residents);
 
             sw.Stop();
             SimulationTime = sw.ElapsedMilliseconds;

@@ -221,14 +221,11 @@ namespace WpfDrawing.Panel
                 var transform = drawingVisual.Transform as TransformGroup;
                 if (transform == null)
                 {
-                    continue;
+                    throw new InvalidOperationException();
                 }
 
-                var transformGroup = new TransformGroup();
-                transformGroup.Children.Add(new ScaleTransform(panelObject.Scale, panelObject.Scale));
-                transformGroup.Children.Add(new TranslateTransform(panelObject.X, panelObject.Y));
-                transformGroup.Children.Add(new RotateTransform(panelObject.Angle, panelObject.X, panelObject.Y));
-                drawingVisual.Transform = transformGroup;
+                drawingVisual.Transform = panelObject.GetTransformGroup();
+                break;
             }
         }
 
