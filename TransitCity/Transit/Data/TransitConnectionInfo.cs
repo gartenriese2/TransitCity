@@ -13,7 +13,7 @@ namespace Transit.Data
     public class TransitConnectionInfo
     {
         private readonly Dictionary<Resident, List<ConnectionList>> _connectionsDictionary;
-        private readonly Dictionary<WeekTimeSpan, List<Connection>> _hourlyConnectionsDictionary = new Dictionary<WeekTimeSpan, ConnectionList>(24 * 7);
+        private readonly Dictionary<WeekTimeSpan, ConnectionList> _hourlyConnectionsDictionary = new Dictionary<WeekTimeSpan, ConnectionList>(24 * 7);
 
         public TransitConnectionInfo(Dictionary<Resident, List<ConnectionList>> connectionsDictionary)
         {

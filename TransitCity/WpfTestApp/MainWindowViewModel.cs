@@ -462,7 +462,7 @@ namespace WpfTestApp
                 10000, 0,
                 10000, 10000,
                 0, 10000
-            ), 20000, 20000);
+            ), 10000, 10000);
 
             return new City("SmallCity", new List<IDistrict> { district });
         }
