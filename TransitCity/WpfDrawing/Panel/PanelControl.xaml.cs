@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using WpfDrawing.Objects;
 using WpfDrawing.Utility;
 
 namespace WpfDrawing.Panel
@@ -94,6 +96,28 @@ namespace WpfDrawing.Panel
         private void UIElement_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             var pt = e.GetPosition((UIElement)sender);
+            VisualTreeHelper.HitTest(this, null, Callback, new PointHitTestParameters(pt));
+
+            HitTestResultBehavior Callback(HitTestResult result)
+            {
+                var obj = (result.VisualHit as PanelDrawingVisual)?.PanelObject;
+                if (obj is Station)
+                {
+                    if (obj.IsSelected)
+                    {
+                        obj.Scale /= 2;
+                        obj.IsSelected = false;
+                    }
+                    else
+                    {
+                        obj.Scale *= 2;
+                        obj.IsSelected = true;
+                    }
+                }
+
+                // Stop the hit test enumeration of objects in the visual tree.
+                return HitTestResultBehavior.Stop;
+            }
         }
     }
 }

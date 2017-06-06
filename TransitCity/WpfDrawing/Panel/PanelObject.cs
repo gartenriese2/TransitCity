@@ -63,6 +63,8 @@ namespace WpfDrawing.Panel
             }
         }
 
+        public bool IsSelected { get; set; }
+
         public abstract Drawing GetDrawing();
     }
 }

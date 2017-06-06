@@ -212,20 +212,17 @@ namespace WpfDrawing.Panel
                     continue;
                 }
 
-                var transform = drawingVisual.Transform as TranslateTransform;
+                var transform = drawingVisual.Transform as TransformGroup;
                 if (transform == null)
                 {
                     continue;
                 }
 
-                if (args.PropertyName == nameof(panelObject.X))
-                {
-                    transform.X = RenderSize.Width * panelObject.X;
-                }
-                else if (args.PropertyName == nameof(panelObject.Y))
-                {
-                    transform.Y = RenderSize.Height * panelObject.Y;
-                }
+                var transformGroup = new TransformGroup();
+                transformGroup.Children.Add(new ScaleTransform(panelObject.Scale, panelObject.Scale));
+                transformGroup.Children.Add(new TranslateTransform(panelObject.X, panelObject.Y));
+                transformGroup.Children.Add(new RotateTransform(panelObject.Angle, panelObject.X, panelObject.Y));
+                drawingVisual.Transform = transformGroup;
             }
         }
 
