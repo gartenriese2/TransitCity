@@ -264,7 +264,7 @@ namespace WpfTestApp
             }
         }
 
-        private static City CreateCity()
+        private static City CreateLondon()
         {
             var balham = new RandomDistrict("Balham", new Polygon(
                 5000, 4500,
@@ -705,42 +705,20 @@ namespace WpfTestApp
         {
             var activeConnections = _transitConnectionInfo.GetActiveConnections(wtp).ToList();
             ActiveConnectionsCount = activeConnections.Count;
-            var walkingConnections = activeConnections.Where(c => c.Item2.Type == Connection.TypeEnum.WalkToStation || c.Item2.Type == Connection.TypeEnum.WalkFromStation || c.Item2.Type == Connection.TypeEnum.Transfer);
-            var residentObjects = new List<ResidentObject>();
-            foreach (var (r, wc) in walkingConnections)
-            {
-                var isTransfer = wc.Type == Connection.TypeEnum.Transfer;
-                if (isTransfer)
-                {
-                    var vec = wc.TargetStation.EntryPosition - wc.SourceStation.ExitPosition;
-                    var from = wc.SourceStation.ExitPosition;
-                    var to = wc.TargetStation.EntryPosition;
-                    var t = (wtp - wc.SourceTime).TotalMilliseconds / (wc.TargetTime - wc.SourceTime).TotalMilliseconds;
-                    var pos = Position2d.Lerp(t, from, to);
-                    var ro = new ResidentObject(pos, vec, r);
-                    residentObjects.Add(ro);
-                }
-                else
-                {
-                    var toStation = wc.Type == Connection.TypeEnum.WalkToStation;
-                    var vec = toStation ? wc.TargetStation.EntryPosition - wc.SourcePos : wc.TargetPos - wc.SourceStation.ExitPosition;
-                    var from = toStation ? wc.SourcePos : wc.SourceStation.ExitPosition;
-                    var to = toStation ? wc.TargetStation.EntryPosition : wc.TargetPos;
-                    var t = (wtp - wc.SourceTime).TotalMilliseconds / (wc.TargetTime - wc.SourceTime).TotalMilliseconds;
-                    var pos = Position2d.Lerp(t, from, to);
-                    var ro = new ResidentObject(pos, vec, r);
-                    residentObjects.Add(ro);
-                }
-            }
+
+            var activeResidents = _transitConnectionInfo.GetActiveResidents(activeConnections, wtp).ToList();
+            var residentObjects = new List<ResidentObject>(activeResidents.Count);
 
             // Add new residents
-            foreach (var ro in residentObjects.Where(x => !_residentObjects.Select(r => r.Resident).Contains(x.Resident)))
+            foreach (var (r, p, v) in activeResidents.Where(x => !_residentObjects.Select(r => r.Resident).Contains(x.Item1)))
             {
+                var ro = new ResidentObject(p, v, r);
                 PanelObjects.Add(ro);
+                residentObjects.Add(ro);
             }
 
             // Remove or Update old residents
-            var removedResidents = _residentObjects.Where(x => !residentObjects.Select(r => r.Resident).Contains(x.Resident)).ToList();
+            var removedResidents = _residentObjects.Where(x => !activeResidents.Select(r => r.Item1).Contains(x.Resident)).ToList();
             for (var i = PanelObjects.Count - 1; i >= 0; --i)
             {
                 var po = PanelObjects[i];
@@ -756,8 +734,9 @@ namespace WpfTestApp
                 }
                 else
                 {
-                    var nr = residentObjects.Find(x => x.Resident == ro.Resident);
-                    ro.Update(nr.X, nr.Y, nr.Angle, ro.Scale);
+                    var nr = activeResidents.Find(x => x.Item1 == ro.Resident);
+                    ro.Update(nr.Item2, nr.Item3);
+                    residentObjects.Add(ro);
                 }
             }
 
@@ -783,7 +762,7 @@ namespace WpfTestApp
         {
             PercentageLoadedVisibility = Visibility.Visible;
 
-            var city = CreateSmallLondon();
+            var city = CreateLondon();
             var rnd = new Random();
             var workerScheduleTuples = city.Residents.Where(r => r.HasJob).Select(r => (r, JobSchedule.CreateRandom(rnd))).ToList();
             var raptor = new Raptor(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), _dataManager);
