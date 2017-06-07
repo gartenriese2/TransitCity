@@ -5,11 +5,11 @@ using WpfDrawing.Panel;
 
 namespace WpfDrawing.Objects
 {
-    public class Station : PanelObject
+    public class StationObject : PanelObject
     {
         private static readonly Drawing Drawing;
 
-        static Station()
+        static StationObject()
         {
             var brush = new SolidColorBrush(Colors.White);
             var pen = new Pen(new SolidColorBrush(Colors.Black), 1);
@@ -17,11 +17,9 @@ namespace WpfDrawing.Objects
             Drawing = new GeometryDrawing(brush, pen, geo);
         }
 
-        public Station(Position2d position)
+        public StationObject(Position2d position)
         {
-            X = position.X;
-            Y = position.Y;
-            Scale = 5;
+            Update(position.X, position.Y, 0.0, 5);
         }
 
         public override Drawing GetDrawing() => Drawing;

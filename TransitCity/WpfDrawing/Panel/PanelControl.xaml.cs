@@ -101,7 +101,7 @@ namespace WpfDrawing.Panel
             HitTestResultBehavior Callback(HitTestResult result)
             {
                 var obj = (result.VisualHit as PanelDrawingVisual)?.PanelObject;
-                if (obj is Station)
+                if (obj is StationObject)
                 {
                     if (obj.IsSelected)
                     {

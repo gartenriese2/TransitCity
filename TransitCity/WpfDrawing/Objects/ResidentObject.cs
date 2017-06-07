@@ -31,10 +31,7 @@ namespace WpfDrawing.Objects
         public ResidentObject(Position2d position, Vector2d direction, Resident resident)
         {
             Resident = resident;
-            X = position.X;
-            Y = position.Y;
-            Angle = Math.Atan2(direction.Y, direction.X) * 180.0 / Math.PI - 90.0;
-            Scale = 2;
+            Update(position.X, position.Y, Math.Atan2(direction.Y, direction.X) * 180.0 / Math.PI - 90.0, 2);
         }
 
         public Resident Resident { get; }

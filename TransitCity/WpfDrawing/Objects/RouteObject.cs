@@ -6,11 +6,11 @@ using WpfDrawing.Panel;
 
 namespace WpfDrawing.Objects
 {
-    public class Route : PanelObject
+    public class RouteObject : PanelObject
     {
         private readonly GeometryDrawing _drawing;
 
-        public Route(Path path, Color color)
+        public RouteObject(Path path, Color color)
         {
             var brush = new SolidColorBrush(Colors.Transparent);
             var pen = new Pen(new SolidColorBrush(color), 4.0);
@@ -25,13 +25,17 @@ namespace WpfDrawing.Objects
             var geo = new PathGeometry(new []{pathFigure});
             _drawing = new GeometryDrawing(brush, pen, geo);
 
-            Scale = 1;
+            Update(0.0, 0.0, 0.0, 1.0);
         }
 
         public double Thickness
         {
             get => _drawing.Pen.Thickness;
-            set => _drawing.Pen.Thickness = value;
+            set
+            {
+                _drawing.Pen.Thickness = value;
+                OnPropertyChanged();
+            }
         }
 
         public override Drawing GetDrawing() => _drawing;

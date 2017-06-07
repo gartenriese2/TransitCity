@@ -218,13 +218,7 @@ namespace WpfDrawing.Panel
                     continue;
                 }
 
-                var transform = drawingVisual.Transform as TransformGroup;
-                if (transform == null)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                drawingVisual.Transform = panelObject.GetTransformGroup();
+                drawingVisual.Transform = panelObject.TransformGroup;
                 break;
             }
         }
@@ -258,7 +252,7 @@ namespace WpfDrawing.Panel
                 var drawingVisual = new PanelDrawingVisual { PanelObject = panelObject };
                 var dc = drawingVisual.RenderOpen();
                 dc.DrawDrawing(panelObject.GetDrawing());
-                drawingVisual.Transform = panelObject.GetTransformGroup();
+                drawingVisual.Transform = panelObject.TransformGroup;
                 dc.Close();
                 _visualChildren.Add(drawingVisual);
             }

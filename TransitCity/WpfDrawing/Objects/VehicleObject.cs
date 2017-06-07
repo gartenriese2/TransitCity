@@ -6,11 +6,11 @@ using WpfDrawing.Panel;
 
 namespace WpfDrawing.Objects
 {
-    public class Vehicle : PanelObject
+    public class VehicleObject : PanelObject
     {
         private static readonly Drawing Drawing;
 
-        static Vehicle()
+        static VehicleObject()
         {
             var brush = new SolidColorBrush(Colors.Gray);
             var pen = new Pen(new SolidColorBrush(Colors.Black), 1);
@@ -27,12 +27,9 @@ namespace WpfDrawing.Objects
             Drawing = new GeometryDrawing(brush, pen, geo);
         }
 
-        public Vehicle(Position2d position, Vector2d direction)
+        public VehicleObject(Position2d position, Vector2d direction)
         {
-            X = position.X;
-            Y = position.Y;
-            Angle = Math.Atan2(direction.Y, direction.X) * 180.0 / Math.PI - 90.0;
-            Scale = 5;
+            Update(position.X, position.Y, Math.Atan2(direction.Y, direction.X) * 180.0 / Math.PI - 90.0, 5);
         }
 
         public override Drawing GetDrawing() => Drawing;

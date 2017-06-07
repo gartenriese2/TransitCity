@@ -78,21 +78,21 @@ namespace WpfTestApp
 
                 foreach (var path in lineInfo.RouteInfos.Select(ri => ri.Path))
                 {
-                    var r = new Route(path, color);
+                    var r = new RouteObject(path, color);
                     PanelObjects.Add(r);
                 }
             }
 
             foreach (var station in _dataManager.AllStations)
             {
-                var s = new Station(station.Position);
+                var s = new StationObject(station.Position);
                 PanelObjects.Add(s);
             }
 
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(new WeekTimePoint(DayOfWeek.Monday) + _time);
             foreach (var activeVehicle in activeVehicles)
             {
-                var v = new Vehicle(activeVehicle.Item1, activeVehicle.Item2.Normalize());
+                var v = new VehicleObject(activeVehicle.Item1, activeVehicle.Item2.Normalize());
                 PanelObjects.Add(v);
             }
 
@@ -672,7 +672,7 @@ namespace WpfTestApp
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(wtp).ToList();
             for (var i = PanelObjects.Count - 1; i >= 0; --i)
             {
-                if (PanelObjects[i] is Vehicle)
+                if (PanelObjects[i] is VehicleObject)
                 {
                     PanelObjects.RemoveAt(i);
                 }
@@ -680,7 +680,7 @@ namespace WpfTestApp
 
             foreach (var activeVehicle in activeVehicles)
             {
-                var v = new Vehicle(activeVehicle.Item1, activeVehicle.Item2.Normalize());
+                var v = new VehicleObject(activeVehicle.Item1, activeVehicle.Item2.Normalize());
                 PanelObjects.Add(v);
             }
 
@@ -732,9 +732,7 @@ namespace WpfTestApp
                 else
                 {
                     var nr = residents.Find(x => x.Resident == ro.Resident);
-                    ro.Angle = nr.Angle;
-                    ro.X = nr.X;
-                    ro.Y = nr.Y;
+                    ro.Update(nr.X, nr.Y, nr.Angle, ro.Scale);
                 }
             }
 
