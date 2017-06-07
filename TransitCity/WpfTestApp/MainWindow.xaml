@@ -36,65 +36,32 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Center">
             <TextBlock Text="{Binding WeekTime}"
+                       Margin="0,0,8,0"
                        FontSize="32"/>
-            <Button Margin="8,0"
-                    Width="32"
-                    FontSize="32"
-                    Command="{Binding PlusCommand}">
-                <TextBlock Text="+"/>
+            <Button Margin="2,0"
+                    Width="24" Height="28"
+                    FontSize="12"
+                    Command="{Binding Speed0Command}">
+                <TextBlock Text="0"/>
             </Button>
-            <Button Margin="8,0"
-                    Width="32"
-                    FontSize="32"
-                    Command="{Binding MinusCommand}">
-                <TextBlock Text="-"/>
+            <Button Margin="2,0"
+                    Width="24" Height="28"
+                    FontSize="12"
+                    Command="{Binding Speed1Command}">
+                <TextBlock Text="1"/>
             </Button>
-            <Grid Width="512">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition Width="4*"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Row="0" Grid.Column="0"
-                            Text="Zoom"/>
-                <Slider Grid.Row="0" Grid.Column="1"
-                        Focusable="False"
-                        x:Name="ZoomSlider"
-                        Minimum="{Binding MinZoom, Mode=OneTime}"
-                        Maximum="{Binding MaxZoom, Mode=OneTime}"
-                        Value="{Binding Zoom}"/>
-                <TextBlock Grid.Row="0" Grid.Column="2"
-                           Text="{Binding Value, ElementName=ZoomSlider, StringFormat=N2}"
-                           TextAlignment="Right"/>
-                
-                <TextBlock Grid.Row="1" Grid.Column="0"
-                           Text="CenterX"/>
-                <Slider Grid.Row="1" Grid.Column="1"
-                        Focusable="False"
-                        Minimum="0.0"
-                        Maximum="1.0"
-                        Value="{Binding CenterX, Mode=TwoWay}"/>
-                <TextBlock Grid.Row="1" Grid.Column="2"
-                           Text="{Binding CenterX, StringFormat=N2}"
-                           TextAlignment="Right"/>
-
-                <TextBlock Grid.Row="2" Grid.Column="0"
-                           Text="CenterY"/>
-                <Slider Grid.Row="2" Grid.Column="1"
-                        Focusable="False"
-                        Minimum="0.0"
-                        Maximum="1.0"
-                        Value="{Binding CenterY}"/>
-                <TextBlock Grid.Row="2" Grid.Column="2"
-                           Text="{Binding CenterY, StringFormat=N2}"
-                           TextAlignment="Right"/>
-            </Grid>
+            <Button Margin="2,0"
+                    Width="24" Height="28"
+                    FontSize="12"
+                    Command="{Binding Speed2Command}">
+                <TextBlock Text="2"/>
+            </Button>
+            <Button Margin="2,0,16,0"
+                    Width="24" Height="28"
+                    FontSize="12"
+                    Command="{Binding Speed3Command}">
+                <TextBlock Text="3"/>
+            </Button>
             <TextBlock>
                 <Run Text="Active Connections:"/>
                 <Run Text="{Binding ActiveConnectionsCount}"/>

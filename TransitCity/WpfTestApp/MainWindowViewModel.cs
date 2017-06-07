@@ -32,7 +32,7 @@ namespace WpfTestApp
         private List<VehicleObject> _vehicleObjects = new List<VehicleObject>();
         private TimeSpan _time = TimeSpan.Zero;
         private string _weektime = string.Empty;
-        private double _timeDelta = 5.0;
+        private double _simulationSpeedFactor = 1.0;
         private double _simulationTime;
         private Point _center;
         private double _centerX;
@@ -50,8 +50,11 @@ namespace WpfTestApp
             _transitConnectionInfo = new TransitConnectionInfo(new Dictionary<Resident, List<List<Connection>>>());
             Initialize();
 
-            PlusCommand = new RelayCommand(o => _timeDelta *= 2.0, o => _timeDelta < 20.0);
-            MinusCommand = new RelayCommand(o => _timeDelta /= 2.0, o => _timeDelta > 0.001);
+            Speed0Command = new RelayCommand(o => _simulationSpeedFactor = 0.0);
+            Speed1Command = new RelayCommand(o => _simulationSpeedFactor = 1.0);
+            Speed2Command = new RelayCommand(o => _simulationSpeedFactor = 10.0);
+            Speed3Command = new RelayCommand(o => _simulationSpeedFactor = 60.0);
+
             CenterX = 0.5;
             CenterY = 0.5;
             Zoom = 1.0;
@@ -98,17 +101,44 @@ namespace WpfTestApp
             }
 
             var tmr = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16.67) };
-            tmr.Tick += OnTimerTick2;
+            tmr.Tick += MainLoopTick;
             tmr.Start();
+
+            //WeekTime = new WeekTimePoint(DayOfWeek.Monday).ToString();
+            //var sw = new Stopwatch();
+            //sw.Start();
+            //var tmr = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(1) };
+            //tmr.Tick += (sender, args) =>
+            //{
+            //    tmr.Stop();
+            //    sw.Stop();
+            //    SimulationTime = sw.ElapsedMilliseconds;
+            //    _time += TimeSpan.FromTicks((long)(_simulationSpeedFactor * sw.ElapsedTicks));
+            //    sw.Restart();
+
+            //    //_time += TimeSpan.FromSeconds(_simulationSpeedFactor);
+            //    var wtp = new WeekTimePoint(DayOfWeek.Monday) + _time;
+            //    WeekTime = wtp.ToString();
+
+            //    UpdateVehicles(wtp);
+            //    UpdateResidents(wtp);
+
+            //    tmr.Start();
+            //};
+            //tmr.Start();
         }
 
         #region Properties
 
         public ObservableNotifiableCollection<PanelObject> PanelObjects { get; } = new ObservableNotifiableCollection<PanelObject>();
 
-        public RelayCommand PlusCommand { get; }
+        public RelayCommand Speed0Command { get; }
 
-        public RelayCommand MinusCommand { get; }
+        public RelayCommand Speed1Command { get; }
+
+        public RelayCommand Speed2Command { get; }
+
+        public RelayCommand Speed3Command { get; }
 
         public string WeekTime
         {
@@ -743,11 +773,52 @@ namespace WpfTestApp
             _residentObjects = residentObjects;
         }
 
-        private void OnTimerTick2(object sender, EventArgs args)
+        private void MainLoop()
+        {
+            WeekTime = new WeekTimePoint(DayOfWeek.Monday).ToString();
+
+            var sw = new Stopwatch();
+
+            CompositionTarget.Rendering += (sender, args) =>
+            {
+                sw.Restart();
+
+                if (_simulationSpeedFactor > 0.0)
+                {
+                    var wtp = new WeekTimePoint(DayOfWeek.Monday) + _time;
+                    WeekTime = wtp.ToString();
+                    UpdateVehicles(wtp);
+                    UpdateResidents(wtp);
+                }
+
+                sw.Stop();
+                SimulationTime = sw.ElapsedMilliseconds;
+                _time += TimeSpan.FromTicks((long) (_simulationSpeedFactor * sw.ElapsedTicks));
+            };
+            //while (true)
+            //{
+            //    sw.Restart();
+
+            //    if (_simulationSpeedFactor > 0.0)
+            //    {
+            //        var wtp = new WeekTimePoint(DayOfWeek.Monday) + _time;
+            //        WeekTime = wtp.ToString();
+            //        UpdateVehicles(wtp);
+            //        UpdateResidents(wtp);
+            //    }
+
+            //    sw.Stop();
+            //    SimulationTime = sw.ElapsedMilliseconds;
+            //    _time += TimeSpan.FromTicks((long) (_simulationSpeedFactor * sw.ElapsedTicks));
+            //}
+        }
+
+        private void MainLoopTick(object sender, EventArgs args)
         {
             var sw = new Stopwatch();
             sw.Start();
-            _time += TimeSpan.FromSeconds(_timeDelta);
+            
+            _time += TimeSpan.FromSeconds(_simulationSpeedFactor);
             var wtp = new WeekTimePoint(DayOfWeek.Monday) + _time;
             WeekTime = wtp.ToString();
             
@@ -762,7 +833,7 @@ namespace WpfTestApp
         {
             PercentageLoadedVisibility = Visibility.Visible;
 
-            var city = CreateLondon();
+            var city = CreateSmallLondon();
             var rnd = new Random();
             var workerScheduleTuples = city.Residents.Where(r => r.HasJob).Select(r => (r, JobSchedule.CreateRandom(rnd))).ToList();
             var raptor = new Raptor(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), _dataManager);
