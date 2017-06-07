@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Media;
 using Geometry;
+using Transit;
 using WpfDrawing.Panel;
 
 namespace WpfDrawing.Objects
@@ -27,11 +28,19 @@ namespace WpfDrawing.Objects
             Drawing = new GeometryDrawing(brush, pen, geo);
         }
 
-        public VehicleObject(Position2d position, Vector2d direction)
+        public VehicleObject(Position2d position, Vector2d direction, Trip trip)
         {
+            Trip = trip;
             Update(position.X, position.Y, Math.Atan2(direction.Y, direction.X) * 180.0 / Math.PI - 90.0, 5);
         }
 
+        public Trip Trip { get; }
+
         public override Drawing GetDrawing() => Drawing;
+
+        public void Update(Position2d position, Vector2d direction)
+        {
+            Update(position.X, position.Y, Math.Atan2(direction.Y, direction.X) * 180.0 / Math.PI - 90.0, Scale);
+        }
     }
 }

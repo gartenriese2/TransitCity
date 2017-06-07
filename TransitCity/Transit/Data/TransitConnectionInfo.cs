@@ -13,13 +13,13 @@ namespace Transit.Data
     public class TransitConnectionInfo
     {
         private readonly Dictionary<Resident, List<ConnectionList>> _connectionsDictionary;
-        private readonly HourlyDictionary<Connection> _hourlyConnectionsDictionary;
+        private readonly WeekTimeDictionary<Connection> _weekTimeConnectionsDictionary;
         private readonly Dictionary<Connection, Resident> _connectionToResidentDictionary = new Dictionary<Connection, Resident>();
 
         public TransitConnectionInfo(Dictionary<Resident, List<ConnectionList>> connectionsDictionary)
         {
             _connectionsDictionary = connectionsDictionary ?? throw new ArgumentNullException(nameof(connectionsDictionary));
-            _hourlyConnectionsDictionary = new HourlyDictionary<Connection>(HourlyDictionary<Connection>.Granularity.Hour, connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl));
+            _weekTimeConnectionsDictionary = new WeekTimeDictionary<Connection>(WeekTimeDictionary<Connection>.Granularity.HalfHour, connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl));
             foreach (var (resident, connectionLists) in connectionsDictionary)
             {
                 foreach (var connection in connectionLists.SelectMany(cl => cl))
@@ -36,7 +36,7 @@ namespace Transit.Data
                 _connectionsDictionary.Add(key, value);
             }
             
-            _hourlyConnectionsDictionary.AddRange(connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl));
+            _weekTimeConnectionsDictionary.AddRange(connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl));
             foreach (var (resident, connectionLists) in connectionsDictionary)
             {
                 foreach (var connection in connectionLists.SelectMany(cl => cl))
@@ -64,7 +64,7 @@ namespace Transit.Data
 
         public IEnumerable<(Resident, Connection)> GetActiveConnections(WeekTimePoint wtp)
         {
-            return _hourlyConnectionsDictionary[wtp].Where(c => new WeekTimeSpan(c.SourceTime, c.TargetTime).IsInside(wtp)).Select(c => (_connectionToResidentDictionary[c], c));
+            return _weekTimeConnectionsDictionary[wtp].Where(c => new WeekTimeSpan(c.SourceTime, c.TargetTime).IsInside(wtp)).Select(c => (_connectionToResidentDictionary[c], c));
         }
     }
 }

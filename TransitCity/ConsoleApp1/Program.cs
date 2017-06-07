@@ -200,7 +200,7 @@ namespace TestApp
                     document.Add(c);
                 }
 
-                foreach (var (pos, vec) in activeVehicles)
+                foreach (var (_, pos, vec) in activeVehicles)
                 {
                     var tip = pos + vec.Normalize() * 32f;
                     var right = pos - vec.Normalize() * 32f + vec.RotateRight().Normalize() * 16f;

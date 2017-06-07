@@ -10,7 +10,7 @@ namespace Transit.Data
 {
     public class RouteInfo
     {
-        private readonly HourlyDictionary<Trip> _hourlyTripsDictionary;
+        private readonly WeekTimeDictionary<Trip> _weekTimeTripsDictionary;
 
         public RouteInfo(Route route, Path path, List<StationInfo> stationInfos, List<Trip> trips)
         {
@@ -18,7 +18,7 @@ namespace Transit.Data
             Path = path ?? throw new ArgumentNullException(nameof(path));
             StationInfos = stationInfos ?? throw new ArgumentNullException(nameof(stationInfos));
             Trips = trips ?? throw new ArgumentNullException(nameof(trips));
-            _hourlyTripsDictionary = new HourlyDictionary<Trip>(HourlyDictionary<Trip>.Granularity.Hour, Trips);
+            _weekTimeTripsDictionary = new WeekTimeDictionary<Trip>(WeekTimeDictionary<Trip>.Granularity.TwentyMinutes, Trips);
         }
 
         public Route Route { get; }
@@ -83,7 +83,7 @@ namespace Transit.Data
 
         public IEnumerable<Trip> GetActiveTrips(WeekTimePoint wtp)
         {
-            var hourlyTrips = _hourlyTripsDictionary[wtp];
+            var hourlyTrips = _weekTimeTripsDictionary[wtp];
             return hourlyTrips.Where(trip => new WeekTimeSpan(trip.DepartureAtStation(trip.Stations.First()), trip.ArrivalAtStation(trip.Stations.Last())).IsInside(wtp));
         }
 
@@ -111,10 +111,10 @@ namespace Transit.Data
             return positions;
         }
 
-        public IEnumerable<(Position2d, Vector2d)> GetActiveVehiclePositionsAndDirections(WeekTimePoint wtp)
+        public IEnumerable<(Trip, Position2d, Vector2d)> GetActiveVehiclePositionsAndDirections(WeekTimePoint wtp)
         {
             var trips = GetActiveTrips(wtp).ToList();
-            var positions = new List<(Position2d, Vector2d)>(trips.Count);
+            var posAndDirs = new List<(Trip, Position2d, Vector2d)>(trips.Count);
             foreach (var trip in trips)
             {
                 var (lastArrival, lastDeparture, stationIdx) = GetArrivalDepartureInfoFromTrip(trip, wtp);
@@ -124,18 +124,18 @@ namespace Transit.Data
                     var pos = trip.Stations.ElementAt(stationIdx).Position;
                     var idx = Path.FindIndex(f => f.EqualPosition(pos));
                     var vec = idx == Path.Count - 1 ? Path[idx] - Path[idx - 1] : Path[idx + 1] - Path[idx];
-                    positions.Add((pos, vec));
+                    posAndDirs.Add((trip, pos, vec));
                 }
                 else
                 {
                     var departurePosition = trip.Stations.ElementAt(stationIdx).Position;
                     var arrivalPosition = trip.Stations.ElementAt(stationIdx + 1).Position;
                     var (pos, vec) = GetPositionAndDirectionOnPath(wtp.TimePoint, lastDeparture.TimePoint, lastArrival.TimePoint, departurePosition, arrivalPosition);
-                    positions.Add((pos, vec));
+                    posAndDirs.Add((trip, pos, vec));
                 }
             }
 
-            return positions;
+            return posAndDirs;
         }
 
         private static (WeekTimePoint, WeekTimePoint, int) GetArrivalDepartureInfoFromTrip(Trip trip, WeekTimePoint wtp)

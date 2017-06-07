@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AtomicWeekTimePoint.cs" />
-    <Compile Include="HourlyDictionary.cs" />
+    <Compile Include="WeekTimeDictionary.cs" />
     <Compile Include="WeekTimeCollection.cs" />
     <Compile Include="WeekTimeEnumerator.cs" />
     <Compile Include="WeekTimePoint.cs" />

@@ -5,11 +5,11 @@ using Utility.Extensions;
 
 namespace Time
 {
-    public class HourlyDictionary<T> where T : WeekTimeSpan
+    public class WeekTimeDictionary<T> where T : WeekTimeSpan
     {
         private readonly Dictionary<WeekTimeSpan, List<T>> _dictionary = new Dictionary<WeekTimeSpan, List<T>>();
 
-        public HourlyDictionary(Granularity granularity, IEnumerable<T> collection = null)
+        public WeekTimeDictionary(Granularity granularity, IEnumerable<T> collection = null)
         {
             var stepHours = TimeSpan.FromDays(7).TotalHours / (int) granularity;
             for (var i = 0; i < (int)granularity; ++i)

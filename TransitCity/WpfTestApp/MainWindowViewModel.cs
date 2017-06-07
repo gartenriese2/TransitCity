@@ -28,7 +28,8 @@ namespace WpfTestApp
 
         private readonly DataManager _dataManager;
         private readonly TransitConnectionInfo _transitConnectionInfo;
-        private readonly List<ResidentObject> _residentObjects = new List<ResidentObject>();
+        private List<ResidentObject> _residentObjects = new List<ResidentObject>();
+        private List<VehicleObject> _vehicleObjects = new List<VehicleObject>();
         private TimeSpan _time = TimeSpan.Zero;
         private string _weektime = string.Empty;
         private double _timeDelta = 5.0;
@@ -92,7 +93,7 @@ namespace WpfTestApp
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(new WeekTimePoint(DayOfWeek.Monday) + _time);
             foreach (var activeVehicle in activeVehicles)
             {
-                var v = new VehicleObject(activeVehicle.Item1, activeVehicle.Item2.Normalize());
+                var v = new VehicleObject(activeVehicle.Item2, activeVehicle.Item3.Normalize(), activeVehicle.Item1);
                 PanelObjects.Add(v);
             }
 
@@ -661,33 +662,51 @@ namespace WpfTestApp
             return new City("SmallCity", new List<IDistrict> { district });
         }
 
-        private void OnTimerTick2(object sender, EventArgs args)
+        private void UpdateVehicles(WeekTimePoint wtp)
         {
-            var sw = new Stopwatch();
-            sw.Start();
-            _time += TimeSpan.FromSeconds(_timeDelta);
-            var wtp = new WeekTimePoint(DayOfWeek.Monday) + _time;
-            WeekTime = wtp.ToString();
-            
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(wtp).ToList();
+            var vehicleObjects = new List<VehicleObject>(activeVehicles.Count);
+
+            // Add new vehicles
+            foreach (var addedVehicle in activeVehicles.Where(x => !_vehicleObjects.Select(r => r.Trip).Contains(x.Item1)))
+            {
+                var v = new VehicleObject(addedVehicle.Item2, addedVehicle.Item3.Normalize(), addedVehicle.Item1);
+                PanelObjects.Add(v);
+                vehicleObjects.Add(v);
+            }
+
+            // Remove or Update old vehicles
+            var removedVehicles = _vehicleObjects.Where(x => !activeVehicles.Select(r => r.Item1).Contains(x.Trip)).ToList();
             for (var i = PanelObjects.Count - 1; i >= 0; --i)
             {
-                if (PanelObjects[i] is VehicleObject)
+                var po = PanelObjects[i];
+                if (!(po is VehicleObject))
+                {
+                    continue;
+                }
+
+                var vo = (VehicleObject)po;
+                if (removedVehicles.Exists(x => x.Trip == vo.Trip))
                 {
                     PanelObjects.RemoveAt(i);
                 }
+                else
+                {
+                    var nv = activeVehicles.Find(x => x.Item1 == vo.Trip);
+                    vo.Update(nv.Item2, nv.Item3);
+                    vehicleObjects.Add(vo);
+                }
             }
 
-            foreach (var activeVehicle in activeVehicles)
-            {
-                var v = new VehicleObject(activeVehicle.Item1, activeVehicle.Item2.Normalize());
-                PanelObjects.Add(v);
-            }
+            _vehicleObjects = vehicleObjects;
+        }
 
+        private void UpdateResidents(WeekTimePoint wtp)
+        {
             var activeConnections = _transitConnectionInfo.GetActiveConnections(wtp).ToList();
             ActiveConnectionsCount = activeConnections.Count;
             var walkingConnections = activeConnections.Where(c => c.Item2.Type == Connection.TypeEnum.WalkToStation || c.Item2.Type == Connection.TypeEnum.WalkFromStation || c.Item2.Type == Connection.TypeEnum.Transfer);
-            var residents = new List<ResidentObject>();
+            var residentObjects = new List<ResidentObject>();
             foreach (var (r, wc) in walkingConnections)
             {
                 var isTransfer = wc.Type == Connection.TypeEnum.Transfer;
@@ -699,7 +718,7 @@ namespace WpfTestApp
                     var t = (wtp - wc.SourceTime).TotalMilliseconds / (wc.TargetTime - wc.SourceTime).TotalMilliseconds;
                     var pos = Position2d.Lerp(t, from, to);
                     var ro = new ResidentObject(pos, vec, r);
-                    residents.Add(ro);
+                    residentObjects.Add(ro);
                 }
                 else
                 {
@@ -710,12 +729,18 @@ namespace WpfTestApp
                     var t = (wtp - wc.SourceTime).TotalMilliseconds / (wc.TargetTime - wc.SourceTime).TotalMilliseconds;
                     var pos = Position2d.Lerp(t, from, to);
                     var ro = new ResidentObject(pos, vec, r);
-                    residents.Add(ro);
+                    residentObjects.Add(ro);
                 }
             }
 
-            var removed = _residentObjects.Where(x => !residents.Select(r => r.Resident).Contains(x.Resident)).ToList();
-            var added = residents.Where(x => !_residentObjects.Select(r => r.Resident).Contains(x.Resident)).ToList();
+            // Add new residents
+            foreach (var ro in residentObjects.Where(x => !_residentObjects.Select(r => r.Resident).Contains(x.Resident)))
+            {
+                PanelObjects.Add(ro);
+            }
+
+            // Remove or Update old residents
+            var removedResidents = _residentObjects.Where(x => !residentObjects.Select(r => r.Resident).Contains(x.Resident)).ToList();
             for (var i = PanelObjects.Count - 1; i >= 0; --i)
             {
                 var po = PanelObjects[i];
@@ -724,21 +749,31 @@ namespace WpfTestApp
                     continue;
                 }
 
-                var ro = (ResidentObject) po;
-                if (removed.Exists(x => x.Resident == ro.Resident))
+                var ro = (ResidentObject)po;
+                if (removedResidents.Exists(x => x.Resident == ro.Resident))
                 {
                     PanelObjects.RemoveAt(i);
                 }
                 else
                 {
-                    var nr = residents.Find(x => x.Resident == ro.Resident);
+                    var nr = residentObjects.Find(x => x.Resident == ro.Resident);
                     ro.Update(nr.X, nr.Y, nr.Angle, ro.Scale);
                 }
             }
 
-            added.ForEach(r => PanelObjects.Add(r));
-            _residentObjects.Clear();
-            _residentObjects.AddRange(residents);
+            _residentObjects = residentObjects;
+        }
+
+        private void OnTimerTick2(object sender, EventArgs args)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            _time += TimeSpan.FromSeconds(_timeDelta);
+            var wtp = new WeekTimePoint(DayOfWeek.Monday) + _time;
+            WeekTime = wtp.ToString();
+            
+            UpdateVehicles(wtp);
+            UpdateResidents(wtp);
 
             sw.Stop();
             SimulationTime = sw.ElapsedMilliseconds;
