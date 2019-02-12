@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WpfDrawing</RootNamespace>
     <AssemblyName>WpfDrawing</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -49,6 +50,7 @@
     <Compile Include="Objects\ResidentObject.cs" />
     <Compile Include="Objects\RouteObject.cs" />
     <Compile Include="Objects\StationObject.cs" />
+    <Compile Include="Objects\TextObject.cs" />
     <Compile Include="Objects\VehicleObject.cs" />
     <Compile Include="Panel\PanelDrawingVisual.cs" />
     <Compile Include="Panel\PanelObject.cs" />
