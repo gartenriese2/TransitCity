@@ -42,6 +42,7 @@
                     16,
                     Brushes.Black,
                     1.0);
+                OnPropertyChanged();
             }
         }
 

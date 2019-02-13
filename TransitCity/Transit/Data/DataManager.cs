@@ -32,7 +32,17 @@ namespace Transit.Data
 
         public IEnumerable<Position2d> GetActiveVehiclePositions(WeekTimePoint wtp) => AllLineInfos.SelectMany(li => li.GetActiveVehiclePositions(wtp));
 
-        public IEnumerable<(Trip, Position2d, Vector2d)> GetActiveVehiclePositionsAndDirections(WeekTimePoint wtp) => AllLineInfos.SelectMany(li => li.GetActiveVehiclePositionsAndDirections(wtp));
+        public IEnumerable<(LineInfo, RouteInfo, Trip, Position2d, Vector2d)> GetActiveVehiclePositionsAndDirections(WeekTimePoint wtp) => AllLineInfos.SelectMany(li =>
+        {
+            var tuples = li.GetActiveVehiclePositionsAndDirections(wtp);
+            var list = new List<(LineInfo, RouteInfo, Trip, Position2d, Vector2d)>();
+            foreach (var (ri, trip, pos, vec) in tuples)
+            {
+                list.Add((li, ri, trip, pos, vec));
+            }
+
+            return list;
+        });
 
         public void AddSubwayLine(Dictionary<Position2d, string> route, string name, WeekTimeCollection initialOutwardDepartures, WeekTimeCollection initialInwardDepartures, Duration waitingTime)
         {

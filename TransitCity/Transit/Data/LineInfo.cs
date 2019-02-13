@@ -22,6 +22,16 @@ namespace Transit.Data
 
         public IEnumerable<Position2d> GetActiveVehiclePositions(WeekTimePoint wtp) => RouteInfos.SelectMany(ri => ri.GetActiveVehiclePositions(wtp));
 
-        public IEnumerable<(Trip, Position2d, Vector2d)> GetActiveVehiclePositionsAndDirections(WeekTimePoint wtp) => RouteInfos.SelectMany(ri => ri.GetActiveVehiclePositionsAndDirections(wtp));
+        public IEnumerable<(RouteInfo, Trip, Position2d, Vector2d)> GetActiveVehiclePositionsAndDirections(WeekTimePoint wtp) => RouteInfos.SelectMany(ri =>
+        {
+            var tuples = ri.GetActiveVehiclePositionsAndDirections(wtp);
+            var list = new List<(RouteInfo, Trip, Position2d, Vector2d)>();
+            foreach (var (trip, pos, vec) in tuples)
+            {
+                list.Add((ri, trip, pos, vec));
+            }
+
+            return list;
+        });
     }
 }

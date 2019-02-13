@@ -1,4 +1,6 @@
-﻿namespace WpfTestApp
+﻿using Transit;
+
+namespace WpfTestApp
 {
     using System;
     using System.Collections.Generic;
@@ -98,12 +100,38 @@
                 PanelObjects.Add(s);
             }
 
-            var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(new WeekTimePoint(DayOfWeek.Monday) + _time);
-            foreach (var activeVehicle in activeVehicles)
+            var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(new WeekTimePoint(DayOfWeek.Monday) + _time).ToList();
+            var ridingConnections = _transitConnectionInfo.GetRidingResidents(new WeekTimePoint(DayOfWeek.Monday) + _time).ToList();
+            var ridershipDictionary = new Dictionary<Trip, int>();
+            foreach (var connection in ridingConnections)
             {
-                var v = new VehicleObject(activeVehicle.Item2, activeVehicle.Item3.Normalize(), activeVehicle.Item1);
+                var line = connection.Line;
+                var possibleVehicles = activeVehicles.Where(t => t.Item1.Line == line);
+                foreach (var (_, routeInfo, trip, _, _) in possibleVehicles)
+                {
+                    if (!routeInfo.StationInfos.Select(si => si.Station).Contains(connection.SourceStation))
+                    {
+                        continue;
+                    }
+
+                    if (trip.DepartureAtStation(connection.SourceStation) == connection.SourceTime && trip.ArrivalAtStation(connection.TargetStation) == connection.TargetTime)
+                    {
+                        if (ridershipDictionary.ContainsKey(trip))
+                        {
+                            ridershipDictionary[trip]++;
+                        }
+                        else
+                        {
+                            ridershipDictionary.Add(trip, 1);
+                        }
+                    }
+                }
+            }
+            foreach (var (lineInfo, routeInfo, trip, pos, vec) in activeVehicles)
+            {
+                var v = new VehicleObject(pos, vec.Normalize(), trip);
                 PanelObjects.Add(v);
-                var t = new TextObject("Test!", activeVehicle.Item2);
+                var t = new TextObject((ridershipDictionary.ContainsKey(trip) ? ridershipDictionary[trip] : 0).ToString(), pos);
                 PanelObjects.Add(t);
                 _vehicleObjects.Add((v, t));
             }
@@ -111,29 +139,6 @@
             var tmr = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16.67) };
             tmr.Tick += MainLoopTick;
             tmr.Start();
-
-            //WeekTime = new WeekTimePoint(DayOfWeek.Monday).ToString();
-            //var sw = new Stopwatch();
-            //sw.Start();
-            //var tmr = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(1) };
-            //tmr.Tick += (sender, args) =>
-            //{
-            //    tmr.Stop();
-            //    sw.Stop();
-            //    SimulationTime = sw.ElapsedMilliseconds;
-            //    _time += TimeSpan.FromTicks((long)(_simulationSpeedFactor * sw.ElapsedTicks));
-            //    sw.Restart();
-
-            //    //_time += TimeSpan.FromSeconds(_simulationSpeedFactor);
-            //    var wtp = new WeekTimePoint(DayOfWeek.Monday) + _time;
-            //    WeekTime = wtp.ToString();
-
-            //    UpdateVehicles(wtp);
-            //    UpdateResidents(wtp);
-
-            //    tmr.Start();
-            //};
-            //tmr.Start();
         }
 
         #region Properties
@@ -703,10 +708,37 @@
         private void UpdateVehicles(WeekTimePoint wtp)
         {
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(wtp).ToList();
+            var ridingConnections = _transitConnectionInfo.GetRidingResidents(wtp).ToList();
+            var ridershipDictionary = new Dictionary<Trip, int>();
+            foreach (var connection in ridingConnections)
+            {
+                var line = connection.Line;
+                var possibleVehicles = activeVehicles.Where(t => t.Item1.Line == line);
+                foreach (var (_, routeInfo, trip, _, _) in possibleVehicles)
+                {
+                    if (!routeInfo.StationInfos.Select(si => si.Station).Contains(connection.SourceStation))
+                    {
+                        continue;
+                    }
+
+                    if (trip.DepartureAtStation(connection.SourceStation) == connection.SourceTime && trip.ArrivalAtStation(connection.TargetStation) == connection.TargetTime)
+                    {
+                        if (ridershipDictionary.ContainsKey(trip))
+                        {
+                            ridershipDictionary[trip]++;
+                        }
+                        else
+                        {
+                            ridershipDictionary.Add(trip, 1);
+                        }
+                    }
+                }
+            }
+
             var vehicleObjects = new List<(VehicleObject, TextObject)>(activeVehicles.Count);
 
             // Remove old vehicles
-            var toBeRemoved = _vehicleObjects.Where(x => !activeVehicles.Select(r => r.Item1).Contains(x.Item1.Trip)).ToList();
+            var toBeRemoved = _vehicleObjects.Where(x => !activeVehicles.Select(r => r.Item3).Contains(x.Item1.Trip)).ToList();
             foreach (var (vo, to) in toBeRemoved)
             {
                 PanelObjects.Remove(vo);
@@ -714,7 +746,7 @@
             }
 
             // Update or create active vehicles
-            foreach (var (trip, pos, dir) in activeVehicles)
+            foreach (var (lineInfo, routeInfo, trip, pos, dir) in activeVehicles)
             {
                 if (_vehicleObjects.Exists(t => t.Item1.Trip == trip))
                 {
@@ -722,15 +754,16 @@
                     vo.Update(pos, dir);
                     to.X = pos.X;
                     to.Y = pos.Y;
+                    to.Text = (ridershipDictionary.ContainsKey(trip) ? ridershipDictionary[trip] : 0).ToString();
                     vehicleObjects.Add((vo, to));
                 }
                 else
                 {
-                    var v = new VehicleObject(pos, dir.Normalize(), trip);
-                    PanelObjects.Add(v);
-                    var t = new TextObject("Test!", pos);
-                    PanelObjects.Add(t);
-                    vehicleObjects.Add((v, t));
+                    var vo = new VehicleObject(pos, dir.Normalize(), trip);
+                    PanelObjects.Add(vo);
+                    var to = new TextObject((ridershipDictionary.ContainsKey(trip) ? ridershipDictionary[trip] : 0).ToString(), pos);
+                    PanelObjects.Add(to);
+                    vehicleObjects.Add((vo, to));
                 }
             }
 
@@ -777,46 +810,6 @@
             }
 
             _residentObjects = residentObjects;
-        }
-
-        private void MainLoop()
-        {
-            WeekTime = new WeekTimePoint(DayOfWeek.Monday).ToString();
-
-            var sw = new Stopwatch();
-
-            CompositionTarget.Rendering += (sender, args) =>
-            {
-                sw.Restart();
-
-                if (_simulationSpeedFactor > 0.0)
-                {
-                    var wtp = new WeekTimePoint(DayOfWeek.Monday) + _time;
-                    WeekTime = wtp.ToString();
-                    UpdateVehicles(wtp);
-                    UpdateResidents(wtp);
-                }
-
-                sw.Stop();
-                SimulationTime = sw.ElapsedMilliseconds;
-                _time += TimeSpan.FromTicks((long) (_simulationSpeedFactor * sw.ElapsedTicks));
-            };
-            //while (true)
-            //{
-            //    sw.Restart();
-
-            //    if (_simulationSpeedFactor > 0.0)
-            //    {
-            //        var wtp = new WeekTimePoint(DayOfWeek.Monday) + _time;
-            //        WeekTime = wtp.ToString();
-            //        UpdateVehicles(wtp);
-            //        UpdateResidents(wtp);
-            //    }
-
-            //    sw.Stop();
-            //    SimulationTime = sw.ElapsedMilliseconds;
-            //    _time += TimeSpan.FromTicks((long) (_simulationSpeedFactor * sw.ElapsedTicks));
-            //}
         }
 
         private void MainLoopTick(object sender, EventArgs args)
