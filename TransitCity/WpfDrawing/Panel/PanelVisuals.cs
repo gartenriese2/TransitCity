@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Windows;
-using System.Windows.Media;
-using WpfDrawing.Utility;
-
-namespace WpfDrawing.Panel
+﻿namespace WpfDrawing.Panel
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using System.Windows;
+    using System.Windows.Media;
+
+    using WpfDrawing.Utility;
+
     public class PanelVisuals : FrameworkElement
     {
         #region DependencyProperties
@@ -67,8 +68,8 @@ namespace WpfDrawing.Panel
 
         public ObservableNotifiableCollection<PanelObject> ItemsSource
         {
-            set => SetValue(ItemsSourceProperty, value);
             get => (ObservableNotifiableCollection<PanelObject>)GetValue(ItemsSourceProperty);
+            set => SetValue(ItemsSourceProperty, value);
         }
 
         public double Zoom
@@ -251,7 +252,7 @@ namespace WpfDrawing.Panel
 
                 var drawingVisual = new PanelDrawingVisual { PanelObject = panelObject };
                 var dc = drawingVisual.RenderOpen();
-                dc.DrawDrawing(panelObject.GetDrawing());
+                panelObject.Draw(dc);
                 drawingVisual.Transform = panelObject.TransformGroup;
                 dc.Close();
                 _visualChildren.Add(drawingVisual);

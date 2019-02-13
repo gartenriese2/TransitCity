@@ -1,12 +1,15 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Media;
-using Geometry;
-using Transit;
-using WpfDrawing.Panel;
-
-namespace WpfDrawing.Objects
+﻿namespace WpfDrawing.Objects
 {
+    using System;
+    using System.Windows;
+    using System.Windows.Media;
+
+    using Geometry;
+
+    using Transit;
+
+    using WpfDrawing.Panel;
+
     public class VehicleObject : PanelObject
     {
         private static readonly Drawing Drawing;
@@ -26,6 +29,7 @@ namespace WpfDrawing.Objects
                 true)
             });
             Drawing = new GeometryDrawing(brush, pen, geo);
+            
         }
 
         public VehicleObject(Position2d position, Vector2d direction, Trip trip)
@@ -36,7 +40,10 @@ namespace WpfDrawing.Objects
 
         public Trip Trip { get; }
 
-        public override Drawing GetDrawing() => Drawing;
+        public override void Draw(DrawingContext dc)
+        {
+            dc.DrawDrawing(Drawing);
+        }
 
         public void Update(Position2d position, Vector2d direction)
         {

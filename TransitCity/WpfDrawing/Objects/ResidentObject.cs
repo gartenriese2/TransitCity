@@ -36,7 +36,10 @@ namespace WpfDrawing.Objects
 
         public Resident Resident { get; }
 
-        public override Drawing GetDrawing() => Drawing;
+        public override void Draw(DrawingContext dc)
+        {
+            dc.DrawDrawing(Drawing);
+        }
 
         public void Update(Position2d position, Vector2d direction)
         {

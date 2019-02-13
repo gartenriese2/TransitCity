@@ -38,6 +38,9 @@ namespace WpfDrawing.Objects
             }
         }
 
-        public override Drawing GetDrawing() => _drawing;
+        public override void Draw(DrawingContext dc)
+        {
+            dc.DrawDrawing(_drawing);
+        }
     }
 }

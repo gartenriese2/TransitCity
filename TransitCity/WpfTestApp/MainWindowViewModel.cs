@@ -1,27 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Threading;
-using CitySimulation;
-using Geometry;
-using Geometry.Shapes;
-using Time;
-using Transit.Data;
-using Transit.Timetable;
-using Transit.Timetable.Algorithm;
-using Utility.MVVM;
-using Utility.Units;
-using WpfDrawing.Objects;
-using WpfDrawing.Panel;
-using WpfDrawing.Utility;
-
-namespace WpfTestApp
+﻿namespace WpfTestApp
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Input;
+    using System.Windows.Media;
+    using System.Windows.Threading;
+
+    using CitySimulation;
+
+    using Geometry.Shapes;
+
+    using Time;
+
+    using Transit.Data;
+    using Transit.Timetable;
+    using Transit.Timetable.Algorithm;
+
+    using Utility.MVVM;
+    using Utility.Units;
+
+    using WpfDrawing.Objects;
+    using WpfDrawing.Panel;
+    using WpfDrawing.Utility;
+
     public class MainWindowViewModel : PropertyChangedBase
     {
         #region Fields
@@ -29,7 +34,7 @@ namespace WpfTestApp
         private readonly DataManager _dataManager;
         private readonly TransitConnectionInfo _transitConnectionInfo;
         private List<ResidentObject> _residentObjects = new List<ResidentObject>();
-        private List<VehicleObject> _vehicleObjects = new List<VehicleObject>();
+        private List<(VehicleObject, TextObject)> _vehicleObjects = new List<(VehicleObject, TextObject)>();
         private TimeSpan _time = TimeSpan.Zero;
         private string _weektime = string.Empty;
         private double _simulationSpeedFactor = 1.0;
@@ -98,6 +103,9 @@ namespace WpfTestApp
             {
                 var v = new VehicleObject(activeVehicle.Item2, activeVehicle.Item3.Normalize(), activeVehicle.Item1);
                 PanelObjects.Add(v);
+                var t = new TextObject("Test!", activeVehicle.Item2);
+                PanelObjects.Add(t);
+                _vehicleObjects.Add((v, t));
             }
 
             var tmr = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16.67) };
@@ -695,36 +703,34 @@ namespace WpfTestApp
         private void UpdateVehicles(WeekTimePoint wtp)
         {
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(wtp).ToList();
-            var vehicleObjects = new List<VehicleObject>(activeVehicles.Count);
+            var vehicleObjects = new List<(VehicleObject, TextObject)>(activeVehicles.Count);
 
-            // Add new vehicles
-            foreach (var addedVehicle in activeVehicles.Where(x => !_vehicleObjects.Select(r => r.Trip).Contains(x.Item1)))
+            // Remove old vehicles
+            var toBeRemoved = _vehicleObjects.Where(x => !activeVehicles.Select(r => r.Item1).Contains(x.Item1.Trip)).ToList();
+            foreach (var (vo, to) in toBeRemoved)
             {
-                var v = new VehicleObject(addedVehicle.Item2, addedVehicle.Item3.Normalize(), addedVehicle.Item1);
-                PanelObjects.Add(v);
-                vehicleObjects.Add(v);
+                PanelObjects.Remove(vo);
+                PanelObjects.Remove(to);
             }
 
-            // Remove or Update old vehicles
-            var removedVehicles = _vehicleObjects.Where(x => !activeVehicles.Select(r => r.Item1).Contains(x.Trip)).ToList();
-            for (var i = PanelObjects.Count - 1; i >= 0; --i)
+            // Update or create active vehicles
+            foreach (var (trip, pos, dir) in activeVehicles)
             {
-                var po = PanelObjects[i];
-                if (!(po is VehicleObject))
+                if (_vehicleObjects.Exists(t => t.Item1.Trip == trip))
                 {
-                    continue;
-                }
-
-                var vo = (VehicleObject)po;
-                if (removedVehicles.Exists(x => x.Trip == vo.Trip))
-                {
-                    PanelObjects.RemoveAt(i);
+                    var (vo, to) = _vehicleObjects.First(t => t.Item1.Trip == trip);
+                    vo.Update(pos, dir);
+                    to.X = pos.X;
+                    to.Y = pos.Y;
+                    vehicleObjects.Add((vo, to));
                 }
                 else
                 {
-                    var nv = activeVehicles.Find(x => x.Item1 == vo.Trip);
-                    vo.Update(nv.Item2, nv.Item3);
-                    vehicleObjects.Add(vo);
+                    var v = new VehicleObject(pos, dir.Normalize(), trip);
+                    PanelObjects.Add(v);
+                    var t = new TextObject("Test!", pos);
+                    PanelObjects.Add(t);
+                    vehicleObjects.Add((v, t));
                 }
             }
 

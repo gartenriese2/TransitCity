@@ -22,6 +22,9 @@ namespace WpfDrawing.Objects
             Update(position.X, position.Y, 0.0, 5);
         }
 
-        public override Drawing GetDrawing() => Drawing;
+        public override void Draw(DrawingContext dc)
+        {
+            dc.DrawDrawing(Drawing);
+        }
     }
 }

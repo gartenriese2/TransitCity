@@ -1,9 +1,10 @@
-﻿using System;
-using System.Windows.Media;
-using Utility.MVVM;
-
-namespace WpfDrawing.Panel
+﻿namespace WpfDrawing.Panel
 {
+    using System;
+    using System.Windows.Media;
+
+    using global::Utility.MVVM;
+
     public abstract class PanelObject : PropertyChangedBase
     {
         private double _x;
@@ -76,7 +77,7 @@ namespace WpfDrawing.Panel
 
         public bool IsSelected { get; set; }
 
-        public abstract Drawing GetDrawing();
+        public abstract void Draw(DrawingContext dc);
 
         public void Update(double x, double y, double angle, double scale)
         {
