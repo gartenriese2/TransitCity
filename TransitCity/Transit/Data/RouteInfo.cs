@@ -118,20 +118,45 @@ namespace Transit.Data
             foreach (var trip in trips)
             {
                 var (lastArrival, lastDeparture, stationIdx) = GetArrivalDepartureInfoFromTrip(trip, wtp);
-
                 if (lastArrival < lastDeparture)
                 {
-                    var pos = trip.Stations.ElementAt(stationIdx).Position;
-                    var idx = Path.FindIndex(f => f.EqualPosition(pos));
-                    var vec = idx == Path.Count - 1 ? Path[idx] - Path[idx - 1] : Path[idx + 1] - Path[idx];
-                    posAndDirs.Add((trip, pos, vec));
+                    if (lastDeparture.GetDayOfWeek() == DayOfWeek.Sunday
+                        && lastArrival.GetDayOfWeek() == DayOfWeek.Monday)
+                    {
+                        // on path from d to a
+                        var departurePosition = trip.Stations.ElementAt(stationIdx).Position;
+                        var arrivalPosition = trip.Stations.ElementAt(stationIdx + 1).Position;
+                        var (pos, vec) = GetPositionAndDirectionOnPath(WeekTimePoint.GetCorrectedDifference(lastDeparture, wtp), WeekTimePoint.GetCorrectedDifference(lastDeparture, lastArrival), departurePosition, arrivalPosition);
+                        posAndDirs.Add((trip, pos, vec));
+                    }
+                    else
+                    {
+                        // at station
+                        var pos = trip.Stations.ElementAt(stationIdx).Position;
+                        var idx = Path.FindIndex(f => f.EqualPosition(pos));
+                        var vec = idx == Path.Count - 1 ? Path[idx] - Path[idx - 1] : Path[idx + 1] - Path[idx];
+                        posAndDirs.Add((trip, pos, vec));
+                    }
                 }
                 else
                 {
-                    var departurePosition = trip.Stations.ElementAt(stationIdx).Position;
-                    var arrivalPosition = trip.Stations.ElementAt(stationIdx + 1).Position;
-                    var (pos, vec) = GetPositionAndDirectionOnPath(wtp.TimePoint, lastDeparture.TimePoint, lastArrival.TimePoint, departurePosition, arrivalPosition);
-                    posAndDirs.Add((trip, pos, vec));
+                    if (lastDeparture.GetDayOfWeek() == DayOfWeek.Monday
+                        && lastArrival.GetDayOfWeek() == DayOfWeek.Sunday)
+                    {
+                        // at station
+                        var pos = trip.Stations.ElementAt(stationIdx).Position;
+                        var idx = Path.FindIndex(f => f.EqualPosition(pos));
+                        var vec = idx == Path.Count - 1 ? Path[idx] - Path[idx - 1] : Path[idx + 1] - Path[idx];
+                        posAndDirs.Add((trip, pos, vec));
+                    }
+                    else
+                    {
+                        // on path from d to a
+                        var departurePosition = trip.Stations.ElementAt(stationIdx).Position;
+                        var arrivalPosition = trip.Stations.ElementAt(stationIdx + 1).Position;
+                        var (pos, vec) = GetPositionAndDirectionOnPath(wtp.TimePoint - lastDeparture.TimePoint, lastArrival.TimePoint - lastDeparture.TimePoint, departurePosition, arrivalPosition);
+                        posAndDirs.Add((trip, pos, vec));
+                    }
                 }
             }
 
@@ -140,26 +165,86 @@ namespace Transit.Data
 
         private static (WeekTimePoint, WeekTimePoint, int) GetArrivalDepartureInfoFromTrip(Trip trip, WeekTimePoint wtp)
         {
-            var lastArrival = trip.DepartureAtStation(trip.Stations.First()) - TimeSpan.FromSeconds(30); // TODO
             var lastDeparture = trip.DepartureAtStation(trip.Stations.First());
+            var lastArrival = lastDeparture - TimeSpan.FromSeconds(30); // TODO
             var stationIdx = 0;
             var lastIsArrival = true; // arrival must be less than departure if true
-            while ((lastIsArrival && lastDeparture < wtp) || (!lastIsArrival && lastArrival < wtp))
+
+            if (wtp < lastDeparture)
             {
-                if (lastIsArrival)
+                // Must be a trip from sunday to monday.
+                if (trip.DepartureAtStation(trip.Stations.Last()) > lastDeparture)
                 {
-                    lastArrival = trip.ArrivalAtStation(trip.Stations.ElementAt(stationIdx + 1));
+                    throw new InvalidOperationException();
                 }
-                else
+
+                // Advance until monday
+                while (lastArrival.GetDayOfWeek() != DayOfWeek.Monday
+                       && lastDeparture.GetDayOfWeek() != DayOfWeek.Monday)
                 {
+                    if (lastIsArrival)
+                    {
+                        lastArrival = trip.ArrivalAtStation(trip.Stations.ElementAt(stationIdx + 1));
+                    }
+                    else
+                    {
+                        lastDeparture = trip.DepartureAtStation(trip.Stations.ElementAt(stationIdx + 1));
+                        ++stationIdx;
+                    }
+
+                    lastIsArrival = !lastIsArrival;
+                }
+
+                // Now either last arrival or last departure is on a monday.
+                if (!lastIsArrival)
+                {
+                    if (lastArrival >= wtp)
+                    {
+                        return (lastArrival, lastDeparture, stationIdx);
+                    }
+
                     lastDeparture = trip.DepartureAtStation(trip.Stations.ElementAt(stationIdx + 1));
                     ++stationIdx;
+                    lastIsArrival = !lastIsArrival;
                 }
 
-                lastIsArrival = !lastIsArrival;
-            }
+                // Now both last arrival and last departure are on a monday.
+                while ((lastIsArrival && lastDeparture < wtp) || (!lastIsArrival && lastArrival < wtp))
+                {
+                    if (lastIsArrival)
+                    {
+                        lastArrival = trip.ArrivalAtStation(trip.Stations.ElementAt(stationIdx + 1));
+                    }
+                    else
+                    {
+                        lastDeparture = trip.DepartureAtStation(trip.Stations.ElementAt(stationIdx + 1));
+                        ++stationIdx;
+                    }
 
-            return (lastArrival, lastDeparture, stationIdx);
+                    lastIsArrival = !lastIsArrival;
+                }
+
+                return (lastArrival, lastDeparture, stationIdx);
+            }
+            else
+            {
+                while ((lastIsArrival && lastDeparture < wtp) || (!lastIsArrival && lastArrival < wtp))
+                {
+                    if (lastIsArrival)
+                    {
+                        lastArrival = trip.ArrivalAtStation(trip.Stations.ElementAt(stationIdx + 1));
+                    }
+                    else
+                    {
+                        lastDeparture = trip.DepartureAtStation(trip.Stations.ElementAt(stationIdx + 1));
+                        ++stationIdx;
+                    }
+
+                    lastIsArrival = !lastIsArrival;
+                }
+
+                return (lastArrival, lastDeparture, stationIdx);
+            }
         }
 
         private Position2d GetPositionOnPath(
@@ -188,21 +273,20 @@ namespace Transit.Data
         }
 
         private (Position2d, Vector2d) GetPositionAndDirectionOnPath(
-            TimeSpan wtp,
-            TimeSpan departureFromLastStation,
-            TimeSpan arrivalAtNextStation,
+            TimeSpan durationSinceDeparture,
+            TimeSpan durationForPart,
             Position2d departurePosition,
             Position2d arrivalPosition)
         {
-            if (wtp < departureFromLastStation || wtp > arrivalAtNextStation)
+            if (durationSinceDeparture > durationForPart)
             {
                 throw new ArgumentOutOfRangeException();
             }
 
-            var traveledDistance = SubwayTravelDistanceFunc(Duration.FromSeconds((wtp - departureFromLastStation).TotalSeconds), Duration.FromSeconds((arrivalAtNextStation - departureFromLastStation).TotalSeconds));
+            var traveledDistance = SubwayTravelDistanceFunc(Duration.FromSeconds(durationSinceDeparture.TotalSeconds), Duration.FromSeconds(durationForPart.TotalSeconds));
             var departureStationIndex = Path.FindIndex(f => f.EqualPosition(departurePosition));
             var arrivalStationIndex = Path.FindIndex(f => f.EqualPosition(arrivalPosition));
-            var pathBetweenStations = Path.Subpath(departureStationIndex, arrivalStationIndex - departureStationIndex + 1);
+            var pathBetweenStations = Path.Subpath(departureStationIndex, arrivalStationIndex - departureStationIndex + 1); // TODO hier stimmt was nicht, hier werden die stations indices übergeben, aber die path indices werden benötigt
             if (!pathBetweenStations.First().EqualPosition(departurePosition))
             {
                 throw new InvalidOperationException();
