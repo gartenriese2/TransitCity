@@ -79,10 +79,26 @@ namespace WpfTestApp
                 }
             }
 
+            var waitingConnections = _transitConnectionInfo.GetWaitingResidents(new WeekTimePoint(DayOfWeek.Monday) + _time);
+            var waitingDictionary = new Dictionary<Station, int>();
+            foreach (var connection in waitingConnections)
+            {
+                if (waitingDictionary.ContainsKey(connection.TargetStation))
+                {
+                    waitingDictionary[connection.TargetStation]++;
+                }
+                else
+                {
+                    waitingDictionary.Add(connection.TargetStation, 1);
+                }
+            }
+
             foreach (var station in _dataManager.AllStations)
             {
                 var s = new StationObject(station.Position);
                 PanelObjects.Add(s);
+                var swo = new StationWaitersObject((waitingDictionary.ContainsKey(station) ? waitingDictionary[station] : 0).ToString(), station);
+                PanelObjects.Add(swo);
             }
 
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(new WeekTimePoint(DayOfWeek.Monday) + _time).ToList();
@@ -112,7 +128,7 @@ namespace WpfTestApp
                     }
                 }
             }
-            foreach (var (lineInfo, routeInfo, trip, pos, vec) in activeVehicles)
+            foreach (var (lineInfo, _, trip, pos, vec) in activeVehicles)
             {
                 var v = new VehicleObject(pos, vec.Normalize(), trip);
                 PanelObjects.Add(v);
@@ -717,6 +733,28 @@ namespace WpfTestApp
             return new City("SmallCity", new List<IDistrict> { district });
         }
 
+        private void UpdateStations(WeekTimePoint wtp)
+        {
+            var waitingConnections = _transitConnectionInfo.GetWaitingResidents(wtp);
+            var waitingDictionary = new Dictionary<Station, int>();
+            foreach (var connection in waitingConnections)
+            {
+                if (waitingDictionary.ContainsKey(connection.TargetStation))
+                {
+                    waitingDictionary[connection.TargetStation]++;
+                }
+                else
+                {
+                    waitingDictionary.Add(connection.TargetStation, 1);
+                }
+            }
+
+            foreach (var swo in PanelObjects.OfType<StationWaitersObject>())
+            {
+                swo.Text = (waitingDictionary.ContainsKey(swo.Station) ? waitingDictionary[swo.Station] : 0).ToString();
+            }
+        }
+
         private void UpdateVehicles(WeekTimePoint wtp)
         {
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(wtp).ToList();
@@ -850,7 +888,8 @@ namespace WpfTestApp
             _time += TimeSpan.FromSeconds(_simulationSpeedFactor);
             var wtp = new WeekTimePoint(DayOfWeek.Monday) + _time;
             WeekTime = wtp.ToString();
-            
+
+            UpdateStations(wtp);
             UpdateVehicles(wtp);
             UpdateResidents(wtp);
 

@@ -104,5 +104,11 @@ namespace Transit.Data
             var activeConnections = GetActiveConnections(wtp);
             return activeConnections.Where(t => t.Item2.Type == Connection.TypeEnum.Ride).Select(t => t.Item2);
         }
+
+        public IEnumerable<Connection> GetWaitingResidents(WeekTimePoint wtp)
+        {
+            var activeConnections = GetActiveConnections(wtp);
+            return activeConnections.Where(t => t.Item2.Type == Connection.TypeEnum.Transfer || t.Item2.Type == Connection.TypeEnum.WalkToStation).Select(t => t.Item2);
+        }
     }
 }
