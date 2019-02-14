@@ -70,24 +70,7 @@ namespace WpfTestApp
 
             foreach (var lineInfo in _dataManager.AllLineInfos)
             {
-                Color color;
-                switch (lineInfo.Line.Name)
-                {
-                    case "1":
-                        color = Colors.Red;
-                        break;
-                    case "2":
-                        color = Colors.DarkGreen;
-                        break;
-                    case "3":
-                        color = Colors.DarkBlue;
-                        break;
-                    case "4":
-                        color = Colors.Orange;
-                        break;
-                    default:
-                        throw new InvalidOperationException();
-                }
+                var color = LineInfoToColor(lineInfo);
 
                 foreach (var path in lineInfo.RouteInfos.Select(ri => ri.Path))
                 {
@@ -133,7 +116,8 @@ namespace WpfTestApp
             {
                 var v = new VehicleObject(pos, vec.Normalize(), trip);
                 PanelObjects.Add(v);
-                var t = new TextObject((ridershipDictionary.ContainsKey(trip) ? ridershipDictionary[trip] : 0).ToString(), pos);
+                var color = LineInfoToColor(lineInfo);
+                var t = new TextObject((ridershipDictionary.ContainsKey(trip) ? ridershipDictionary[trip] : 0).ToString(), pos, color);
                 PanelObjects.Add(t);
                 _vehicleObjects.Add((v, t));
             }
@@ -796,7 +780,8 @@ namespace WpfTestApp
                 {
                     var vo = new VehicleObject(pos, dir.Normalize(), trip);
                     PanelObjects.Add(vo);
-                    var to = new TextObject((ridershipDictionary.ContainsKey(trip) ? ridershipDictionary[trip] : 0).ToString(), pos);
+                    var color = LineInfoToColor(lineInfo);
+                    var to = new TextObject((ridershipDictionary.ContainsKey(trip) ? ridershipDictionary[trip] : 0).ToString(), pos, color);
                     PanelObjects.Add(to);
                     vehicleObjects.Add((vo, to));
                 }
@@ -909,6 +894,30 @@ namespace WpfTestApp
             }
 
             PercentageLoadedVisibility = Visibility.Collapsed;
+        }
+
+        private Color LineInfoToColor(LineInfo lineInfo)
+        {
+            Color color;
+            switch (lineInfo.Line.Name)
+            {
+                case "1":
+                    color = Colors.Red;
+                    break;
+                case "2":
+                    color = Colors.DarkGreen;
+                    break;
+                case "3":
+                    color = Colors.DarkBlue;
+                    break;
+                case "4":
+                    color = Colors.Orange;
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+
+            return color;
         }
     }
 }
