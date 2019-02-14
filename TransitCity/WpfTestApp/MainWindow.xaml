@@ -62,10 +62,20 @@
                     Command="{Binding Speed3Command}">
                 <TextBlock Text="3"/>
             </Button>
-            <TextBlock>
-                <Run Text="Active Connections:"/>
-                <Run Text="{Binding ActiveConnectionsCount}"/>
-            </TextBlock>
+            <StackPanel Orientation="Vertical">
+                <TextBlock>
+                    <Run Text="Active Connections:"/>
+                    <Run Text="{Binding ActiveConnectionsCount}"/>
+                </TextBlock>
+                <TextBlock>
+                    <Run Text="Active Riders:"/>
+                    <Run Text="{Binding ActiveRiderCount}"/>
+                </TextBlock>
+                <TextBlock>
+                    <Run Text="Active Vehicles:"/>
+                    <Run Text="{Binding ActiveVehicleCount}"/>
+                </TextBlock>
+            </StackPanel>
         </StackPanel>
 
         <TextBlock Grid.Row="0" Grid.Column="1"

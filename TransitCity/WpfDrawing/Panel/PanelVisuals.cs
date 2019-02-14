@@ -219,7 +219,10 @@
                     continue;
                 }
 
+                var dc = drawingVisual.RenderOpen();
+                panelObject.Draw(dc);
                 drawingVisual.Transform = panelObject.TransformGroup;
+                dc.Close();
                 break;
             }
         }

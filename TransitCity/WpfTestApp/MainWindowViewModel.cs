@@ -46,6 +46,8 @@ namespace WpfTestApp
         private double _centerY;
         private double _zoom;
         private int _activeConnectionsCount;
+        private int _activeRiderCount;
+        private int _activeVehicleCount;
         private double _percentageLoaded;
         private Visibility _percentageLoadedVisibility = Visibility.Hidden;
 
@@ -241,6 +243,32 @@ namespace WpfTestApp
                 if (value != _activeConnectionsCount)
                 {
                     _activeConnectionsCount = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public int ActiveRiderCount
+        {
+            get => _activeRiderCount;
+            set
+            {
+                if (value != _activeRiderCount)
+                {
+                    _activeRiderCount = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public int ActiveVehicleCount
+        {
+            get => _activeVehicleCount;
+            set
+            {
+                if (value != _activeVehicleCount)
+                {
+                    _activeVehicleCount = value;
                     OnPropertyChanged();
                 }
             }
@@ -708,7 +736,9 @@ namespace WpfTestApp
         private void UpdateVehicles(WeekTimePoint wtp)
         {
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(wtp).ToList();
+            ActiveVehicleCount = activeVehicles.Count;
             var ridingConnections = _transitConnectionInfo.GetRidingResidents(wtp).ToList();
+            ActiveRiderCount = ridingConnections.Count;
             var ridershipDictionary = new Dictionary<Trip, int>();
             foreach (var connection in ridingConnections)
             {
@@ -733,6 +763,11 @@ namespace WpfTestApp
                         }
                     }
                 }
+            }
+
+            if (ridershipDictionary.Sum(p => p.Value) != ridingConnections.Count)
+            {
+                throw new InvalidOperationException();
             }
 
             var vehicleObjects = new List<(VehicleObject, TextObject)>(activeVehicles.Count);
@@ -768,6 +803,16 @@ namespace WpfTestApp
             }
 
             _vehicleObjects = vehicleObjects;
+
+            if (_vehicleObjects.Sum(v => int.Parse(v.Item2.Text)) != ridingConnections.Count)
+            {
+                throw new InvalidOperationException();
+            }
+
+            if (PanelObjects.OfType<TextObject>().Sum(t => int.Parse(t.Text)) != ridingConnections.Count)
+            {
+                throw new InvalidOperationException();
+            }
         }
 
         private void UpdateResidents(WeekTimePoint wtp)
