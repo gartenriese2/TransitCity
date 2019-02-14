@@ -25,7 +25,7 @@
                 Brushes.Black,
                 1.0);
             _text = text;
-            Update(position.X, position.Y, 0.0, 5);
+            Update(position.X, position.Y, 0.0, 10);
         }
 
         public string Text
@@ -48,7 +48,7 @@
 
         public override void Draw(DrawingContext dc)
         {
-            dc.DrawText(_formattedText, new Point(0, 0));
+            dc.DrawText(_formattedText, new Point(10, -10));
         }
     }
 }
