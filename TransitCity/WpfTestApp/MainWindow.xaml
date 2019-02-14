@@ -89,7 +89,7 @@
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch"
                             Objects="{Binding PanelObjects}"
-                            Zoom="{Binding Value, ElementName=ZoomSlider}"
+                            Zoom="{Binding Zoom}"
                             MinZoom="{Binding MinZoom, Mode=OneTime}"
                             MaxZoom="{Binding MaxZoom, Mode=OneTime}"
                             WorldSize="{Binding WorldSize, Mode=OneTime}"
