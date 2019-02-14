@@ -50,7 +50,7 @@
     <Compile Include="Objects\ResidentObject.cs" />
     <Compile Include="Objects\RouteObject.cs" />
     <Compile Include="Objects\StationObject.cs" />
-    <Compile Include="Objects\TextObject.cs" />
+    <Compile Include="Objects\VehicleRidersObject.cs" />
     <Compile Include="Objects\VehicleObject.cs" />
     <Compile Include="Panel\PanelDrawingVisual.cs" />
     <Compile Include="Panel\PanelObject.cs" />

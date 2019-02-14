@@ -6,9 +6,9 @@
 
     using Geometry;
 
-    using WpfDrawing.Panel;
+    using Panel;
 
-    public class TextObject : PanelObject
+    public class VehicleRidersObject : PanelObject
     {
         private readonly SolidColorBrush _brush;
 
@@ -16,7 +16,7 @@
         private string _text;
 
 
-        public TextObject(string text, Position2d position, Color color)
+        public VehicleRidersObject(string text, Position2d position, Color color)
         {
             _formattedText = new FormattedText(
                 text,

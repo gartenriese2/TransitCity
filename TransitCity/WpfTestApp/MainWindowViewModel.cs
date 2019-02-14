@@ -36,7 +36,7 @@ namespace WpfTestApp
         private readonly DataManager _dataManager;
         private readonly TransitConnectionInfo _transitConnectionInfo;
         private List<ResidentObject> _residentObjects = new List<ResidentObject>();
-        private List<(VehicleObject, TextObject)> _vehicleObjects = new List<(VehicleObject, TextObject)>();
+        private List<(VehicleObject, VehicleRidersObject)> _vehicleObjects = new List<(VehicleObject, VehicleRidersObject)>();
         private TimeSpan _time = TimeSpan.Zero;
         private string _weektime = string.Empty;
         private double _simulationSpeedFactor = 1.0;
@@ -117,7 +117,7 @@ namespace WpfTestApp
                 var v = new VehicleObject(pos, vec.Normalize(), trip);
                 PanelObjects.Add(v);
                 var color = LineInfoToColor(lineInfo);
-                var t = new TextObject((ridershipDictionary.ContainsKey(trip) ? ridershipDictionary[trip] : 0).ToString(), pos, color);
+                var t = new VehicleRidersObject((ridershipDictionary.ContainsKey(trip) ? ridershipDictionary[trip] : 0).ToString(), pos, color);
                 PanelObjects.Add(t);
                 _vehicleObjects.Add((v, t));
             }
@@ -754,7 +754,7 @@ namespace WpfTestApp
                 throw new InvalidOperationException();
             }
 
-            var vehicleObjects = new List<(VehicleObject, TextObject)>(activeVehicles.Count);
+            var vehicleObjects = new List<(VehicleObject, VehicleRidersObject)>(activeVehicles.Count);
 
             // Remove old vehicles
             var toBeRemoved = _vehicleObjects.Where(x => !activeVehicles.Select(r => r.Item3).Contains(x.Item1.Trip)).ToList();
@@ -781,7 +781,7 @@ namespace WpfTestApp
                     var vo = new VehicleObject(pos, dir.Normalize(), trip);
                     PanelObjects.Add(vo);
                     var color = LineInfoToColor(lineInfo);
-                    var to = new TextObject((ridershipDictionary.ContainsKey(trip) ? ridershipDictionary[trip] : 0).ToString(), pos, color);
+                    var to = new VehicleRidersObject((ridershipDictionary.ContainsKey(trip) ? ridershipDictionary[trip] : 0).ToString(), pos, color);
                     PanelObjects.Add(to);
                     vehicleObjects.Add((vo, to));
                 }
@@ -794,7 +794,7 @@ namespace WpfTestApp
                 throw new InvalidOperationException();
             }
 
-            if (PanelObjects.OfType<TextObject>().Sum(t => int.Parse(t.Text)) != ridingConnections.Count)
+            if (PanelObjects.OfType<VehicleRidersObject>().Sum(t => int.Parse(t.Text)) != ridingConnections.Count)
             {
                 throw new InvalidOperationException();
             }
