@@ -20,7 +20,8 @@ namespace Transit.Timetable
             Walk,
             Transfer,
             WalkToStation,
-            WalkFromStation
+            WalkFromStation,
+            Wait
         }
 
         public TypeEnum Type { get; private set; } = TypeEnum.Undefined;
@@ -90,6 +91,17 @@ namespace Transit.Timetable
             };
         }
 
+        public static Connection CreateWait(Station station, Line line, WeekTimePoint sourceTime, WeekTimePoint targetTime)
+        {
+            return new Connection(sourceTime, targetTime)
+            {
+                Type = TypeEnum.Wait,
+                SourceStation = station,
+                TargetStation = station,
+                Line = line
+            };
+        }
+
         public override string ToString()
         {
             switch (Type)
@@ -106,6 +118,8 @@ namespace Transit.Timetable
                     return $"Walk from {SourceStation} at {SourceTime} to {TargetPos} at {TargetTime}";
                 case TypeEnum.Transfer:
                     return $"Transfer from {SourceStation} at {SourceTime} to {TargetStation} at {TargetTime}";
+                case TypeEnum.Wait:
+                    return $"Wait at {TargetStation} for line {Line} from {SourceTime} to {TargetTime}";
                 default:
                     throw new InvalidEnumArgumentException(nameof(Type), (int)Type, typeof(TypeEnum));
             }

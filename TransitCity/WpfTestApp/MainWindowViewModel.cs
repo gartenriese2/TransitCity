@@ -918,10 +918,37 @@ namespace WpfTestApp
 
                 await Task.WhenAll(workerTaskList.ToArray());
                 var connections = workerTaskList.Select(t => t.Result).ToList();
-                if (connections.Count == 1)
+
+                // Add waits at transfers to connections
+                foreach (var connection in connections)
                 {
+                    var transferCount = connection.Count(c => c.Type == Connection.TypeEnum.Transfer);
+                    if (transferCount == 0)
+                    {
+                        continue;
+                    }
+
+                    for (var i = 0; i < transferCount; ++i)
+                    {
+                        var numTransfers = 0;
+                        for (var index = 0; index < connection.Count; index++)
+                        {
+                            var connectionStep = connection[index];
+                            if (connectionStep.Type == Connection.TypeEnum.Transfer)
+                            {
+                                ++numTransfers;
+                                if (numTransfers > i)
+                                {
+                                    var nextConnectionStep = connection[index + 1];
+                                    connection.Insert(index + 1, Connection.CreateWait(connectionStep.TargetStation, nextConnectionStep.Line, connectionStep.TargetTime, nextConnectionStep.SourceTime));
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     
                 }
+
                 var dic = new Dictionary<Resident, List<List<Connection>>>
                 {
                     [worker] = connections

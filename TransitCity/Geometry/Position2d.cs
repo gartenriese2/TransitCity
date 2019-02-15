@@ -57,7 +57,7 @@
 
         public override string ToString()
         {
-            return $"({X}|{Y})";
+            return $"({X:F2}|{Y:F2})";
         }
 
         public double DistanceTo(IPosition other)

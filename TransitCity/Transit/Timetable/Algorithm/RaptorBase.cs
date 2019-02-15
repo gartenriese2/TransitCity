@@ -92,9 +92,9 @@ namespace Transit.Timetable.Algorithm
             var exitTimeSpans = new Dictionary<Station, TimeSpan>();
             foreach (var stationInfo in _dataManager.AllStationInfos)
             {
-                var walktingTimeFromExit = TimeSpan.FromSeconds(stationInfo.Station.ExitPosition.DistanceTo(targetPos) / walkingSpeed.MetersPerSecond);
-                exitTimeSpans.Add(stationInfo.Station, walktingTimeFromExit);
-                //if (walktingTimeFromExit.TotalMilliseconds / 2 > _maxWalkingTime.TotalMilliseconds) // Approximation
+                var walkingTimeFromExit = TimeSpan.FromSeconds(stationInfo.Station.ExitPosition.DistanceTo(targetPos) / walkingSpeed.MetersPerSecond);
+                exitTimeSpans.Add(stationInfo.Station, walkingTimeFromExit);
+                //if (walkingTimeFromExit.TotalMilliseconds / 2 > _maxWalkingTime.TotalMilliseconds) // Approximation
                 //{
                 //    continue;
                 //}
