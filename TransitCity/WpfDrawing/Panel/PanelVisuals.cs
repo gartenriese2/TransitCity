@@ -44,7 +44,7 @@
             "Center",
             typeof(Point),
             typeof(PanelVisuals),
-            new PropertyMetadata(new Point(0.5, 0.5)),
+            new PropertyMetadata(new Point(0.5, 0.5), OnCenterChanged),
             value => ((Point)value).X >= 0.0 && ((Point)value).X <= 1.0 && ((Point)value).Y >= 0.0 && ((Point)value).Y <= 1.0);
 
         public static readonly DependencyProperty WorldSizeProperty = DependencyProperty.Register(
@@ -152,6 +152,11 @@
         }
 
         private static void OnZoomChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
+        {
+            (obj as PanelVisuals)?.Refresh();
+        }
+
+        private static void OnCenterChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
             (obj as PanelVisuals)?.Refresh();
         }

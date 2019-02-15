@@ -208,14 +208,14 @@ namespace Transit.Timetable.Algorithm
 
                 if (!earliestConnectionsToStationsDictionary.ContainsKey(nextStation))
                 {
-                    var connection = Connection.CreateRide(stationInfo.Station, currentDeparture, nextStation, nextTime, lineInfo.Line);
+                    var connection = Connection.CreateRide(stationInfo.Station, currentDeparture, nextStation, nextTime, lineInfo);
                     earliestKnownConnections.Add(connection);
                     newlyMarkedStations.Add(nextStationInfo, nextTime);
                     earliestConnectionsToStationsDictionary.Add(nextStation, nextTime);
                 }
                 else if (earliestKnownConnections.Exists(c => c.TargetStation == nextStation && c.TargetTime > nextTime))
                 {
-                    var connection = Connection.CreateRide(stationInfo.Station, currentDeparture, nextStation, nextTime, lineInfo.Line);
+                    var connection = Connection.CreateRide(stationInfo.Station, currentDeparture, nextStation, nextTime, lineInfo);
                     var idx = earliestKnownConnections.FindIndex(c => c.TargetStation == nextStation && c.TargetTime > nextTime);
                     earliestKnownConnections[idx] = connection;
                     newlyMarkedStations.Add(nextStationInfo, nextTime);
@@ -280,12 +280,12 @@ namespace Transit.Timetable.Algorithm
                 var entryWalkingTime = enterTimeSpans[lastStation];
                 if (entryWalkingTime < _maxWalkingTime)
                 {
-                    var departureAtSorucePos = lastTime - entryWalkingTime;
-                    if (departureAtSorucePos > latestKnownSourceDepartureTime)
+                    var departureAtSourcePos = lastTime - entryWalkingTime;
+                    if (departureAtSourcePos > latestKnownSourceDepartureTime)
                     {
-                        latestKnownSourceDepartureTime = departureAtSorucePos;
+                        latestKnownSourceDepartureTime = departureAtSourcePos;
                         var idx = latestKnownConnections.FindIndex(c => c.SourcePos.DistanceTo(sourcePos) < float.Epsilon);
-                        latestKnownConnections[idx] = Connection.CreateWalkToStation(sourcePos, departureAtSorucePos, lastStation, lastTime);
+                        latestKnownConnections[idx] = Connection.CreateWalkToStation(sourcePos, departureAtSourcePos, lastStation, lastTime);
                     }
                 }
 
@@ -296,14 +296,14 @@ namespace Transit.Timetable.Algorithm
 
                 if (!latestConnectionsFromStationsDictionary.ContainsKey(lastStation))
                 {
-                    var connection = Connection.CreateRide(lastStation, lastTime, stationInfo.Station, currentArrival, lineInfo.Line);
+                    var connection = Connection.CreateRide(lastStation, lastTime, stationInfo.Station, currentArrival, lineInfo);
                     latestKnownConnections.Add(connection);
                     newlyMarkedStations.Add(lastStationInfo, lastTime);
                     latestConnectionsFromStationsDictionary.Add(lastStation, lastTime);
                 }
                 else if (latestKnownConnections.Exists(c => c.SourceStation == lastStation && c.SourceTime < lastTime))
                 {
-                    var connection = Connection.CreateRide(lastStation, lastTime, stationInfo.Station, currentArrival, lineInfo.Line);
+                    var connection = Connection.CreateRide(lastStation, lastTime, stationInfo.Station, currentArrival, lineInfo);
                     var idx = latestKnownConnections.FindIndex(c => c.SourceStation == lastStation && c.SourceTime < lastTime);
                     latestKnownConnections[idx] = connection;
                     newlyMarkedStations.Add(lastStationInfo, lastTime);

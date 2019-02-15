@@ -54,6 +54,32 @@ namespace Transit.Data
 
         public IEnumerable<Trip> Trips => _trips;
 
+        public (WeekTimePoint, Trip) GetPreviousDepartureAndTripArrayBinarySearch(WeekTimePoint time)
+        {
+            if (_departuresArray.Length == 0)
+            {
+                return (null, null);
+            }
+
+            var idx = Array.BinarySearch(_departuresArray, time);
+            if (idx < 0)
+            {
+                idx = ~idx;
+            }
+
+            if (idx == 0)
+            {
+                return (_departuresArray[_departuresArray.Length - 1], _tripsSortedByDeparture[_departuresArray.Length - 1]);
+            }
+
+            if (idx <= _departuresArray.Length)
+            {
+                return (_departuresArray[idx - 1], _tripsSortedByDeparture[idx - 1]);
+            }
+
+            throw new InvalidOperationException();
+        }
+
         public (WeekTimePoint, Trip) GetNextDepartureAndTripArrayBinarySearch(WeekTimePoint time)
         {
             if (_departuresArray.Length == 0)

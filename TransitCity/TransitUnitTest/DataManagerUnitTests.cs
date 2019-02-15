@@ -204,13 +204,13 @@ namespace TransitUnitTest
                         continue;
                     }
 
-                    if (!dic.ContainsKey(connection.Line))
+                    if (!dic.ContainsKey(connection.LineInfo))
                     {
-                        dic[connection.Line] = 1;
+                        dic[connection.LineInfo] = 1;
                     }
                     else
                     {
-                        dic[connection.Line]++;
+                        dic[connection.LineInfo]++;
                     }
                     
                 }

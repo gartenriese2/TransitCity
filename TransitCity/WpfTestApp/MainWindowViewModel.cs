@@ -93,12 +93,25 @@ namespace WpfTestApp
                 }
             }
 
-            foreach (var station in _dataManager.AllStations)
+            foreach (var lineInfo in _dataManager.AllLineInfos)
             {
-                var s = new StationObject(station.Position);
-                PanelObjects.Add(s);
-                var swo = new StationWaitersObject((waitingDictionary.ContainsKey(station) ? waitingDictionary[station] : 0).ToString(), station);
-                PanelObjects.Add(swo);
+                // First routeInfo text will be below
+                foreach (var stationInfo in lineInfo.RouteInfos[0].StationInfos)
+                {
+                    var s = new StationObject(stationInfo.Station.Position);
+                    PanelObjects.Add(s);
+                    var swo = new StationWaitersObject((waitingDictionary.ContainsKey(stationInfo.Station) ? waitingDictionary[stationInfo.Station] : 0).ToString(), stationInfo.Station, true);
+                    PanelObjects.Add(swo);
+                }
+
+                // Second routeInfo text will be above
+                foreach (var stationInfo in lineInfo.RouteInfos[1].StationInfos)
+                {
+                    var s = new StationObject(stationInfo.Station.Position);
+                    PanelObjects.Add(s);
+                    var swo = new StationWaitersObject((waitingDictionary.ContainsKey(stationInfo.Station) ? waitingDictionary[stationInfo.Station] : 0).ToString(), stationInfo.Station, false);
+                    PanelObjects.Add(swo);
+                }
             }
 
             var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(new WeekTimePoint(DayOfWeek.Monday) + _time).ToList();
@@ -106,8 +119,8 @@ namespace WpfTestApp
             var ridershipDictionary = new Dictionary<Trip, int>();
             foreach (var connection in ridingConnections)
             {
-                var line = connection.Line;
-                var possibleVehicles = activeVehicles.Where(t => t.Item1.Line == line);
+                var lineInfo = connection.LineInfo;
+                var possibleVehicles = activeVehicles.Where(t => t.Item1 == lineInfo);
                 foreach (var (_, routeInfo, trip, _, _) in possibleVehicles)
                 {
                     if (!routeInfo.StationInfos.Select(si => si.Station).Contains(connection.SourceStation))
@@ -128,6 +141,7 @@ namespace WpfTestApp
                     }
                 }
             }
+
             foreach (var (lineInfo, _, trip, pos, vec) in activeVehicles)
             {
                 var v = new VehicleObject(pos, vec.Normalize(), trip);
@@ -764,8 +778,8 @@ namespace WpfTestApp
             var ridershipDictionary = new Dictionary<Trip, int>();
             foreach (var connection in ridingConnections)
             {
-                var line = connection.Line;
-                var possibleVehicles = activeVehicles.Where(t => t.Item1.Line == line);
+                var lineInfo = connection.LineInfo;
+                var possibleVehicles = activeVehicles.Where(t => t.Item1 == lineInfo);
                 foreach (var (_, routeInfo, trip, _, _) in possibleVehicles)
                 {
                     if (!routeInfo.StationInfos.Select(si => si.Station).Contains(connection.SourceStation))
@@ -919,6 +933,30 @@ namespace WpfTestApp
                 await Task.WhenAll(workerTaskList.ToArray());
                 var connections = workerTaskList.Select(t => t.Result).ToList();
 
+                // Add random or existing waits after walking to station
+                foreach (var connection in connections)
+                {
+                    if (connection.Any() && connection[0].Type == Connection.TypeEnum.WalkToStation)
+                    {
+                        var walkToStation = connection[0];
+                        var ride = connection[1];
+                        var waitTime = WeekTimePoint.GetCorrectedDifference(walkToStation.TargetTime, connection[1].SourceTime);
+                        if (waitTime.Ticks == 0)
+                        {
+                            var (_, _, stationInfo) = _dataManager.GetInfos(walkToStation.TargetStation);
+                            var (wtp, _) = stationInfo.GetPreviousDepartureAndTripArrayBinarySearch(walkToStation.TargetTime);
+                            var maxDiff = WeekTimePoint.GetCorrectedDifference(wtp, walkToStation.TargetTime);
+                            waitTime = TimeSpan.FromSeconds(new Random().Next(Math.Min((int)maxDiff.TotalSeconds, 300)));
+                            connection[0] = Connection.CreateWalkToStation(walkToStation.SourcePos, walkToStation.SourceTime - waitTime, walkToStation.TargetStation, walkToStation.TargetTime - waitTime);
+                            connection.Insert(1, Connection.CreateWait(ride.SourceStation, ride.LineInfo, connection[0].TargetTime, ride.SourceTime));
+                        }
+                        else
+                        {
+                            connection.Insert(1, Connection.CreateWait(ride.SourceStation, ride.LineInfo, walkToStation.TargetTime, ride.SourceTime));
+                        }
+                    }
+                }
+
                 // Add waits at transfers to connections
                 foreach (var connection in connections)
                 {
@@ -940,7 +978,7 @@ namespace WpfTestApp
                                 if (numTransfers > i)
                                 {
                                     var nextConnectionStep = connection[index + 1];
-                                    connection.Insert(index + 1, Connection.CreateWait(connectionStep.TargetStation, nextConnectionStep.Line, connectionStep.TargetTime, nextConnectionStep.SourceTime));
+                                    connection.Insert(index + 1, Connection.CreateWait(connectionStep.TargetStation, nextConnectionStep.LineInfo, connectionStep.TargetTime, nextConnectionStep.SourceTime));
                                     break;
                                 }
                             }

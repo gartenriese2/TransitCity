@@ -4,6 +4,8 @@ using Time;
 
 namespace Transit.Timetable
 {
+    using Transit.Data;
+
     public class Connection : WeekTimeSpan
     {
         private Connection(WeekTimePoint begin, WeekTimePoint end)
@@ -38,7 +40,7 @@ namespace Transit.Timetable
 
         public WeekTimePoint TargetTime { get; private set; }
 
-        public Line Line { get; private set; }
+        public LineInfo LineInfo { get; private set; }
 
         public static Connection CreateWalkToStation(Position2d sourcePos, WeekTimePoint sourceTime, Station targetStation, WeekTimePoint targetTime)
         {
@@ -70,14 +72,14 @@ namespace Transit.Timetable
             };
         }
 
-        public static Connection CreateRide(Station sourceStation, WeekTimePoint sourceTime, Station targetStation, WeekTimePoint targetTime, Line line)
+        public static Connection CreateRide(Station sourceStation, WeekTimePoint sourceTime, Station targetStation, WeekTimePoint targetTime, LineInfo line)
         {
             return new Connection(sourceTime, targetTime)
             {
                 Type = TypeEnum.Ride,
                 SourceStation = sourceStation,
                 TargetStation = targetStation,
-                Line = line
+                LineInfo = line
             };
         }
 
@@ -91,14 +93,14 @@ namespace Transit.Timetable
             };
         }
 
-        public static Connection CreateWait(Station station, Line line, WeekTimePoint sourceTime, WeekTimePoint targetTime)
+        public static Connection CreateWait(Station station, LineInfo line, WeekTimePoint sourceTime, WeekTimePoint targetTime)
         {
             return new Connection(sourceTime, targetTime)
             {
                 Type = TypeEnum.Wait,
                 SourceStation = station,
                 TargetStation = station,
-                Line = line
+                LineInfo = line
             };
         }
 
@@ -109,7 +111,7 @@ namespace Transit.Timetable
                 case TypeEnum.Undefined:
                     return "Undefined";
                 case TypeEnum.Ride:
-                    return $"Ride with line {Line} from {SourceStation} at {SourceTime} to {TargetStation} at {TargetTime}";
+                    return $"Ride with line {LineInfo.Line} from {SourceStation} at {SourceTime} to {TargetStation} at {TargetTime}";
                 case TypeEnum.Walk:
                     return $"Walk from {SourcePos} at {SourceTime} to {TargetPos} at {TargetTime}";
                 case TypeEnum.WalkToStation:
@@ -119,7 +121,7 @@ namespace Transit.Timetable
                 case TypeEnum.Transfer:
                     return $"Transfer from {SourceStation} at {SourceTime} to {TargetStation} at {TargetTime}";
                 case TypeEnum.Wait:
-                    return $"Wait at {TargetStation} for line {Line} from {SourceTime} to {TargetTime}";
+                    return $"Wait at {TargetStation} for line {LineInfo.Line} from {SourceTime} to {TargetTime}";
                 default:
                     throw new InvalidEnumArgumentException(nameof(Type), (int)Type, typeof(TypeEnum));
             }
