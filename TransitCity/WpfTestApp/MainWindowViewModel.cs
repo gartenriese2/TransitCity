@@ -916,6 +916,12 @@ namespace WpfTestApp
             PercentageLoadedVisibility = Visibility.Visible;
 
             var city = CreateSmallLondon();
+            //var city = CreateLondon();
+            foreach (var district in city.Districts)
+            {
+                PanelObjects.Add(new DistrictObject((Polygon)district.Shape));
+            }
+
             var rnd = new Random();
             var workerScheduleTuples = city.Residents.Where(r => r.HasJob).Select(r => (r, JobSchedule.CreateRandom(rnd))).ToList();
             var raptor = new Raptor(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(15), _dataManager);
