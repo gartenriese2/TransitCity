@@ -8,7 +8,7 @@
         xmlns:wpfTestApp="clr-namespace:WpfTestApp"
         xmlns:panel="clr-namespace:WpfDrawing.Panel;assembly=WpfDrawing"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1000" Width="1000"
+        Title="MainWindow" Height="1000" Width="1300"
         WindowStartupLocation="CenterScreen">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="MouseWheel">
@@ -26,76 +26,107 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Grid.ColumnSpan="2"
                     Margin="0,16"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center">
-            <TextBlock Text="{Binding WeekTime}"
+                <TextBlock Text="{Binding WeekTime}"
                        Margin="0,0,8,0"
                        FontSize="32"/>
-            <Button Margin="2,0"
+                <Button Margin="2,0"
                     Width="24" Height="28"
                     FontSize="12"
                     Command="{Binding Speed0Command}">
-                <TextBlock Text="0"/>
-            </Button>
-            <Button Margin="2,0"
+                    <TextBlock Text="0"/>
+                </Button>
+                <Button Margin="2,0"
                     Width="24" Height="28"
                     FontSize="12"
                     Command="{Binding Speed1Command}">
-                <TextBlock Text="1"/>
-            </Button>
-            <Button Margin="2,0"
+                    <TextBlock Text="1"/>
+                </Button>
+                <Button Margin="2,0"
                     Width="24" Height="28"
                     FontSize="12"
                     Command="{Binding Speed2Command}">
-                <TextBlock Text="2"/>
-            </Button>
-            <Button Margin="2,0,16,0"
+                    <TextBlock Text="2"/>
+                </Button>
+                <Button Margin="2,0,16,0"
                     Width="24" Height="28"
                     FontSize="12"
                     Command="{Binding Speed3Command}">
-                <TextBlock Text="3"/>
-            </Button>
-            <StackPanel Orientation="Vertical">
-                <TextBlock>
-                    <Run Text="Active Connections:"/>
-                    <Run Text="{Binding ActiveConnectionsCount}"/>
-                </TextBlock>
-                <TextBlock>
-                    <Run Text="Active Riders:"/>
-                    <Run Text="{Binding ActiveRiderCount}"/>
-                </TextBlock>
-                <TextBlock>
-                    <Run Text="Active Vehicles:"/>
-                    <Run Text="{Binding ActiveVehicleCount}"/>
-                </TextBlock>
+                    <TextBlock Text="3"/>
+                </Button>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock>
+                        <Run Text="Active Connections:"/>
+                        <Run Text="{Binding ActiveConnectionsCount}"/>
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="Active Riders:"/>
+                        <Run Text="{Binding ActiveRiderCount}"/>
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="Active Vehicles:"/>
+                        <Run Text="{Binding ActiveVehicleCount}"/>
+                    </TextBlock>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
 
-        <TextBlock Grid.Row="0" Grid.Column="1"
+            <TextBlock Grid.Column="1"
                    Width="32"
                    TextAlignment="Right">
             <Run Text="{Binding SimulationTime, StringFormat=N0}"/>
             <Run Text="ms"/>
-        </TextBlock>
+            </TextBlock>
+        </Grid>
+        
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <panel:PanelControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            Objects="{Binding PanelObjects}"
-                            Zoom="{Binding Zoom}"
-                            MinZoom="{Binding MinZoom, Mode=OneTime}"
-                            MaxZoom="{Binding MaxZoom, Mode=OneTime}"
-                            WorldSize="{Binding WorldSize, Mode=OneTime}"
-                            Center="{Binding Center, Mode=OneWay}"/>
+            <panel:PanelControl Grid.Column="0"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Objects="{Binding PanelObjects}"
+                                Zoom="{Binding Zoom}"
+                                MinZoom="{Binding MinZoom, Mode=OneTime}"
+                                MaxZoom="{Binding MaxZoom, Mode=OneTime}"
+                                WorldSize="{Binding WorldSize, Mode=OneTime}"
+                                Center="{Binding Center, Mode=OneWay}"/>
 
-        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+            <StackPanel Grid.Column="1" Orientation="Vertical">
+                <ItemsControl ItemsSource="{Binding Districts}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} (R: {1}, J: {2})">
+                                        <Binding Path="Name" />
+                                        <Binding Path="ResidentCount" />
+                                        <Binding Path="JobCount"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Grid>
+        
+
+        
+
+        <Grid Grid.Row="1"
               Visibility="{Binding PercentageLoadedVisibility}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>

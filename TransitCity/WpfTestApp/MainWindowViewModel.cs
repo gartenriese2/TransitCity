@@ -1,9 +1,8 @@
-﻿using Transit;
-
-namespace WpfTestApp
+﻿namespace WpfTestApp
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
@@ -18,6 +17,7 @@ namespace WpfTestApp
 
     using Time;
 
+    using Transit;
     using Transit.Data;
     using Transit.Timetable;
     using Transit.Timetable.Algorithm;
@@ -160,6 +160,8 @@ namespace WpfTestApp
         #region Properties
 
         public ObservableNotifiableCollection<PanelObject> PanelObjects { get; } = new ObservableNotifiableCollection<PanelObject>();
+
+        public ObservableCollection<DistrictViewModel> Districts { get; } = new ObservableCollection<DistrictViewModel>();
 
         public RelayCommand Speed0Command { get; }
 
@@ -905,7 +907,8 @@ namespace WpfTestApp
 
             UpdateStations(wtp);
             UpdateVehicles(wtp);
-            UpdateResidents(wtp);
+            //UpdateResidents(wtp);
+            ActiveConnectionsCount = _transitConnectionInfo.GetActiveConnections(wtp).Count();
 
             sw.Stop();
             SimulationTime = sw.ElapsedMilliseconds;
@@ -915,11 +918,12 @@ namespace WpfTestApp
         {
             PercentageLoadedVisibility = Visibility.Visible;
 
-            var city = CreateSmallLondon();
-            //var city = CreateLondon();
+            //var city = CreateSmallLondon();
+            var city = CreateLondon();
             foreach (var district in city.Districts)
             {
                 PanelObjects.Add(new DistrictObject((Polygon)district.Shape));
+                Districts.Add(new DistrictViewModel(district));
             }
 
             var rnd = new Random();
