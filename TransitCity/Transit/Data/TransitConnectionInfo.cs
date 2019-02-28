@@ -20,7 +20,7 @@ namespace Transit.Data
         public TransitConnectionInfo(Dictionary<Resident, List<ConnectionList>> connectionsDictionary)
         {
             _connectionsDictionary = connectionsDictionary ?? throw new ArgumentNullException(nameof(connectionsDictionary));
-            _weekTimeConnectionsDictionary = new WeekTimeDictionary<Connection>(WeekTimeDictionary<Connection>.Granularity.HalfHour, connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl));
+            _weekTimeConnectionsDictionary = new WeekTimeDictionary<Connection>(WeekTimeDictionary<Connection>.Granularity.Hour, connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl));
             foreach (var (resident, connectionLists) in connectionsDictionary)
             {
                 foreach (var connection in connectionLists.SelectMany(cl => cl))
@@ -36,8 +36,9 @@ namespace Transit.Data
             {
                 _connectionsDictionary.Add(key, value);
             }
-            
-            _weekTimeConnectionsDictionary.AddRange(connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl));
+
+            var connections = connectionsDictionary.Values.SelectMany(cll => cll).SelectMany(cl => cl).ToList();
+            _weekTimeConnectionsDictionary.AddRange(connections);
             foreach (var (resident, connectionLists) in connectionsDictionary)
             {
                 foreach (var connection in connectionLists.SelectMany(cl => cl))
