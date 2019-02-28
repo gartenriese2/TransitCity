@@ -1,25 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
-using CitySimulation;
-using Geometry;
-using Geometry.Shapes;
-using Statistics.Charts;
-using Statistics.Data;
-using Svg;
-using SvgDrawing;
-using SvgDrawing.Charts;
-using Time;
-using Transit;
-using Transit.Data;
-using Transit.Timetable;
-using Transit.Timetable.Algorithm;
-using Utility.Units;
-
-namespace TestApp
+﻿namespace TestApp
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Drawing;
+    using System.Linq;
+    using System.Threading.Tasks;
+
+    using CitySimulation;
+
+    using Geometry;
+    using Geometry.Shapes;
+
+    using Statistics.Charts;
+    using Statistics.Data;
+
+    using Svg;
+
+    using SvgDrawing;
+    using SvgDrawing.Charts;
+
+    using Time;
+
+    using Transit;
+    using Transit.Data;
+    using Transit.Timetable;
+    using Transit.Timetable.Algorithm;
+
+    using Utility.Units;
+
     internal static class Program
     {
         private static void Main(string[] args)
@@ -200,7 +208,7 @@ namespace TestApp
                     document.Add(c);
                 }
 
-                foreach (var (_, pos, vec) in activeVehicles)
+                foreach (var (_, _, _, pos, vec) in activeVehicles)
                 {
                     var tip = pos + vec.Normalize() * 32f;
                     var right = pos - vec.Normalize() * 32f + vec.RotateRight().Normalize() * 16f;
@@ -243,7 +251,7 @@ namespace TestApp
             }
 
             var info = new TransitConnectionInfo(workerConnectionsDictionary);
-            Console.WriteLine($"{info.GetPercentagOfConnectionsWithTransit()}% of connections are made with transit.");
+            Console.WriteLine($"{info.GetPercentageOfConnectionsWithTransit()}% of connections are made with transit.");
             Console.WriteLine($"{info.GetPercentageOfWorkersUsingTransitAtLeastOnce()}% of workers use transit at least once.");
             Console.WriteLine($"{info.GetPercentageOfWorkersUsingTransitOnly()}% of workers use transit only.");
         }

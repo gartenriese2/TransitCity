@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using MiscUtil;
-using Statistics.Data;
-
-namespace Statistics.Charts
+﻿namespace Statistics.Charts
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using MiscUtil;
+
+    using Statistics.Data;
+
     public class BarChart<T> where T : struct
     {
         private readonly NamedData<T> _data;

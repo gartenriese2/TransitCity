@@ -47,7 +47,7 @@ namespace Transit.Data
             }
         }
 
-        public float GetPercentagOfConnectionsWithTransit()
+        public float GetPercentageOfConnectionsWithTransit()
         {
             var connectionsLists = _connectionsDictionary.SelectMany(p => p.Value).ToList();
             return connectionsLists.Count(c => c.Count > 1) * 100f / connectionsLists.Count ;

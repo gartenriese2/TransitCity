@@ -1,9 +1,7 @@
-﻿using System.Globalization;
-using Svg;
-using Svg.Transforms;
-
-namespace SvgDrawing
+﻿namespace SvgDrawing
 {
+    using Svg;
+
     public class SvgDocumentWrapper
     {
         private readonly SvgDocument _document = new SvgDocument();
