@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Geometry.Shapes
+﻿namespace Geometry.Shapes
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class Polygon : IShape
     {
         private readonly List<Triangle> _triangulation = new List<Triangle>();

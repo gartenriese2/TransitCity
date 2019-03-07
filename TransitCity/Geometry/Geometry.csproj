@@ -50,6 +50,7 @@
     <Compile Include="Position2i.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shapes\Circle.cs" />
+    <Compile Include="Shapes\CombinedShape.cs" />
     <Compile Include="Shapes\IShape.cs" />
     <Compile Include="Shapes\Polygon.cs" />
     <Compile Include="Shapes\Triangle.cs" />
