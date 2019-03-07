@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("CityEditor")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("infoteam Software AG")]
-[assembly: AssemblyProduct("CityEditor")]
-[assembly: AssemblyCopyright("Copyright © infoteam Software AG 2019")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("TransitCity")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
