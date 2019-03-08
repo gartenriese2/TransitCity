@@ -5,9 +5,32 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:panel="clr-namespace:WpfDrawing.Panel;assembly=WpfDrawing"
              xmlns:canvas="clr-namespace:CityEditor.Canvas"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance canvas:CanvasViewModel, IsDesignTimeCreatable=False}">
+             d:DataContext="{d:DesignInstance canvas:CanvasViewModel, IsDesignTimeCreatable=False}"
+             Loaded="OnLoaded"
+             DataContextChanged="OnDataContextChanged"
+             ClipToBounds="True"
+             Background="White">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="SizeChanged">
+            <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnSizeChanged"/>
+        </i:EventTrigger>
+        <i:EventTrigger EventName="MouseLeftButtonDown">
+            <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonDown"/>
+        </i:EventTrigger>
+        <i:EventTrigger EventName="MouseLeftButtonUp">
+            <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonUp"/>
+        </i:EventTrigger>
+        <i:EventTrigger EventName="MouseMove">
+            <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseMove"/>
+        </i:EventTrigger>
+        <i:EventTrigger EventName="MouseLeave">
+            <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeave"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <panel:PanelControl Objects="{Binding PanelObjects}"
                         Zoom="{Binding Zoom}"
                         MinZoom="{Binding MinZoom, Mode=OneTime}"

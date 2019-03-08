@@ -13,10 +13,17 @@
         private City _city;
 
         private string _cityName = string.Empty;
+        private double _mouseX;
+        private double _mouseY;
 
         public MainWindowViewModel()
         {
             CanvasViewModel = new CanvasViewModel();
+            CanvasViewModel.MouseMoved += (sender, point) =>
+            {
+                MouseX = point.X;
+                MouseY = point.Y;
+            };
 
             CreateNewCityCommand = new RelayCommand(o => CreateNewCity());
             LoadCityCommand = new RelayCommand(o => LoadCity());
@@ -37,6 +44,26 @@
             set
             {
                 _cityName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double MouseX
+        {
+            get => _mouseX;
+            set
+            {
+                _mouseX = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double MouseY
+        {
+            get => _mouseY;
+            set
+            {
+                _mouseY = value;
                 OnPropertyChanged();
             }
         }

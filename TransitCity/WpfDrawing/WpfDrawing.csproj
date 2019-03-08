@@ -54,6 +54,7 @@
     <Compile Include="Objects\StationWaitersObject.cs" />
     <Compile Include="Objects\VehicleRidersObject.cs" />
     <Compile Include="Objects\VehicleObject.cs" />
+    <Compile Include="Panel\CoordinateSystem.cs" />
     <Compile Include="Panel\PanelDrawingVisual.cs" />
     <Compile Include="Panel\PanelObject.cs" />
     <Compile Include="Panel\PanelControl.xaml.cs">
