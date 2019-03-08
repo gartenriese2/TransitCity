@@ -4,9 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:cityEditor="clr-namespace:CityEditor"
+        xmlns:canvas="clr-namespace:CityEditor.Canvas"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance cityEditor:MainWindowViewModel, IsDesignTimeCreatable=False}"
-        Title="MainWindow" Height="800" Width="800">
+        Title="CityEditor" Height="800" Width="1200">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -14,9 +15,13 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Button Margin="8,4" Width="100" Content="New"/>
-            <Button Margin="8,4" Width="100" Content="Load"/>
-            <Button Margin="8,4" Width="100" Content="Save"/>
+            <Button Margin="8,4" Width="100" Content="New" Command="{Binding CreateNewCityCommand}"/>
+            <Button Margin="8,4" Width="100" Content="Load" Command="{Binding LoadCityCommand}"/>
+            <Button Margin="8,4" Width="100" Content="Save" Command="{Binding SaveCityCommand}"/>
+            <TextBlock Margin="8,4,2,4" Text="Name:"></TextBlock>
+            <TextBox Margin="2,4,8,4" Width="100" Text="{Binding CityName, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
+
+        <canvas:CanvasControl Grid.Row="1" DataContext="{Binding CanvasViewModel}"/>
     </Grid>
 </Window>

@@ -59,6 +59,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Canvas\CanvasControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -68,6 +72,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="AppBuilder.cs" />
+    <Compile Include="Canvas\CanvasControl.xaml.cs">
+      <DependentUpon>CanvasControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Canvas\CanvasViewModel.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -100,6 +108,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CitySimulation\CitySimulation.csproj">
+      <Project>{1247B810-D259-44B0-A520-64F5225DF770}</Project>
+      <Name>CitySimulation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utility\Utility.csproj">
+      <Project>{d1e7778b-2c3c-4058-9ccf-757e12d3beb1}</Project>
+      <Name>Utility</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WpfDrawing\WpfDrawing.csproj">
+      <Project>{31DF70BB-F397-4EC2-AF6E-B34270C6245C}</Project>
+      <Name>WpfDrawing</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
