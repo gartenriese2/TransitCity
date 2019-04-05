@@ -7,8 +7,6 @@
              MouseLeftButtonUp="UIElement_OnMouseLeftButtonUp">
     <panel:PanelVisuals ItemsSource="{Binding Objects, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         Zoom="{Binding Zoom, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        MinZoom="{Binding MinZoom, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        MaxZoom="{Binding MaxZoom, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        Center="{Binding Center, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        ViewOffset="{Binding ViewOffset, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         WorldSize="{Binding WorldSize, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
 </UserControl>

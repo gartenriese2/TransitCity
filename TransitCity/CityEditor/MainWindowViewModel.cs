@@ -28,6 +28,8 @@
             CreateNewCityCommand = new RelayCommand(o => CreateNewCity());
             LoadCityCommand = new RelayCommand(o => LoadCity());
             SaveCityCommand = new RelayCommand(o => SaveCity(), o => !string.IsNullOrWhiteSpace(CityName) && _city != null);
+
+            CreateNewDistrictCommand = new RelayCommand(o => CreateNewDistrict(), o => !CanvasViewModel.IsInDrawingMode);
         }
 
         public CanvasViewModel CanvasViewModel { get; }
@@ -37,6 +39,8 @@
         public RelayCommand LoadCityCommand { get; }
 
         public RelayCommand SaveCityCommand { get; }
+
+        public RelayCommand CreateNewDistrictCommand { get; }
 
         public string CityName
         {
@@ -82,6 +86,11 @@
         private void SaveCity()
         {
 
+        }
+
+        private void CreateNewDistrict()
+        {
+            CanvasViewModel.StartDrawingPolygon();
         }
     }
 }

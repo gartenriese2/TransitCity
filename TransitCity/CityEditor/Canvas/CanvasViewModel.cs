@@ -4,8 +4,11 @@
     using System.Windows;
     using System.Windows.Input;
 
+    using Geometry;
+
     using Utility.MVVM;
 
+    using WpfDrawing.Objects;
     using WpfDrawing.Panel;
     using WpfDrawing.Utility;
 
@@ -26,6 +29,21 @@
         private bool _mouseLeftButtonIsDown;
 
         private Point _previousMousePosition;
+
+        private bool _isInDrawingMode;
+
+        public CanvasViewModel()
+        {
+            PanelObjects.Add(new StationObject(new Position2d(0, 0)) { Scale = 10 });
+            PanelObjects.Add(new StationObject(new Position2d(5000, 0)) { Scale = 10 });
+            PanelObjects.Add(new StationObject(new Position2d(10000, 0)) { Scale = 10 });
+            PanelObjects.Add(new StationObject(new Position2d(0, 5000)) { Scale = 10 });
+            PanelObjects.Add(new StationObject(new Position2d(5000, 5000)) { Scale = 10 });
+            PanelObjects.Add(new StationObject(new Position2d(10000, 5000)) { Scale = 10 });
+            PanelObjects.Add(new StationObject(new Position2d(0, 10000)) { Scale = 10 });
+            PanelObjects.Add(new StationObject(new Position2d(5000, 10000)) { Scale = 10 });
+            PanelObjects.Add(new StationObject(new Position2d(10000, 10000)) { Scale = 10 });
+        }
 
         public event EventHandler<Point> MouseMoved;
 
@@ -89,7 +107,7 @@
 
         public double MaxZoom { get; } = 50.0;
 
-        public Size WorldSize { get; } = new Size(10000, 10000);
+        public Rect WorldSize { get; } = new Rect(new Size(10000, 10000));
 
         public Point ViewOffset
         {
@@ -101,6 +119,16 @@
             }
         }
 
+        public bool IsInDrawingMode
+        {
+            get => _isInDrawingMode;
+            private set
+            {
+                _isInDrawingMode = value;
+                OnPropertyChanged();
+            }
+        }
+
         public void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
             _viewSize = e.NewSize;
@@ -108,13 +136,43 @@
 
         public void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (IsInDrawingMode)
+            {
+                return;
+            }
+
             _mouseLeftButtonIsDown = true;
             _previousMousePosition = e.GetPosition((IInputElement)sender);
             Mouse.OverrideCursor = Cursors.ScrollAll;
         }
 
+        public void OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (_mouseLeftButtonIsDown)
+            {
+                return;
+            }
+
+            if (IsInDrawingMode)
+            {
+                IsInDrawingMode = false;
+            }
+        }
+
         public void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            if (IsInDrawingMode)
+            {
+                var currentMousePositionView = e.GetPosition((IInputElement)sender);
+                var currentMousePositionWorld = CoordinateSystem.TransformPointFromViewToWorld(
+                    currentMousePositionView,
+                    _viewSize,
+                    WorldSize,
+                    ViewOffset,
+                    Zoom);
+                PanelObjects.Add(new StationObject(new Position2d(currentMousePositionWorld.X, currentMousePositionWorld.Y)) { Scale = 10 });
+            }
+
             _mouseLeftButtonIsDown = false;
             Mouse.OverrideCursor = null;
         }
@@ -139,7 +197,7 @@
             var currentMousePositionWorld = CoordinateSystem.TransformPointFromViewToWorld(
                 currentMousePositionView,
                 _viewSize,
-                new Rect(WorldSize),
+                WorldSize,
                 ViewOffset,
                 Zoom);
             MouseMoved?.Invoke(this, currentMousePositionWorld);
@@ -148,6 +206,11 @@
         public void SetInitialViewSize(Size actualSize)
         {
             _viewSize = actualSize;
+        }
+
+        public void StartDrawingPolygon()
+        {
+            IsInDrawingMode = true;
         }
     }
 }

@@ -1,11 +1,12 @@
-﻿using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media;
-using WpfDrawing.Objects;
-using WpfDrawing.Utility;
-
-namespace WpfDrawing.Panel
+﻿namespace WpfDrawing.Panel
 {
+    using System.Windows;
+    using System.Windows.Input;
+    using System.Windows.Media;
+
+    using WpfDrawing.Objects;
+    using WpfDrawing.Utility;
+
     /// <summary>
     /// Interaction logic for PanelControl.xaml
     /// </summary>
@@ -24,33 +25,18 @@ namespace WpfDrawing.Panel
             new PropertyMetadata(1.0),
             value => (double)value > 0.0);
 
-        public static readonly DependencyProperty MinZoomProperty = DependencyProperty.Register(
-            "MinZoom",
-            typeof(double),
-            typeof(PanelControl),
-            new PropertyMetadata(0.001),
-            value => (double)value > 0.0);
-
-        public static readonly DependencyProperty MaxZoomProperty = DependencyProperty.Register(
-            "MaxZoom",
-            typeof(double),
-            typeof(PanelControl),
-            new PropertyMetadata(1000.0),
-            value => (double)value > 0.0);
-
-        public static readonly DependencyProperty CenterProperty = DependencyProperty.Register(
-            "Center",
+        public static readonly DependencyProperty ViewOffsetProperty = DependencyProperty.Register(
+            "ViewOffset",
             typeof(Point),
             typeof(PanelControl),
-            new PropertyMetadata(new Point(0.5, 0.5)),
-            value => ((Point)value).X >= 0.0 && ((Point)value).X <= 1.0 && ((Point)value).Y >= 0.0 && ((Point)value).Y <= 1.0);
+            new PropertyMetadata(new Point(0, 0)));
 
         public static readonly DependencyProperty WorldSizeProperty = DependencyProperty.Register(
             "WorldSize",
-            typeof(Size),
+            typeof(Rect),
             typeof(PanelControl),
-            new PropertyMetadata(new Size(0, 0)),
-            value => ((Size)value).Width >= 0 && ((Size)value).Height >= 0);
+            new PropertyMetadata(new Rect(new Size(0, 0))),
+            value => ((Rect)value).Width >= 0 && ((Rect)value).Height >= 0);
 
         public PanelControl()
         {
@@ -69,27 +55,15 @@ namespace WpfDrawing.Panel
             set => SetValue(ZoomProperty, value);
         }
 
-        public double MinZoom
+        public Point ViewOffset
         {
-            get => (double)GetValue(MinZoomProperty);
-            set => SetValue(MinZoomProperty, value);
+            get => (Point)GetValue(ViewOffsetProperty);
+            set => SetValue(ViewOffsetProperty, value);
         }
 
-        public double MaxZoom
+        public Rect WorldSize
         {
-            get => (double)GetValue(MaxZoomProperty);
-            set => SetValue(MaxZoomProperty, value);
-        }
-
-        public Point Center
-        {
-            get => (Point)GetValue(CenterProperty);
-            set => SetValue(CenterProperty, value);
-        }
-
-        public Size WorldSize
-        {
-            get => (Size)GetValue(WorldSizeProperty);
+            get => (Rect)GetValue(WorldSizeProperty);
             set => SetValue(WorldSizeProperty, value);
         }
 

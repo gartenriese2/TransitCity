@@ -33,17 +33,15 @@
     {
         #region Fields
 
-        private readonly DataManager _dataManager;
-        private readonly TransitConnectionInfo _transitConnectionInfo;
+        private DataManager _dataManager;
+        private TransitConnectionInfo _transitConnectionInfo;
         private List<ResidentObject> _residentObjects = new List<ResidentObject>();
         private List<(VehicleObject, VehicleRidersObject)> _vehicleObjects = new List<(VehicleObject, VehicleRidersObject)>();
         private TimeSpan _time = TimeSpan.Zero;
         private string _weektime = string.Empty;
         private double _simulationSpeedFactor = 1.0;
         private double _simulationTime;
-        private Point _center;
-        private double _centerX;
-        private double _centerY;
+        private Point _viewOffset;
         private double _zoom;
         private int _activeConnectionsCount;
         private int _activeRiderCount;
@@ -51,110 +49,21 @@
         private double _percentageLoaded;
         private Visibility _percentageLoadedVisibility = Visibility.Hidden;
 
+        /// <summary>
+        /// The view size. This is the actual size of the panel control.
+        /// </summary>
+        private Size _viewSize = new Size(0, 0);
+
         #endregion
 
         public MainWindowViewModel()
         {
-            _dataManager = new TestTransitData().DataManager;
-            _transitConnectionInfo = new TransitConnectionInfo(new Dictionary<Resident, List<List<Connection>>>());
-            Initialize();
-
             Speed0Command = new RelayCommand(o => _simulationSpeedFactor = 0.0);
             Speed1Command = new RelayCommand(o => _simulationSpeedFactor = 1.0);
             Speed2Command = new RelayCommand(o => _simulationSpeedFactor = 10.0);
             Speed3Command = new RelayCommand(o => _simulationSpeedFactor = 60.0);
 
-            CenterX = 0.5;
-            CenterY = 0.5;
             Zoom = 1.0;
-
-            foreach (var lineInfo in _dataManager.AllLineInfos)
-            {
-                var color = LineInfoToColor(lineInfo);
-
-                foreach (var path in lineInfo.RouteInfos.Select(ri => ri.Path))
-                {
-                    var r = new RouteObject(path, color);
-                    PanelObjects.Add(r);
-                }
-            }
-
-            var waitingConnections = _transitConnectionInfo.GetWaitingResidents(new WeekTimePoint(DayOfWeek.Monday) + _time);
-            var waitingDictionary = new Dictionary<Station, int>();
-            foreach (var connection in waitingConnections)
-            {
-                if (waitingDictionary.ContainsKey(connection.TargetStation))
-                {
-                    waitingDictionary[connection.TargetStation]++;
-                }
-                else
-                {
-                    waitingDictionary.Add(connection.TargetStation, 1);
-                }
-            }
-
-            foreach (var lineInfo in _dataManager.AllLineInfos)
-            {
-                // First routeInfo text will be below
-                foreach (var stationInfo in lineInfo.RouteInfos[0].StationInfos)
-                {
-                    var s = new StationObject(stationInfo.Station.Position);
-                    PanelObjects.Add(s);
-                    var swo = new StationWaitersObject((waitingDictionary.ContainsKey(stationInfo.Station) ? waitingDictionary[stationInfo.Station] : 0).ToString(), stationInfo.Station, true);
-                    PanelObjects.Add(swo);
-                }
-
-                // Second routeInfo text will be above
-                foreach (var stationInfo in lineInfo.RouteInfos[1].StationInfos)
-                {
-                    var s = new StationObject(stationInfo.Station.Position);
-                    PanelObjects.Add(s);
-                    var swo = new StationWaitersObject((waitingDictionary.ContainsKey(stationInfo.Station) ? waitingDictionary[stationInfo.Station] : 0).ToString(), stationInfo.Station, false);
-                    PanelObjects.Add(swo);
-                }
-            }
-
-            var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(new WeekTimePoint(DayOfWeek.Monday) + _time).ToList();
-            var ridingConnections = _transitConnectionInfo.GetRidingResidents(new WeekTimePoint(DayOfWeek.Monday) + _time).ToList();
-            var ridershipDictionary = new Dictionary<Trip, int>();
-            foreach (var connection in ridingConnections)
-            {
-                var lineInfo = connection.LineInfo;
-                var possibleVehicles = activeVehicles.Where(t => t.Item1 == lineInfo);
-                foreach (var (_, routeInfo, trip, _, _) in possibleVehicles)
-                {
-                    if (!routeInfo.StationInfos.Select(si => si.Station).Contains(connection.SourceStation))
-                    {
-                        continue;
-                    }
-
-                    if (trip.DepartureAtStation(connection.SourceStation) == connection.SourceTime && trip.ArrivalAtStation(connection.TargetStation) == connection.TargetTime)
-                    {
-                        if (ridershipDictionary.ContainsKey(trip))
-                        {
-                            ridershipDictionary[trip]++;
-                        }
-                        else
-                        {
-                            ridershipDictionary.Add(trip, 1);
-                        }
-                    }
-                }
-            }
-
-            foreach (var (lineInfo, _, trip, pos, vec) in activeVehicles)
-            {
-                var v = new VehicleObject(pos, vec.Normalize(), trip);
-                PanelObjects.Add(v);
-                var color = LineInfoToColor(lineInfo);
-                var t = new VehicleRidersObject((ridershipDictionary.ContainsKey(trip) ? ridershipDictionary[trip] : 0).ToString(), pos, color);
-                PanelObjects.Add(t);
-                _vehicleObjects.Add((v, t));
-            }
-
-            var tmr = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16.67) };
-            tmr.Tick += MainLoopTick;
-            tmr.Start();
         }
 
         #region Properties
@@ -197,43 +106,15 @@
             }
         }
 
-        public Point Center
+        public Point ViewOffset
         {
-            get => _center;
+            get => _viewOffset;
             private set
             {
-                if (_center != value)
+                if (_viewOffset != value)
                 {
-                    _center = value;
+                    _viewOffset = value;
                     OnPropertyChanged();
-                }
-            }
-        }
-
-        public double CenterX
-        {
-            get => _centerX;
-            set
-            {
-                if (Math.Abs(value - _centerX) > double.Epsilon)
-                {
-                    _centerX = value;
-                    OnPropertyChanged();
-                    Center = new Point(CenterX, CenterY);
-                }
-            }
-        }
-
-        public double CenterY
-        {
-            get => _centerY;
-            set
-            {
-                if (Math.Abs(value - _centerY) > double.Epsilon)
-                {
-                    _centerY = value;
-                    OnPropertyChanged();
-                    Center = new Point(CenterX, CenterY);
                 }
             }
         }
@@ -320,14 +201,35 @@
 
         public double MaxZoom { get; } = 50.0;
 
-        public Size WorldSize { get; } = new Size(10000, 10000);
+        public Rect WorldSize { get; } = new Rect(new Size(10000, 10000));
 
         #endregion
 
+        /// <summary>
+        /// Processes the SizeChange event.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The event arguments.</param>
+        public void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            _viewSize = e.NewSize;
+        }
+
         public void OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
+            if (e.Delta == 0)
+            {
+                return;
+            }
+
+            var previousZoom = Zoom;
+            var mousePositionInViewCoordinates = e.GetPosition((IInputElement)sender);
+
             var diff = e.Delta / 1000.0 * Zoom;
             Zoom = Math.Max(MinZoom, Math.Min(MaxZoom, Zoom + diff));
+
+            // Adjust view offset after zooming.
+            ViewOffset = CoordinateSystem.CalculateZoomingOffset(_viewSize, WorldSize, previousZoom, Zoom, mousePositionInViewCoordinates, ViewOffset);
         }
 
         public void OnKeyDown(object sender, KeyEventArgs e)
@@ -335,20 +237,38 @@
             var delta = 0.1 / Zoom;
             if (e.Key == Key.Left)
             {
-                CenterX = Math.Max(0.0, CenterX - delta);
+                ViewOffset += new Vector(10, 0);
             }
             if (e.Key == Key.Right)
             {
-                CenterX = Math.Min(1.0, CenterX + delta);
+                ViewOffset += new Vector(-10, 0);
             }
             if (e.Key == Key.Up)
             {
-                CenterY = Math.Min(1.0, CenterY + delta);
+                ViewOffset += new Vector(0, 10);
             }
             if (e.Key == Key.Down)
             {
-                CenterY = Math.Max(0.0, CenterY - delta);
+                ViewOffset += new Vector(0, -10);
             }
+        }
+
+        public void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            var window = (MainWindow)sender;
+            var initialSize = new Size(window.ActualWidth, window.ActualHeight);
+            SetInitialViewSize(initialSize);
+
+            InitializeVisuals();
+        }
+
+        /// <summary>
+        /// Sets the initial view size.
+        /// </summary>
+        /// <param name="actualSize">The actual view size.</param>
+        public void SetInitialViewSize(Size actualSize)
+        {
+            _viewSize = actualSize;
         }
 
         private static City CreateLondon()
@@ -749,6 +669,101 @@
             return new City("SmallCity", new List<IDistrict> { district });
         }
 
+        private void InitializeVisuals()
+        {
+            _dataManager = new TestTransitData().DataManager;
+            _transitConnectionInfo = new TransitConnectionInfo(new Dictionary<Resident, List<List<Connection>>>());
+            InitializeData();
+
+            foreach (var lineInfo in _dataManager.AllLineInfos)
+            {
+                var color = LineInfoToColor(lineInfo);
+
+                foreach (var path in lineInfo.RouteInfos.Select(ri => ri.Path))
+                {
+                    var r = new RouteObject(path, color);
+                    PanelObjects.Add(r);
+                }
+            }
+
+            var waitingConnections = _transitConnectionInfo.GetWaitingResidents(new WeekTimePoint(DayOfWeek.Monday) + _time);
+            var waitingDictionary = new Dictionary<Station, int>();
+            foreach (var connection in waitingConnections)
+            {
+                if (waitingDictionary.ContainsKey(connection.TargetStation))
+                {
+                    waitingDictionary[connection.TargetStation]++;
+                }
+                else
+                {
+                    waitingDictionary.Add(connection.TargetStation, 1);
+                }
+            }
+
+            foreach (var lineInfo in _dataManager.AllLineInfos)
+            {
+                // First routeInfo text will be below
+                foreach (var stationInfo in lineInfo.RouteInfos[0].StationInfos)
+                {
+                    var s = new StationObject(stationInfo.Station.Position);
+                    PanelObjects.Add(s);
+                    var swo = new StationWaitersObject((waitingDictionary.ContainsKey(stationInfo.Station) ? waitingDictionary[stationInfo.Station] : 0).ToString(), stationInfo.Station, true);
+                    PanelObjects.Add(swo);
+                }
+
+                // Second routeInfo text will be above
+                foreach (var stationInfo in lineInfo.RouteInfos[1].StationInfos)
+                {
+                    var s = new StationObject(stationInfo.Station.Position);
+                    PanelObjects.Add(s);
+                    var swo = new StationWaitersObject((waitingDictionary.ContainsKey(stationInfo.Station) ? waitingDictionary[stationInfo.Station] : 0).ToString(), stationInfo.Station, false);
+                    PanelObjects.Add(swo);
+                }
+            }
+
+            var activeVehicles = _dataManager.GetActiveVehiclePositionsAndDirections(new WeekTimePoint(DayOfWeek.Monday) + _time).ToList();
+            var ridingConnections = _transitConnectionInfo.GetRidingResidents(new WeekTimePoint(DayOfWeek.Monday) + _time).ToList();
+            var ridershipDictionary = new Dictionary<Trip, int>();
+            foreach (var connection in ridingConnections)
+            {
+                var lineInfo = connection.LineInfo;
+                var possibleVehicles = activeVehicles.Where(t => t.Item1 == lineInfo);
+                foreach (var (_, routeInfo, trip, _, _) in possibleVehicles)
+                {
+                    if (!routeInfo.StationInfos.Select(si => si.Station).Contains(connection.SourceStation))
+                    {
+                        continue;
+                    }
+
+                    if (trip.DepartureAtStation(connection.SourceStation) == connection.SourceTime && trip.ArrivalAtStation(connection.TargetStation) == connection.TargetTime)
+                    {
+                        if (ridershipDictionary.ContainsKey(trip))
+                        {
+                            ridershipDictionary[trip]++;
+                        }
+                        else
+                        {
+                            ridershipDictionary.Add(trip, 1);
+                        }
+                    }
+                }
+            }
+
+            foreach (var (lineInfo, _, trip, pos, vec) in activeVehicles)
+            {
+                var v = new VehicleObject(pos, vec.Normalize(), trip);
+                PanelObjects.Add(v);
+                var color = LineInfoToColor(lineInfo);
+                var t = new VehicleRidersObject((ridershipDictionary.ContainsKey(trip) ? ridershipDictionary[trip] : 0).ToString(), pos, color);
+                PanelObjects.Add(t);
+                _vehicleObjects.Add((v, t));
+            }
+
+            var tmr = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16.67) };
+            tmr.Tick += MainLoopTick;
+            tmr.Start();
+        }
+
         private void UpdateStations(WeekTimePoint wtp)
         {
             var waitingConnections = _transitConnectionInfo.GetWaitingResidents(wtp);
@@ -914,7 +929,7 @@
             SimulationTime = sw.ElapsedMilliseconds;
         }
 
-        private async void Initialize()
+        private async void InitializeData()
         {
             PercentageLoadedVisibility = Visibility.Visible;
 

@@ -116,6 +116,10 @@
       <Project>{1247B810-D259-44B0-A520-64F5225DF770}</Project>
       <Name>CitySimulation</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Geometry\Geometry.csproj">
+      <Project>{75EB7F70-EC1D-45AD-82AC-CB953003D1A3}</Project>
+      <Name>Geometry</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Utility\Utility.csproj">
       <Project>{d1e7778b-2c3c-4058-9ccf-757e12d3beb1}</Project>
       <Name>Utility</Name>

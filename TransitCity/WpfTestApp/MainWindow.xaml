@@ -17,6 +17,9 @@
         <i:EventTrigger EventName="KeyDown">
             <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnKeyDown"/>
         </i:EventTrigger>
+        <i:EventTrigger EventName="Loaded">
+            <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnLoaded"/>
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     <Window.DataContext>
         <wpfTestApp:MainWindowViewModel/>
@@ -99,10 +102,8 @@
                                 VerticalAlignment="Stretch"
                                 Objects="{Binding PanelObjects}"
                                 Zoom="{Binding Zoom}"
-                                MinZoom="{Binding MinZoom, Mode=OneTime}"
-                                MaxZoom="{Binding MaxZoom, Mode=OneTime}"
                                 WorldSize="{Binding WorldSize, Mode=OneTime}"
-                                Center="{Binding Center, Mode=OneWay}"/>
+                                ViewOffset="{Binding ViewOffset, Mode=OneWay}"/>
 
             <StackPanel Grid.Column="1" Orientation="Vertical">
                 <ItemsControl ItemsSource="{Binding Districts}">

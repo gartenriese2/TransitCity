@@ -1,6 +1,7 @@
 ﻿namespace CityEditor.Canvas
 {
     using System.Windows;
+    using System.Windows.Input;
 
     /// <summary>
     /// Interaction logic for CanvasControl.xaml

@@ -11,6 +11,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -23,9 +24,13 @@
             <TextBox Margin="2,4,8,4" Width="100" Text="{Binding CityName, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
 
-        <canvas:CanvasControl Grid.Row="1" DataContext="{Binding CanvasViewModel}"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Button Margin="8,4" Width="100" Content="New District" Command="{Binding CreateNewDistrictCommand}"/>
+        </StackPanel>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal">
+        <canvas:CanvasControl Grid.Row="2" DataContext="{Binding CanvasViewModel}"/>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal">
             <TextBlock Margin="8,4">
                 <TextBlock.Text>
                     <MultiBinding StringFormat="{}X: {0:N2}, Y: {1:N2}">

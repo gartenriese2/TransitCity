@@ -26,33 +26,18 @@
             new PropertyMetadata(1.0, OnZoomChanged),
             value => (double)value > 0.0);
 
-        public static readonly DependencyProperty MinZoomProperty = DependencyProperty.Register(
-            "MinZoom",
-            typeof(double),
-            typeof(PanelVisuals),
-            new PropertyMetadata(0.1),
-            value => (double)value > 0.0);
-
-        public static readonly DependencyProperty MaxZoomProperty = DependencyProperty.Register(
-            "MaxZoom",
-            typeof(double),
-            typeof(PanelVisuals),
-            new PropertyMetadata(100.0),
-            value => (double)value > 0.0);
-
-        public static readonly DependencyProperty CenterProperty = DependencyProperty.Register(
-            "Center",
+        public static readonly DependencyProperty ViewOffsetProperty = DependencyProperty.Register(
+            "ViewOffset",
             typeof(Point),
             typeof(PanelVisuals),
-            new PropertyMetadata(new Point(0.5, 0.5), OnCenterChanged),
-            value => ((Point)value).X >= 0.0 && ((Point)value).X <= 1.0 && ((Point)value).Y >= 0.0 && ((Point)value).Y <= 1.0);
+            new PropertyMetadata(new Point(0, 0), OnViewOffsetChanged));
 
         public static readonly DependencyProperty WorldSizeProperty = DependencyProperty.Register(
             "WorldSize",
-            typeof(Size),
+            typeof(Rect),
             typeof(PanelVisuals),
-            new PropertyMetadata(new Size(0, 0), (o, args) => ((PanelVisuals) o).Refresh()),
-            value => ((Size)value).Width >= 0 && ((Size)value).Height >= 0);
+            new PropertyMetadata(new Rect(new Size(0, 0)), (o, args) => ((PanelVisuals)o).Refresh()),
+            value => ((Rect)value).Width >= 0 && ((Rect)value).Height >= 0);
 
         #endregion
 
@@ -78,27 +63,15 @@
             set => SetValue(ZoomProperty, value);
         }
 
-        public double MinZoom
+        public Point ViewOffset
         {
-            get => (double)GetValue(MinZoomProperty);
-            set => SetValue(MinZoomProperty, value);
+            get => (Point)GetValue(ViewOffsetProperty);
+            set => SetValue(ViewOffsetProperty, value);
         }
 
-        public double MaxZoom
+        public Rect WorldSize
         {
-            get => (double)GetValue(MaxZoomProperty);
-            set => SetValue(MaxZoomProperty, value);
-        }
-
-        public Point Center
-        {
-            get => (Point) GetValue(CenterProperty);
-            set => SetValue(CenterProperty, value);
-        }
-
-        public Size WorldSize
-        {
-            get => (Size) GetValue(WorldSizeProperty);
+            get => (Rect)GetValue(WorldSizeProperty);
             set => SetValue(WorldSizeProperty, value);
         }
 
@@ -111,20 +84,19 @@
             foreach (var child in _visualChildren)
             {
                 var drawingVisual = child as PanelDrawingVisual;
-                var xform = drawingVisual?.Transform as TranslateTransform;
-                if (xform == null)
+                if (!(drawingVisual?.Transform is TranslateTransform translateTransform))
                 {
                     continue;
                 }
 
                 if (sizeInfo.WidthChanged)
                 {
-                    xform.X = sizeInfo.NewSize.Width * drawingVisual.PanelObject.X;
+                    translateTransform.X = sizeInfo.NewSize.Width * drawingVisual.PanelObject.X;
                 }
 
                 if (sizeInfo.HeightChanged)
                 {
-                    xform.Y = sizeInfo.NewSize.Height * drawingVisual.PanelObject.Y;
+                    translateTransform.Y = sizeInfo.NewSize.Height * drawingVisual.PanelObject.Y;
                 }
             }
 
@@ -156,7 +128,7 @@
             (obj as PanelVisuals)?.Refresh();
         }
 
-        private static void OnCenterChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
+        private static void OnViewOffsetChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
             (obj as PanelVisuals)?.Refresh();
         }
@@ -165,34 +137,26 @@
         {
             _visualChildren.Clear();
 
-            if (args.OldValue != null)
+            if (args.OldValue != null && args.OldValue is ObservableNotifiableCollection<PanelObject> oldColl)
             {
-                var coll = args.OldValue as ObservableNotifiableCollection<PanelObject>;
-                if (coll != null)
-                {
-                    coll.CollectionCleared -= OnCollectionCleared;
-                    coll.CollectionChanged -= OnCollectionChanged;
-                    coll.ItemPropertyChanged -= OnItemPropertyChanged;
-                }
+                oldColl.CollectionCleared -= OnCollectionCleared;
+                oldColl.CollectionChanged -= OnCollectionChanged;
+                oldColl.ItemPropertyChanged -= OnItemPropertyChanged;
             }
 
-            if (args.NewValue != null)
+            if (args.NewValue != null && args.NewValue is ObservableNotifiableCollection<PanelObject> newColl)
             {
-                var coll = args.NewValue as ObservableNotifiableCollection<PanelObject>;
-                if (coll != null)
-                {
-                    coll.CollectionCleared += OnCollectionCleared;
-                    coll.CollectionChanged += OnCollectionChanged;
-                    coll.ItemPropertyChanged += OnItemPropertyChanged;
+                newColl.CollectionCleared += OnCollectionCleared;
+                newColl.CollectionChanged += OnCollectionChanged;
+                newColl.ItemPropertyChanged += OnItemPropertyChanged;
 
-                    CreateVisualChildren(coll);
-                }
+                CreateVisualChildren(newColl);
             }
         }
 
         private void OnCollectionCleared(object sender, EventArgs args)
         {
-            RemoveVisualChildren(_visualChildren);
+            _visualChildren.Clear();
         }
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
@@ -210,24 +174,19 @@
 
         private void OnItemPropertyChanged(object sender, ItemPropertyChangedEventArgs args)
         {
-            var panelObject = args.Item as PanelObject;
-            if (panelObject == null)
+            if (!(args.Item is PanelObject panelObject))
             {
                 return;
             }
 
             foreach (var child in _visualChildren)
             {
-                var drawingVisual = child as PanelDrawingVisual;
-                if (drawingVisual == null || drawingVisual.PanelObject != panelObject)
+                if (!(child is PanelDrawingVisual drawingVisual) || drawingVisual.PanelObject != panelObject)
                 {
                     continue;
                 }
 
-                var dc = drawingVisual.RenderOpen();
-                panelObject.Draw(dc);
                 drawingVisual.Transform = panelObject.TransformGroup;
-                dc.Close();
                 break;
             }
         }
@@ -239,8 +198,17 @@
                 return;
             }
 
-            _visualChildren.Clear();
-            CreateVisualChildren(ItemsSource);
+            UpdateRenderTransform();
+        }
+
+        private void UpdateRenderTransform()
+        {
+            if (WorldSize.Height <= 0 || WorldSize.Width <= 0 || RenderSize.Height <= 0 || RenderSize.Width <= 0)
+            {
+                return;
+            }
+
+            RenderTransform = CoordinateSystem.CalculateWorldToViewTransformation(RenderSize, WorldSize, ViewOffset, Zoom);
         }
 
         private void CreateVisualChildren(IEnumerable coll)
@@ -252,8 +220,7 @@
 
             foreach (var obj in coll)
             {
-                var panelObject = obj as PanelObject;
-                if (panelObject == null)
+                if (!(obj is PanelObject panelObject))
                 {
                     continue;
                 }
@@ -266,33 +233,14 @@
                 _visualChildren.Add(drawingVisual);
             }
 
-            var worldWidth = WorldSize.Width;
-            var worldHeight = WorldSize.Height;
-            var renderWidth = RenderSize.Width;
-            var renderHeight = RenderSize.Height;
-            var worldRatio = worldWidth / worldHeight;
-            var renderRatio = renderWidth / renderHeight;
-            var fitWidth = worldRatio >= renderRatio;
-            var worldToRenderConversion = fitWidth ? renderWidth / worldWidth : renderHeight / worldHeight;
-            var translateX = fitWidth ? 0 : (renderWidth - worldWidth * worldToRenderConversion) * 0.5;
-            var translateY = fitWidth ? (renderHeight - worldHeight * worldToRenderConversion) * 0.5 : 0;
-            var group = new TransformGroup();
-            var scale = new ScaleTransform(Zoom * worldToRenderConversion, Zoom * worldToRenderConversion);
-            var zoomOffset = (Zoom - 1) * (fitWidth ? renderWidth : renderHeight) * 0.5;
-            var translate = new TranslateTransform(translateX - zoomOffset, translateY - zoomOffset);
-            var pan = new TranslateTransform((0.5 - Center.X) * renderWidth * Zoom, -(0.5 - Center.Y) * renderHeight * Zoom);
-            group.Children.Add(scale);
-            group.Children.Add(translate);
-            group.Children.Add(pan);
-            RenderTransform = group;
+            UpdateRenderTransform();
         }
 
         private void RemoveVisualChildren(IEnumerable coll)
         {
             foreach (var obj in coll)
             {
-                var panelObject = obj as PanelObject;
-                if (panelObject == null)
+                if (!(obj is PanelObject panelObject))
                 {
                     continue;
                 }
@@ -300,8 +248,7 @@
                 var removeList = new List<PanelDrawingVisual>();
                 foreach (var child in _visualChildren)
                 {
-                    var drawingVisual = child as PanelDrawingVisual;
-                    if (drawingVisual == null)
+                    if (!(child is PanelDrawingVisual drawingVisual))
                     {
                         continue;
                     }

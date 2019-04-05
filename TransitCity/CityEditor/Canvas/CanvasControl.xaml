@@ -24,6 +24,9 @@
         <i:EventTrigger EventName="MouseLeftButtonUp">
             <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonUp"/>
         </i:EventTrigger>
+        <i:EventTrigger EventName="MouseRightButtonUp">
+            <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseRightButtonUp"/>
+        </i:EventTrigger>
         <i:EventTrigger EventName="MouseMove">
             <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseMove"/>
         </i:EventTrigger>
@@ -33,8 +36,6 @@
     </i:Interaction.Triggers>
     <panel:PanelControl Objects="{Binding PanelObjects}"
                         Zoom="{Binding Zoom}"
-                        MinZoom="{Binding MinZoom, Mode=OneTime}"
-                        MaxZoom="{Binding MaxZoom, Mode=OneTime}"
                         WorldSize="{Binding WorldSize, Mode=OneTime}"
-                        Center="{Binding Center, Mode=OneWay}"/>
+                        ViewOffset="{Binding ViewOffset, Mode=OneWay}"/>
 </UserControl>
