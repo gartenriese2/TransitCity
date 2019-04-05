@@ -25,6 +25,8 @@
 
         private List<Position2d> _newDistrictPoints;
 
+        private List<PanelObject> _newDistrictPanelObjects;
+
         /// <summary>
         /// The view size. This is the actual size of the panel control.
         /// </summary>
@@ -118,8 +120,13 @@
 
                 var district = new RandomDistrict("New District", new Polygon(_newDistrictPoints), 1000, 1000);
                 PanelObjects.Add(new DistrictObject(district));
-
+                foreach (var obj in _newDistrictPanelObjects)
+                {
+                    PanelObjects.Remove(obj);
+                }
+                
                 _newDistrictPoints = null;
+                _newDistrictPanelObjects = null;
             }
         }
 
@@ -130,6 +137,11 @@
                 if (_newDistrictPoints == null)
                 {
                     _newDistrictPoints = new List<Position2d>();
+                }
+
+                if (_newDistrictPanelObjects == null)
+                {
+                    _newDistrictPanelObjects = new List<PanelObject>();
                 }
 
                 var currentMousePositionView = e.GetPosition((IInputElement)sender);
@@ -160,7 +172,10 @@
                     Zoom);
                 var pos = new Position2d(currentMousePositionWorld.X, currentMousePositionWorld.Y);
                 _newDistrictPoints.Add(pos);
-                PanelObjects.Add(new StationObject(pos) { Scale = 10 });
+
+                var obj = new StationObject(pos) { Scale = 10 };
+                _newDistrictPanelObjects.Add(obj);
+                PanelObjects.Add(obj);
             }
 
             _mouseLeftButtonIsDown = false;
