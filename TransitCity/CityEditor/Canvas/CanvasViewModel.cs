@@ -1,10 +1,14 @@
 ﻿namespace CityEditor.Canvas
 {
     using System;
+    using System.Collections.Generic;
     using System.Windows;
     using System.Windows.Input;
 
+    using CitySimulation;
+
     using Geometry;
+    using Geometry.Shapes;
 
     using Utility.MVVM;
 
@@ -14,12 +18,11 @@
 
     public class CanvasViewModel : PropertyChangedBase
     {
-        private Point _center;
-        private double _centerX;
-        private double _centerY;
         private double _zoom = 1.0;
 
         private Point _viewOffset = new Point(0, 0);
+
+        private List<Position2d> _newDistrictPoints;
 
         /// <summary>
         /// The view size. This is the actual size of the panel control.
@@ -49,47 +52,6 @@
 
         public ObservableNotifiableCollection<PanelObject> PanelObjects { get; } = new ObservableNotifiableCollection<PanelObject>();
 
-        public Point Center
-        {
-            get => _center;
-            private set
-            {
-                if (_center != value)
-                {
-                    _center = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public double CenterX
-        {
-            get => _centerX;
-            set
-            {
-                if (Math.Abs(value - _centerX) > double.Epsilon)
-                {
-                    _centerX = value;
-                    OnPropertyChanged();
-                    Center = new Point(CenterX, CenterY);
-                }
-            }
-        }
-
-        public double CenterY
-        {
-            get => _centerY;
-            set
-            {
-                if (Math.Abs(value - _centerY) > double.Epsilon)
-                {
-                    _centerY = value;
-                    OnPropertyChanged();
-                    Center = new Point(CenterX, CenterY);
-                }
-            }
-        }
-
         public double Zoom
         {
             get => _zoom;
@@ -102,10 +64,6 @@
                 }
             }
         }
-
-        public double MinZoom { get; } = 0.1;
-
-        public double MaxZoom { get; } = 50.0;
 
         public Rect WorldSize { get; } = new Rect(new Size(10000, 10000));
 
@@ -156,6 +114,11 @@
             if (IsInDrawingMode)
             {
                 IsInDrawingMode = false;
+
+                var district = new RandomDistrict("New District", new Polygon(_newDistrictPoints), 1000, 1000);
+                PanelObjects.Add(new DistrictObject(district));
+
+                _newDistrictPoints = null;
             }
         }
 
@@ -163,6 +126,11 @@
         {
             if (IsInDrawingMode)
             {
+                if (_newDistrictPoints == null)
+                {
+                    _newDistrictPoints = new List<Position2d>();
+                }
+
                 var currentMousePositionView = e.GetPosition((IInputElement)sender);
                 var currentMousePositionWorld = CoordinateSystem.TransformPointFromViewToWorld(
                     currentMousePositionView,
@@ -170,7 +138,9 @@
                     WorldSize,
                     ViewOffset,
                     Zoom);
-                PanelObjects.Add(new StationObject(new Position2d(currentMousePositionWorld.X, currentMousePositionWorld.Y)) { Scale = 10 });
+                var pos = new Position2d(currentMousePositionWorld.X, currentMousePositionWorld.Y);
+                _newDistrictPoints.Add(pos);
+                PanelObjects.Add(new StationObject(pos) { Scale = 10 });
             }
 
             _mouseLeftButtonIsDown = false;

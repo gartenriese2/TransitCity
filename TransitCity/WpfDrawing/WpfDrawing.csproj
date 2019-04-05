@@ -83,6 +83,7 @@
     <Compile Include="Timetable\TimetableViewModel.cs" />
     <Compile Include="Utility\ItemPropertyChangedEventArgs.cs" />
     <Compile Include="Utility\ObservableNotifiableCollection.cs" />
+    <Compile Include="Utility\ShapeToDrawingGeometryExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Panel\PanelControl.xaml">

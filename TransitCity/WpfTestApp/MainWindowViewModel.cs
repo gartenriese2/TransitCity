@@ -937,7 +937,7 @@
             var city = CreateLondon();
             foreach (var district in city.Districts)
             {
-                PanelObjects.Add(new DistrictObject((Polygon)district.Shape));
+                PanelObjects.Add(new DistrictObject(district));
                 Districts.Add(new DistrictViewModel(district));
             }
 
