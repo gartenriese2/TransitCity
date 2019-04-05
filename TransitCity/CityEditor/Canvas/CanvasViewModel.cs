@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Windows;
     using System.Windows.Input;
 
@@ -132,6 +133,25 @@
                 }
 
                 var currentMousePositionView = e.GetPosition((IInputElement)sender);
+
+                // Snap
+                var closeObjects = PanelObjects.OfType<DistrictObject>().Where(d => d.District.Shape is Polygon)
+                    .SelectMany(d => ((Polygon)d.District.Shape).Vertices).Select(
+                        p => CoordinateSystem.TransformPointFromWorldToView(
+                            new Point(p.X, p.Y),
+                            _viewSize,
+                            WorldSize,
+                            ViewOffset,
+                            Zoom)).Where(p => (p - currentMousePositionView).Length < 10);
+                if (closeObjects.Any())
+                {
+                    currentMousePositionView = closeObjects.Aggregate(
+                        (p1, p2) => (p1 - currentMousePositionView).Length.CompareTo(
+                                        (p2 - currentMousePositionView).Length) <= 0
+                                        ? p1
+                                        : p2);
+                }
+
                 var currentMousePositionWorld = CoordinateSystem.TransformPointFromViewToWorld(
                     currentMousePositionView,
                     _viewSize,

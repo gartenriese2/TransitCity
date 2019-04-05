@@ -15,6 +15,8 @@
 
         public DistrictObject(IDistrict district)
         {
+            District = district;
+
             var geo = district.Shape.ToDrawingGeometry();
             var brush = new SolidColorBrush(Colors.Transparent);
             var pen = new Pen(new SolidColorBrush(Colors.Black), 2);
@@ -22,6 +24,8 @@
 
             Update(0, 0, 0, 1);
         }
+
+        public IDistrict District { get; }
 
         public override void Draw(DrawingContext dc)
         {
